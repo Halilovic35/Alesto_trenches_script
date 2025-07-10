@@ -781,3 +781,111 @@ pcall(function()
         Duration = 5
     })
 end) 
+
+-- Modern shadow helper
+local function addShadow(frame)
+    local shadow = Instance.new("ImageLabel", frame)
+    shadow.Name = "Shadow"
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://1316045217"
+    shadow.Size = UDim2.new(1, 30, 1, 30)
+    shadow.Position = UDim2.new(0, -15, 0, -15)
+    shadow.ZIndex = 0
+    shadow.ImageTransparency = 0.5
+    shadow.ScaleType = Enum.ScaleType.Slice
+    shadow.SliceCenter = Rect.new(10,10,118,118)
+    frame.ZIndex = 1
+end
+
+-- MainFrame shadow
+addShadow(MainFrame)
+
+-- Panel drag & drop
+local dragging, dragInput, dragStart, startPos
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+MainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- RightShift toggle
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        MainFrame.Visible = not MainFrame.Visible
+    end
+end)
+
+-- Panel title centriran, veći, modern font
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "Alesto Panel"
+Title.TextColor3 = Config.Colors.Text
+Title.TextScaled = true
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Center
+Title.TextYAlignment = Enum.TextYAlignment.Center
+Title.ZIndex = 2
+
+-- Layout fix: padding i spacing
+local UIPadding = Instance.new("UIPadding", MainFrame)
+UIPadding.PaddingTop = UDim.new(0, 16)
+UIPadding.PaddingLeft = UDim.new(0, 16)
+UIPadding.PaddingRight = UDim.new(0, 16)
+UIPadding.PaddingBottom = UDim.new(0, 16)
+
+-- Fix sekcija spacing
+HitboxSection.Position = UDim2.new(0, 0, 0, 60)
+HitboxSection.Size = UDim2.new(1, 0, 0, 48)
+HitboxDropdown.Position = UDim2.new(0, 0, 0, 108)
+ESPSection.Position = UDim2.new(0, 0, 0, 108+HitboxDropdown.Size.Y.Offset)
+ESPSection.Size = UDim2.new(1, 0, 0, 48)
+ESPDrodown.Position = UDim2.new(0, 0, 0, 156+HitboxDropdown.Size.Y.Offset)
+
+-- Dropdown animacija i logika (samo jedna otvorena)
+local function openDropdown(dropdown)
+    closeAllDropdowns()
+    dropdown:TweenSize(UDim2.new(1,0,0,120), "Out", "Quad", 0.2, true)
+end
+local function closeDropdown(dropdown)
+    dropdown:TweenSize(UDim2.new(1,0,0,0), "Out", "Quad", 0.2, true)
+end
+HitboxSection.MouseButton2Click:Connect(function()
+    if accordionState.Hitbox then
+        closeDropdown(HitboxDropdown)
+        accordionState.Hitbox = false
+    else
+        openDropdown(HitboxDropdown)
+        accordionState.Hitbox = true
+        accordionState.ESP = false
+        closeDropdown(ESPDrodown)
+    end
+end)
+ESPSection.MouseButton2Click:Connect(function()
+    if accordionState.ESP then
+        closeDropdown(ESPDrodown)
+        accordionState.ESP = false
+    else
+        openDropdown(ESPDrodown)
+        accordionState.ESP = true
+        accordionState.Hitbox = false
+        closeDropdown(HitboxDropdown)
+    end
+end) 
