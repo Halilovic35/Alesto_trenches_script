@@ -59,6 +59,9 @@ local META_HEAD = true
 local META_TORSO = false
 local META_FOV = 3
 
+-- Opcije boje glave za hitbox
+local HITBOX_HEAD_COLOR = Color3.fromRGB(255, 0, 0) -- default crvena
+
 -- Nametag opcije
 local NAMETAG_ENABLED = false
 local NAMETAG_SCALE = 1.5
@@ -322,38 +325,48 @@ TorsoBtn.MouseButton1Click:Connect(function()
     TorsoBtn.BackgroundColor3 = META_TORSO and Config.Colors.Accent or Color3.fromRGB(60,60,60)
 end)
 
--- Dodaj slider za veličinu hitboxa (FOV do 200)
-local HitboxFOVLabel = Instance.new("TextLabel", MetaSection)
-HitboxFOVLabel.Size = UDim2.new(0, 60, 0, 28)
-HitboxFOVLabel.Position = UDim2.new(0, 160, 0, 48)
-HitboxFOVLabel.BackgroundTransparency = 1
-HitboxFOVLabel.Text = "HB Veličina"
-HitboxFOVLabel.TextColor3 = Config.Colors.Text
-HitboxFOVLabel.TextScaled = true
-HitboxFOVLabel.Font = Enum.Font.Gotham
+-- GUI: Dugmad za biranje boje glave
+local HeadColorLabel = Instance.new("TextLabel", MetaSection)
+HeadColorLabel.Size = UDim2.new(0, 80, 0, 28)
+HeadColorLabel.Position = UDim2.new(0, 170, 0, 80)
+HeadColorLabel.BackgroundTransparency = 1
+HeadColorLabel.Text = "Boja glave"
+HeadColorLabel.TextColor3 = Config.Colors.Text
+HeadColorLabel.TextScaled = true
+HeadColorLabel.Font = Enum.Font.Gotham
 
-local HitboxFOVSlider = Instance.new("TextButton", MetaSection)
-HitboxFOVSlider.Size = UDim2.new(0, 180, 0, 28)
-HitboxFOVSlider.Position = UDim2.new(0, 230, 0, 48)
-HitboxFOVSlider.BackgroundColor3 = Config.Colors.Accent
-HitboxFOVSlider.Text = tostring(META_FOV)
-HitboxFOVSlider.TextColor3 = Config.Colors.Text
-HitboxFOVSlider.TextScaled = true
-HitboxFOVSlider.Font = Enum.Font.GothamBold
-local draggingHitboxFOV = false
-HitboxFOVSlider.MouseButton1Down:Connect(function()
-    draggingHitboxFOV = true
+local RedBtn = Instance.new("TextButton", MetaSection)
+RedBtn.Size = UDim2.new(0, 28, 0, 28)
+RedBtn.Position = UDim2.new(0, 260, 0, 80)
+RedBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+RedBtn.Text = ""
+local RedBtnCorner = Instance.new("UICorner", RedBtn)
+RedBtnCorner.CornerRadius = UDim.new(1, 0)
+
+local BlueBtn = Instance.new("TextButton", MetaSection)
+BlueBtn.Size = UDim2.new(0, 28, 0, 28)
+BlueBtn.Position = UDim2.new(0, 295, 0, 80)
+BlueBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
+BlueBtn.Text = ""
+local BlueBtnCorner = Instance.new("UICorner", BlueBtn)
+BlueBtnCorner.CornerRadius = UDim.new(1, 0)
+
+local GreenBtn = Instance.new("TextButton", MetaSection)
+GreenBtn.Size = UDim2.new(0, 28, 0, 28)
+GreenBtn.Position = UDim2.new(0, 330, 0, 80)
+GreenBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+GreenBtn.Text = ""
+local GreenBtnCorner = Instance.new("UICorner", GreenBtn)
+GreenBtnCorner.CornerRadius = UDim.new(1, 0)
+
+RedBtn.MouseButton1Click:Connect(function()
+    HITBOX_HEAD_COLOR = Color3.fromRGB(255, 0, 0)
 end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingHitboxFOV = false end
+BlueBtn.MouseButton1Click:Connect(function()
+    HITBOX_HEAD_COLOR = Color3.fromRGB(0, 0, 255)
 end)
-UserInputService.InputChanged:Connect(function(input)
-    if draggingHitboxFOV and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local rel = math.clamp((input.Position.X - HitboxFOVSlider.AbsolutePosition.X) / HitboxFOVSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * 199 + 1)
-        META_FOV = value
-        HitboxFOVSlider.Text = tostring(value)
-    end
+GreenBtn.MouseButton1Click:Connect(function()
+    HITBOX_HEAD_COLOR = Color3.fromRGB(0, 255, 0)
 end)
 
 -- Bindovi
@@ -628,7 +641,7 @@ local function isInVirtualHitbox(targetPart, fov)
 end
 
 -- Ograniči maksimalni FOV za fizički hitbox
-local MAX_HITBOX_FOV = 6
+local MAX_HITBOX_FOV = 200
 
 -- U GUI slideru za FOV (hitbox):
 FOVSlider.MouseButton1Down:Connect(function()
@@ -646,6 +659,46 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
+-- Ukloni stari slider za HB veličinu do 200 (ako postoji)
+if HitboxFOVLabel then HitboxFOVLabel:Destroy() end
+if HitboxFOVSlider then HitboxFOVSlider:Destroy() end
+
+-- Nametag loop (BillboardGui iznad glave protivnika)
+RunService.RenderStepped:Connect(function()
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
+            local show = NAMETAG_ENABLED and ((VIZIJA_ENEMY_ONLY and isEnemy(plr)) or (not VIZIJA_ENEMY_ONLY))
+            local head = plr.Character.Head
+            local tag = head:FindFirstChild("AlestoNametag")
+            if show then
+                if not tag then
+                    local bb = Instance.new("BillboardGui")
+                    bb.Name = "AlestoNametag"
+                    bb.Adornee = head
+                    bb.Size = UDim2.new(0, 200 * NAMETAG_SCALE, 0, 50 * NAMETAG_SCALE)
+                    bb.StudsOffset = Vector3.new(0, 2, 0)
+                    bb.AlwaysOnTop = true
+                    bb.Parent = head
+                    local txt = Instance.new("TextLabel", bb)
+                    txt.Size = UDim2.new(1, 0, 1, 0)
+                    txt.BackgroundTransparency = 1
+                    txt.Text = plr.DisplayName or plr.Name
+                    txt.TextColor3 = Color3.fromRGB(255,255,255)
+                    txt.TextStrokeTransparency = 0.5
+                    txt.TextScaled = true
+                    txt.Font = Enum.Font.GothamBold
+                end
+                -- Update scale
+                if tag then
+                    tag.Size = UDim2.new(0, 200 * NAMETAG_SCALE, 0, 50 * NAMETAG_SCALE)
+                end
+            else
+                if tag then tag:Destroy() end
+            end
+        end
+    end
+end)
+
 -- Meta (hitbox) loop: fizički povećava glavu/tijelo, resetuje na smrt
 RunService.RenderStepped:Connect(function()
     for _,plr in pairs(Players:GetPlayers()) do
@@ -659,9 +712,11 @@ RunService.RenderStepped:Connect(function()
                         head.Size = Vector3.new(META_FOV, META_FOV, META_FOV)
                         head.CanCollide = false
                         head.Transparency = 0.5
+                        head.Color = HITBOX_HEAD_COLOR
                     end)
                 elseif head and hum and hum.Health <= 0 then
                     head.Size = Vector3.new(2, 1, 1) -- default size
+                    head.Color = Color3.fromRGB(163, 162, 165)
                 end
             end
             if META_TORSO then
@@ -707,42 +762,6 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Nametag loop
-RunService.RenderStepped:Connect(function()
-    for _,plr in pairs(Players:GetPlayers()) do
-        if plr ~= Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
-            local show = NAMETAG_ENABLED and ((VIZIJA_ENEMY_ONLY and isEnemy(plr)) or (not VIZIJA_ENEMY_ONLY))
-            local head = plr.Character.Head
-            local tag = head:FindFirstChild("AlestoNametag")
-            if show then
-                if not tag then
-                    local bb = Instance.new("BillboardGui")
-                    bb.Name = "AlestoNametag"
-                    bb.Adornee = head
-                    bb.Size = UDim2.new(0, 200, 0, 50)
-                    bb.StudsOffset = Vector3.new(0, 2, 0)
-                    bb.AlwaysOnTop = true
-                    bb.Parent = head
-                    local txt = Instance.new("TextLabel", bb)
-                    txt.Size = UDim2.new(1, 0, 1, 0)
-                    txt.BackgroundTransparency = 1
-                    txt.Text = plr.DisplayName or plr.Name
-                    txt.TextColor3 = Color3.fromRGB(255,255,255)
-                    txt.TextStrokeTransparency = 0.5
-                    txt.TextScaled = true
-                    txt.Font = Enum.Font.GothamBold
-                end
-                -- Update scale
-                if tag then
-                    tag.Size = UDim2.new(0, 200 * NAMETAG_SCALE, 0, 50 * NAMETAG_SCALE)
-                end
-            else
-                if tag then tag:Destroy() end
-            end
-        end
-    end
-end)
-
 -- Neutralna notifikacija
 pcall(function()
     game.StarterGui:SetCore("SendNotification", {
@@ -751,3 +770,33 @@ pcall(function()
         Duration = 5
     })
 end) 
+
+-- Funkcija za wallshot (kroz zid)
+local function krozZid(origin, direction, ignoreList)
+    local maxDistance = 1000
+    local currentOrigin = origin
+    local remainingDistance = maxDistance
+    local foundTarget = nil
+    local tried = 0
+    while remainingDistance > 0 and tried < 50 do
+        local ray = Ray.new(currentOrigin, direction.Unit * remainingDistance)
+        local part, position = workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
+        if part then
+            -- Provjeri je li dio protivnika
+            local character = part:FindFirstAncestorOfClass("Model")
+            if character and Players:GetPlayerFromCharacter(character) and isEnemy(Players:GetPlayerFromCharacter(character)) then
+                foundTarget = character
+                break
+            else
+                -- Nije protivnik, nastavi raycast od te tačke dalje
+                table.insert(ignoreList, part)
+                currentOrigin = position + direction.Unit * 0.1 -- malo pomjeri dalje
+                remainingDistance = remainingDistance - (position - currentOrigin).Magnitude
+            end
+        else
+            break -- ništa više nije pogođeno
+        end
+        tried = tried + 1
+    end
+    return foundTarget
+end 
