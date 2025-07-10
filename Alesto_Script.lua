@@ -1,7 +1,5 @@
 --[[
-    Vizija & Meta Panel (Modern Version)
-    by Halilovic35 & AI
-    Moderan GUI, color wheel, precizne kutije, jasne sekcije
+    script by Alesto
 ]]
 
 local Players = game:GetService("Players")
@@ -320,6 +318,95 @@ TorsoBtn.MouseButton1Click:Connect(function()
     TorsoBtn.BackgroundColor3 = META_TORSO and Config.Colors.Accent or Color3.fromRGB(60,60,60)
 end)
 
+-- Bindovi
+local ESP_BIND = Enum.KeyCode.E
+local HITBOX_BIND = Enum.KeyCode.H
+local waitingForBind = nil -- "ESP" ili "HITBOX"
+
+-- GUI: Bind sekcija
+local BindSection = Instance.new("Frame", MainFrame)
+BindSection.Size = UDim2.new(1, -32, 0, 70)
+BindSection.Position = UDim2.new(0, 16, 0, 400)
+BindSection.BackgroundColor3 = Config.Colors.Section
+BindSection.BorderSizePixel = 0
+local BindCorner = Instance.new("UICorner", BindSection)
+BindCorner.CornerRadius = UDim.new(0, 12)
+
+local BindLabel = Instance.new("TextLabel", BindSection)
+BindLabel.Size = UDim2.new(0, 120, 0, 28)
+BindLabel.Position = UDim2.new(0, 10, 0, 8)
+BindLabel.BackgroundTransparency = 1
+BindLabel.Text = "Bindovi (tipke)"
+BindLabel.TextColor3 = Config.Colors.Text
+BindLabel.TextScaled = true
+BindLabel.Font = Enum.Font.GothamBold
+
+local ESPBindBtn = Instance.new("TextButton", BindSection)
+ESPBindBtn.Size = UDim2.new(0, 100, 0, 28)
+ESPBindBtn.Position = UDim2.new(0, 140, 0, 8)
+ESPBindBtn.BackgroundColor3 = Config.Colors.Accent
+ESPBindBtn.Text = "ESP: "..tostring(ESP_BIND.Name)
+ESPBindBtn.TextColor3 = Config.Colors.Text
+ESPBindBtn.TextScaled = true
+ESPBindBtn.Font = Enum.Font.GothamBold
+local ESPBindCorner = Instance.new("UICorner", ESPBindBtn)
+ESPBindCorner.CornerRadius = UDim.new(0, 8)
+
+local HitboxBindBtn = Instance.new("TextButton", BindSection)
+HitboxBindBtn.Size = UDim2.new(0, 100, 0, 28)
+HitboxBindBtn.Position = UDim2.new(0, 250, 0, 8)
+HitboxBindBtn.BackgroundColor3 = Config.Colors.Accent
+HitboxBindBtn.Text = "Hitbox: "..tostring(HITBOX_BIND.Name)
+HitboxBindBtn.TextColor3 = Config.Colors.Text
+HitboxBindBtn.TextScaled = true
+HitboxBindBtn.Font = Enum.Font.GothamBold
+local HitboxBindCorner = Instance.new("UICorner", HitboxBindBtn)
+HitboxBindCorner.CornerRadius = UDim.new(0, 8)
+
+ESPBindBtn.MouseButton1Click:Connect(function()
+    ESPBindBtn.Text = "Pritisni tipku..."
+    waitingForBind = "ESP"
+end)
+HitboxBindBtn.MouseButton1Click:Connect(function()
+    HitboxBindBtn.Text = "Pritisni tipku..."
+    waitingForBind = "HITBOX"
+end)
+
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if waitingForBind == "ESP" then
+        ESP_BIND = input.KeyCode
+        ESPBindBtn.Text = "ESP: "..tostring(ESP_BIND.Name)
+        waitingForBind = nil
+        return
+    elseif waitingForBind == "HITBOX" then
+        HITBOX_BIND = input.KeyCode
+        HitboxBindBtn.Text = "Hitbox: "..tostring(HITBOX_BIND.Name)
+        waitingForBind = nil
+        return
+    end
+    -- Bind funkcionalnost
+    if input.KeyCode == ESP_BIND then
+        VIZIJA_ENABLED = not VIZIJA_ENABLED
+        VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
+        VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+        if not VIZIJA_ENABLED then
+            for _,v in pairs(vizijaBoxes) do v:Remove() end
+            vizijaBoxes = {}
+        end
+    elseif input.KeyCode == HITBOX_BIND then
+        if META_HEAD or META_TORSO then
+            META_HEAD = false
+            META_TORSO = false
+            HeadBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+            TorsoBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+        else
+            META_HEAD = true
+            HeadBtn.BackgroundColor3 = Config.Colors.Accent
+        end
+    end
+end)
+
 -- Minimized (kockica) GUI
 local MiniFrame = Instance.new("Frame")
 MiniFrame.Name = miniName
@@ -493,29 +580,44 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Meta (hitbox) loop
+-- Virtualni hitbox funkcija
+local function isInVirtualHitbox(targetPart, fov)
+    local screenPos, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
+    if not onScreen then return false end
+    local mousePos = UserInputService:GetMouseLocation()
+    local dist = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+    return dist <= fov
+end
+
+-- Aimbot/Hitbox meta loop (virtualni hitbox, ne mijenja karakter)
 RunService.RenderStepped:Connect(function()
+    if not (META_HEAD or META_TORSO) then return end
     for _,plr in pairs(Players:GetPlayers()) do
-        if plr ~= Players.LocalPlayer and isEnemy(plr) and getChar(plr) then
-            local char = getChar(plr)
-            if META_HEAD then
-                local head = char:FindFirstChild("Head")
-                if head then
-                    pcall(function()
-                        head.Size = Vector3.new(META_FOV, META_FOV, META_FOV)
-                        head.CanCollide = false
-                        head.Transparency = 0.5
-                    end)
+        if plr ~= Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            if (VIZIJA_ENEMY_ONLY and isEnemy(plr)) or (not VIZIJA_ENEMY_ONLY) then
+                local char = plr.Character
+                local targetPart = nil
+                if META_HEAD and char:FindFirstChild("Head") then
+                    targetPart = char.Head
+                elseif META_TORSO and (char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")) then
+                    targetPart = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
                 end
-            end
-            if META_TORSO then
-                local torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
-                if torso then
-                    pcall(function()
-                        torso.Size = Vector3.new(META_FOV*2, META_FOV*2, META_FOV*1.5)
-                        torso.CanCollide = false
-                        torso.Transparency = 0.5
-                    end)
+                if targetPart and isInVirtualHitbox(targetPart, META_FOV * 25) then
+                    -- Ovdje možeš dodati aimbot ili auto-hit logiku
+                    -- npr. highlight, auto-aim, ili samo vizualni indikator
+                    -- Za sada samo highlightamo part (možeš zamijeniti po želji)
+                    if not targetPart:FindFirstChild("AlestoHighlight") then
+                        local highlight = Instance.new("SelectionBox")
+                        highlight.Name = "AlestoHighlight"
+                        highlight.Adornee = targetPart
+                        highlight.Color3 = Color3.fromRGB(255, 0, 0)
+                        highlight.LineThickness = 0.05
+                        highlight.Parent = targetPart
+                    end
+                else
+                    if targetPart and targetPart:FindFirstChild("AlestoHighlight") then
+                        targetPart.AlestoHighlight:Destroy()
+                    end
                 end
             end
         end
@@ -529,16 +631,18 @@ RunService.RenderStepped:Connect(function()
     local i = 1
     for _,plr in pairs(Players:GetPlayers()) do
         if plr ~= Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-            local char = plr.Character
-            local x, y, w, h = get2DBox(char)
-            if x and y and w and h then
-                if not vizijaBoxes[i] then vizijaBoxes[i] = createBox() end
-                local box = vizijaBoxes[i]
-                box.Visible = true
-                box.Color = VIZIJA_COLOR
-                box.Position = Vector2.new(x, y)
-                box.Size = Vector2.new(w, h)
-                i = i + 1
+            if (VIZIJA_ENEMY_ONLY and isEnemy(plr)) or (not VIZIJA_ENEMY_ONLY) then
+                local char = plr.Character
+                local x, y, w, h = get2DBox(char)
+                if x and y and w and h then
+                    if not vizijaBoxes[i] then vizijaBoxes[i] = createBox() end
+                    local box = vizijaBoxes[i]
+                    box.Visible = true
+                    box.Color = VIZIJA_COLOR
+                    box.Position = Vector2.new(x, y)
+                    box.Size = Vector2.new(w, h)
+                    i = i + 1
+                end
             end
         end
     end
