@@ -434,12 +434,6 @@ local function isEnemy(player)
 end
 
 local function getChar(plr)
-    if not plr.Character then return nil end
-    if not plr.Character:FindFirstChild("HumanoidRootPart") then return nil end
-    if not plr.Character:FindFirstChild("Head") then return nil end
-    if plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Health <= 0 then return nil end
-    local pos = plr.Character.HumanoidRootPart.Position
-    if pos.Magnitude < 1 then return nil end
     return plr.Character
 end
 
@@ -458,7 +452,7 @@ local function get2DBox(char)
         maxY = math.max(maxY, torso.Position.Y)
     end
     local pos, onscreen = Camera:WorldToViewportPoint(hrp.Position)
-    -- Uklonjen onscreen check da se crtaju kutije i za igrače izvan ekrana
+    if not onscreen then return end
     local w = 3.5 * 2
     local h = (maxY - minY + 2.5) * 10
     return pos.X - w/2, pos.Y - h/2, w, h
