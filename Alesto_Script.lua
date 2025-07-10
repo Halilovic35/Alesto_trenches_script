@@ -55,6 +55,7 @@ local isMinimized = false
 local VIZIJA_ENABLED = false
 local VIZIJA_COLOR = Color3.fromRGB(0, 150, 255)
 local VIZIJA_ENEMY_ONLY = true
+local FORCE_RENDER = true -- Uvijek renderuj igrače
 local vizijaBoxes = {}
 local META_HEAD = true
 local META_TORSO = false
@@ -199,9 +200,9 @@ ColorPreview.BorderSizePixel = 0
 local ColorPreviewCorner = Instance.new("UICorner", ColorPreview)
 ColorPreviewCorner.CornerRadius = UDim.new(1, 0)
 
-ColorWheel.MouseButton1Down:Connect(function(x, y)
+ColorWheel.MouseButton1Down:Connect(function(input)
     local abs = ColorWheel.AbsolutePosition
-    local rel = Vector2.new(x.X - abs.X, x.Y - abs.Y)
+    local rel = Vector2.new(input.X - abs.X, input.Y - abs.Y)
     local r = ColorWheel.AbsoluteSize.X/2
     local center = Vector2.new(r, r)
     local dist = (rel - center).Magnitude
@@ -210,6 +211,30 @@ ColorWheel.MouseButton1Down:Connect(function(x, y)
         local hue = (angle/(2*math.pi))%1
         VIZIJA_COLOR = Color3.fromHSV(hue, 1, 1)
         ColorPreview.BackgroundColor3 = VIZIJA_COLOR
+    end
+end)
+
+-- Dodaj i mouse movement za smooth color picking
+local draggingColor = false
+ColorWheel.MouseButton1Down:Connect(function()
+    draggingColor = true
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingColor = false end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if draggingColor and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local abs = ColorWheel.AbsolutePosition
+        local rel = Vector2.new(input.Position.X - abs.X, input.Position.Y - abs.Y)
+        local r = ColorWheel.AbsoluteSize.X/2
+        local center = Vector2.new(r, r)
+        local dist = (rel - center).Magnitude
+        if dist <= r then
+            local angle = math.atan2(rel.Y - r, rel.X - r)
+            local hue = (angle/(2*math.pi))%1
+            VIZIJA_COLOR = Color3.fromHSV(hue, 1, 1)
+            ColorPreview.BackgroundColor3 = VIZIJA_COLOR
+        end
     end
 end)
 
@@ -391,7 +416,21 @@ end
 
 local function isEnemy(player)
     local lp = Players.LocalPlayer
-    return getTeam(player) ~= getTeam(lp)
+    local playerTeam = getTeam(player)
+    local localTeam = getTeam(lp)
+    
+    -- Ako oba igrača imaju tim, provjeri jesu li različiti
+    if playerTeam and localTeam then
+        return playerTeam ~= localTeam
+    end
+    
+    -- Ako jedan ima tim a drugi nema, smatraju se neprijateljima
+    if (playerTeam and not localTeam) or (not playerTeam and localTeam) then
+        return true
+    end
+    
+    -- Ako oba nemaju tim, smatraju se neprijateljima (FFA)
+    return true
 end
 
 local function getChar(plr)
@@ -413,7 +452,7 @@ local function get2DBox(char)
         maxY = math.max(maxY, torso.Position.Y)
     end
     local pos, onscreen = Camera:WorldToViewportPoint(hrp.Position)
-    if not onscreen then return end
+    -- Uklonjen onscreen check da se crtaju kutije i za igrače izvan ekrana
     local w = 3.5 * 2
     local h = (maxY - minY + 2.5) * 10
     return pos.X - w/2, pos.Y - h/2, w, h
@@ -432,6 +471,27 @@ local function createBox()
     end
     return box
 end
+
+-- Force render loop (uvijek renderuj igrače)
+RunService.RenderStepped:Connect(function()
+    if FORCE_RENDER then
+        for _,plr in pairs(Players:GetPlayers()) do
+            if plr ~= Players.LocalPlayer and getChar(plr) then
+                local char = getChar(plr)
+                -- Forsiraj renderovanje karaktera
+                pcall(function()
+                    char.Parent = workspace
+                    for _,part in pairs(char:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.Material = Enum.Material.Plastic
+                            part.CanCollide = false
+                        end
+                    end
+                end)
+            end
+        end
+    end
+end)
 
 -- Meta (hitbox) loop
 RunService.RenderStepped:Connect(function()
@@ -469,7 +529,8 @@ RunService.RenderStepped:Connect(function()
     local i = 1
     for _,plr in pairs(Players:GetPlayers()) do
         if plr ~= Players.LocalPlayer and getChar(plr) then
-            if (VIZIJA_ENEMY_ONLY and isEnemy(plr)) or (not VIZIJA_ENEMY_ONLY) then
+            local isEnemyPlayer = isEnemy(plr)
+            if (VIZIJA_ENEMY_ONLY and isEnemyPlayer) or (not VIZIJA_ENEMY_ONLY) then
                 local char = getChar(plr)
                 local x, y, w, h = get2DBox(char)
                 if x and y and w and h then
