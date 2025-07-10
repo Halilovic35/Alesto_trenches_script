@@ -528,20 +528,17 @@ RunService.RenderStepped:Connect(function()
     for _,v in pairs(vizijaBoxes) do v.Visible = false end
     local i = 1
     for _,plr in pairs(Players:GetPlayers()) do
-        if plr ~= Players.LocalPlayer and getChar(plr) then
-            local isEnemyPlayer = isEnemy(plr)
-            if (VIZIJA_ENEMY_ONLY and isEnemyPlayer) or (not VIZIJA_ENEMY_ONLY) then
-                local char = getChar(plr)
-                local x, y, w, h = get2DBox(char)
-                if x and y and w and h then
-                    if not vizijaBoxes[i] then vizijaBoxes[i] = createBox() end
-                    local box = vizijaBoxes[i]
-                    box.Visible = true
-                    box.Color = VIZIJA_COLOR
-                    box.Position = Vector2.new(x, y)
-                    box.Size = Vector2.new(w, h)
-                    i = i + 1
-                end
+        if plr ~= Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local char = plr.Character
+            local x, y, w, h = get2DBox(char)
+            if x and y and w and h then
+                if not vizijaBoxes[i] then vizijaBoxes[i] = createBox() end
+                local box = vizijaBoxes[i]
+                box.Visible = true
+                box.Color = VIZIJA_COLOR
+                box.Position = Vector2.new(x, y)
+                box.Size = Vector2.new(w, h)
+                i = i + 1
             end
         end
     end
