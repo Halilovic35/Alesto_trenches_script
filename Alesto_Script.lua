@@ -628,151 +628,6 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Accordion sekcije
-local accordionState = {Hitbox = false, ESP = false}
-local function closeAllDropdowns()
-    accordionState.Hitbox = false
-    accordionState.ESP = false
-    HitboxDropdown:TweenSize(UDim2.new(1,0,0,0), "Out", "Quad", 0.2, true)
-    ESPDropdown:TweenSize(UDim2.new(1,0,0,0), "Out", "Quad", 0.2, true)
-end
-
--- Hitbox sekcija
-local HitboxSection = Instance.new("Frame", MainFrame)
-HitboxSection.Size = UDim2.new(1, -32, 0, 40)
-HitboxSection.Position = UDim2.new(0, 16, 0, 60)
-HitboxSection.BackgroundColor3 = Config.Colors.Section
-HitboxSection.BorderSizePixel = 0
-local HitboxCorner = Instance.new("UICorner", HitboxSection)
-HitboxCorner.CornerRadius = UDim.new(0, 10)
-
-local HitboxLabel = Instance.new("TextLabel", HitboxSection)
-HitboxLabel.Size = UDim2.new(1, -40, 1, 0)
-HitboxLabel.Position = UDim2.new(0, 10, 0, 0)
-HitboxLabel.BackgroundTransparency = 1
-HitboxLabel.Text = "Hitbox"
-HitboxLabel.TextColor3 = Config.Colors.Text
-HitboxLabel.TextScaled = true
-HitboxLabel.Font = Enum.Font.GothamBold
-
-local HitboxToggle = Instance.new("TextButton", HitboxSection)
-HitboxToggle.Size = UDim2.new(0, 32, 0, 32)
-HitboxToggle.Position = UDim2.new(1, -38, 0, 4)
-HitboxToggle.BackgroundColor3 = HITBOX_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-HitboxToggle.Text = ""
-local HitboxToggleCorner = Instance.new("UICorner", HitboxToggle)
-HitboxToggleCorner.CornerRadius = UDim.new(1, 0)
-
--- Dropdown za Hitbox
-HitboxDropdown = Instance.new("Frame", MainFrame)
-HitboxDropdown.Size = UDim2.new(1, -32, 0, 0)
-HitboxDropdown.Position = UDim2.new(0, 16, 0, 100)
-HitboxDropdown.BackgroundColor3 = Config.Colors.Section
-HitboxDropdown.BorderSizePixel = 0
-HitboxDropdown.ClipsDescendants = true
-local HitboxDropdownCorner = Instance.new("UICorner", HitboxDropdown)
-HitboxDropdownCorner.CornerRadius = UDim.new(0, 10)
-
--- ESP sekcija
-local ESPSection = Instance.new("Frame", MainFrame)
-ESPSection.Size = UDim2.new(1, -32, 0, 40)
-ESPSection.Position = UDim2.new(0, 16, 0, 150)
-ESPSection.BackgroundColor3 = Config.Colors.Section
-ESPSection.BorderSizePixel = 0
-local ESPCorner = Instance.new("UICorner", ESPSection)
-ESPCorner.CornerRadius = UDim.new(0, 10)
-
-local ESPLabel = Instance.new("TextLabel", ESPSection)
-ESPLabel.Size = UDim2.new(1, -40, 1, 0)
-ESPLabel.Position = UDim2.new(0, 10, 0, 0)
-ESPLabel.BackgroundTransparency = 1
-ESPLabel.Text = "ESP"
-ESPLabel.TextColor3 = Config.Colors.Text
-ESPLabel.TextScaled = true
-ESPLabel.Font = Enum.Font.GothamBold
-
-local ESPToggle = Instance.new("TextButton", ESPSection)
-ESPToggle.Size = UDim2.new(0, 32, 0, 32)
-ESPToggle.Position = UDim2.new(1, -38, 0, 4)
-ESPToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-ESPToggle.Text = ""
-local ESPToggleCorner = Instance.new("UICorner", ESPToggle)
-ESPToggleCorner.CornerRadius = UDim.new(1, 0)
-
--- Dropdown za ESP
-ESPDrodown = Instance.new("Frame", MainFrame)
-ESPDrodown.Size = UDim2.new(1, -32, 0, 0)
-ESPDrodown.Position = UDim2.new(0, 16, 0, 190)
-ESPDrodown.BackgroundColor3 = Config.Colors.Section
-ESPDrodown.BorderSizePixel = 0
-ESPDrodown.ClipsDescendants = true
-local ESPDropdownCorner = Instance.new("UICorner", ESPDrodown)
-ESPDropdownCorner.CornerRadius = UDim.new(0, 10)
-
--- Toggle logika
-HitboxToggle.MouseButton1Click:Connect(function()
-    HITBOX_ENABLED = not HITBOX_ENABLED
-    HitboxToggle.BackgroundColor3 = HITBOX_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-end)
-HitboxSection.MouseButton2Click:Connect(function()
-    closeAllDropdowns()
-    accordionState.Hitbox = not accordionState.Hitbox
-    if accordionState.Hitbox then
-        HitboxDropdown:TweenSize(UDim2.new(1,0,0,120), "Out", "Quad", 0.2, true)
-    else
-        HitboxDropdown:TweenSize(UDim2.new(1,0,0,0), "Out", "Quad", 0.2, true)
-    end
-end)
-
-ESPToggle.MouseButton1Click:Connect(function()
-    VIZIJA_ENABLED = not VIZIJA_ENABLED
-    ESPToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-end)
-ESPSection.MouseButton2Click:Connect(function()
-    closeAllDropdowns()
-    accordionState.ESP = not accordionState.ESP
-    if accordionState.ESP then
-        ESPDrodown:TweenSize(UDim2.new(1,0,0,120), "Out", "Quad", 0.2, true)
-    else
-        ESPDrodown:TweenSize(UDim2.new(1,0,0,0), "Out", "Quad", 0.2, true)
-    end
-end)
-
--- Virtualni hitbox indikator (krug)
-local Drawing = Drawing or getgenv().Drawing
-local hitboxCircles = {}
-RunService.RenderStepped:Connect(function()
-    for _,circle in pairs(hitboxCircles) do circle.Visible = false end
-    if HITBOX_ENABLED then
-        local i = 1
-        for _,plr in pairs(Players:GetPlayers()) do
-            if plr ~= Players.LocalPlayer and isEnemy(plr) and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                local char = plr.Character
-                local hrp = char:FindFirstChild("HumanoidRootPart")
-                local pos, onscreen = Camera:WorldToViewportPoint(hrp.Position)
-                if onscreen then
-                    if not hitboxCircles[i] then
-                        hitboxCircles[i] = Drawing.new("Circle")
-                        hitboxCircles[i].Thickness = 2
-                        hitboxCircles[i].Transparency = 1
-                        hitboxCircles[i].ZIndex = 2
-                        hitboxCircles[i].Filled = false
-                        hitboxCircles[i].Color = Color3.fromRGB(255,0,0)
-                    end
-                    local circle = hitboxCircles[i]
-                    circle.Visible = true
-                    circle.Position = Vector2.new(pos.X, pos.Y)
-                    circle.Radius = META_FOV * 10
-                    i = i + 1
-                end
-            end
-        end
-        for j = i, #hitboxCircles do
-            if hitboxCircles[j] then hitboxCircles[j].Visible = false end
-        end
-    end
-end)
-
 -- Neutralna notifikacija
 pcall(function()
     game.StarterGui:SetCore("SendNotification", {
@@ -782,110 +637,49 @@ pcall(function()
     })
 end) 
 
--- Modern shadow helper
-local function addShadow(frame)
-    local shadow = Instance.new("ImageLabel", frame)
-    shadow.Name = "Shadow"
-    shadow.BackgroundTransparency = 1
-    shadow.Image = "rbxassetid://1316045217"
-    shadow.Size = UDim2.new(1, 30, 1, 30)
-    shadow.Position = UDim2.new(0, -15, 0, -15)
-    shadow.ZIndex = 0
-    shadow.ImageTransparency = 0.5
-    shadow.ScaleType = Enum.ScaleType.Slice
-    shadow.SliceCenter = Rect.new(10,10,118,118)
-    frame.ZIndex = 1
+-- Vesela boja i font
+Config.Colors.Primary = Color3.fromRGB(120, 180, 255) -- svijetlo plava
+Config.Colors.Accent = Color3.fromRGB(180, 120, 255) -- ljubičasta
+Config.Colors.Section = Color3.fromRGB(200, 220, 255)
+Config.Colors.Text = Color3.fromRGB(30, 30, 60)
+local MODERN_FONT = Enum.Font.FredokaOne or Enum.Font.GothamBold
+
+-- Bindanje tipke za svaku funkciju
+local binds = {
+    ESP = ESP_HOTKEY,
+    HITBOX = HITBOX_HOTKEY
+}
+
+local waitingForBind = nil
+
+local function createBindButton(parent, funcName)
+    local btn = Instance.new("TextButton", parent)
+    btn.Size = UDim2.new(0, 48, 0, 24)
+    btn.Position = UDim2.new(1, -54, 0, 0)
+    btn.BackgroundColor3 = Config.Colors.Accent
+    btn.Text = "Bind"
+    btn.TextColor3 = Config.Colors.Text
+    btn.TextScaled = true
+    btn.Font = MODERN_FONT
+    btn.AutoButtonColor = true
+    btn.MouseButton1Click:Connect(function()
+        btn.Text = "..."
+        waitingForBind = funcName
+    end)
+    return btn
 end
 
--- MainFrame shadow
-addShadow(MainFrame)
+-- Dodaj bind dugme pored svakog toggla
+createBindButton(VizijaToggleFrame, "ESP")
+createBindButton(HitboxToggleFrame, "HITBOX")
 
--- Panel drag & drop
-local dragging, dragInput, dragStart, startPos
-MainFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then dragging = false end
-        end)
-    end
-end)
-MainFrame.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        dragInput = input
-    end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
--- RightShift toggle
+-- Globalni input za bindanje
 UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
-    if input.KeyCode == Enum.KeyCode.RightShift then
-        MainFrame.Visible = not MainFrame.Visible
-    end
-end)
-
--- Panel title centriran, veći, modern font
-Title.Size = UDim2.new(1, 0, 1, 0)
-Title.Position = UDim2.new(0, 0, 0, 0)
-Title.BackgroundTransparency = 1
-Title.Text = "Alesto Panel"
-Title.TextColor3 = Config.Colors.Text
-Title.TextScaled = true
-Title.Font = Enum.Font.GothamBold
-Title.TextXAlignment = Enum.TextXAlignment.Center
-Title.TextYAlignment = Enum.TextYAlignment.Center
-Title.ZIndex = 2
-
--- Layout fix: padding i spacing
-local UIPadding = Instance.new("UIPadding", MainFrame)
-UIPadding.PaddingTop = UDim.new(0, 16)
-UIPadding.PaddingLeft = UDim.new(0, 16)
-UIPadding.PaddingRight = UDim.new(0, 16)
-UIPadding.PaddingBottom = UDim.new(0, 16)
-
--- Fix sekcija spacing
-HitboxSection.Position = UDim2.new(0, 0, 0, 60)
-HitboxSection.Size = UDim2.new(1, 0, 0, 48)
-HitboxDropdown.Position = UDim2.new(0, 0, 0, 108)
-ESPSection.Position = UDim2.new(0, 0, 0, 108+HitboxDropdown.Size.Y.Offset)
-ESPSection.Size = UDim2.new(1, 0, 0, 48)
-ESPDrodown.Position = UDim2.new(0, 0, 0, 156+HitboxDropdown.Size.Y.Offset)
-
--- Dropdown animacija i logika (samo jedna otvorena)
-local function openDropdown(dropdown)
-    closeAllDropdowns()
-    dropdown:TweenSize(UDim2.new(1,0,0,120), "Out", "Quad", 0.2, true)
-end
-local function closeDropdown(dropdown)
-    dropdown:TweenSize(UDim2.new(1,0,0,0), "Out", "Quad", 0.2, true)
-end
-HitboxSection.MouseButton2Click:Connect(function()
-    if accordionState.Hitbox then
-        closeDropdown(HitboxDropdown)
-        accordionState.Hitbox = false
-    else
-        openDropdown(HitboxDropdown)
-        accordionState.Hitbox = true
-        accordionState.ESP = false
-        closeDropdown(ESPDrodown)
-    end
-end)
-ESPSection.MouseButton2Click:Connect(function()
-    if accordionState.ESP then
-        closeDropdown(ESPDrodown)
-        accordionState.ESP = false
-    else
-        openDropdown(ESPDrodown)
-        accordionState.ESP = true
-        accordionState.Hitbox = false
-        closeDropdown(HitboxDropdown)
+    if waitingForBind then
+        binds[waitingForBind] = input.KeyCode
+        if waitingForBind == "ESP" then ESP_HOTKEY = input.KeyCode end
+        if waitingForBind == "HITBOX" then HITBOX_HOTKEY = input.KeyCode end
+        waitingForBind = nil
     end
 end) 
