@@ -59,6 +59,10 @@ local META_HEAD = true
 local META_TORSO = false
 local META_FOV = 3
 
+-- Nametag opcije
+local NAMETAG_ENABLED = false
+local NAMETAG_SCALE = 1.5
+
 -- Random names
 local guiName = "UI_"..randStr(4)
 local frameName = "Panel_"..randStr(4)
@@ -316,6 +320,40 @@ end)
 TorsoBtn.MouseButton1Click:Connect(function()
     META_TORSO = not META_TORSO
     TorsoBtn.BackgroundColor3 = META_TORSO and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+end)
+
+-- Dodaj slider za veličinu hitboxa (FOV do 200)
+local HitboxFOVLabel = Instance.new("TextLabel", MetaSection)
+HitboxFOVLabel.Size = UDim2.new(0, 60, 0, 28)
+HitboxFOVLabel.Position = UDim2.new(0, 160, 0, 48)
+HitboxFOVLabel.BackgroundTransparency = 1
+HitboxFOVLabel.Text = "HB Veličina"
+HitboxFOVLabel.TextColor3 = Config.Colors.Text
+HitboxFOVLabel.TextScaled = true
+HitboxFOVLabel.Font = Enum.Font.Gotham
+
+local HitboxFOVSlider = Instance.new("TextButton", MetaSection)
+HitboxFOVSlider.Size = UDim2.new(0, 180, 0, 28)
+HitboxFOVSlider.Position = UDim2.new(0, 230, 0, 48)
+HitboxFOVSlider.BackgroundColor3 = Config.Colors.Accent
+HitboxFOVSlider.Text = tostring(META_FOV)
+HitboxFOVSlider.TextColor3 = Config.Colors.Text
+HitboxFOVSlider.TextScaled = true
+HitboxFOVSlider.Font = Enum.Font.GothamBold
+local draggingHitboxFOV = false
+HitboxFOVSlider.MouseButton1Down:Connect(function()
+    draggingHitboxFOV = true
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingHitboxFOV = false end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if draggingHitboxFOV and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local rel = math.clamp((input.Position.X - HitboxFOVSlider.AbsolutePosition.X) / HitboxFOVSlider.AbsoluteSize.X, 0, 1)
+        local value = math.floor(rel * 199 + 1)
+        META_FOV = value
+        HitboxFOVSlider.Text = tostring(value)
+    end
 end)
 
 -- Bindovi
@@ -580,7 +618,7 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Virtualni hitbox funkcija
+-- U virtualnom hitboxu koristi maksimalnu vrijednost
 local function isInVirtualHitbox(targetPart, fov)
     local screenPos, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
     if not onScreen then return false end
@@ -589,40 +627,9 @@ local function isInVirtualHitbox(targetPart, fov)
     return dist <= fov
 end
 
--- Aimbot/Hitbox meta loop (virtualni hitbox, ne mijenja karakter)
-RunService.RenderStepped:Connect(function()
-    if not (META_HEAD or META_TORSO) then return end
-    for _,plr in pairs(Players:GetPlayers()) do
-        if plr ~= Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-            if (VIZIJA_ENEMY_ONLY and isEnemy(plr)) or (not VIZIJA_ENEMY_ONLY) then
-                local char = plr.Character
-                local targetPart = nil
-                if META_HEAD and char:FindFirstChild("Head") then
-                    targetPart = char.Head
-                elseif META_TORSO and (char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")) then
-                    targetPart = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
-                end
-                if targetPart and isInVirtualHitbox(targetPart, META_FOV * 25) then
-                    -- Ovdje možeš dodati aimbot ili auto-hit logiku
-                    -- npr. highlight, auto-aim, ili samo vizualni indikator
-                    -- Za sada samo highlightamo part (možeš zamijeniti po želji)
-                    if not targetPart:FindFirstChild("AlestoHighlight") then
-                        local highlight = Instance.new("SelectionBox")
-                        highlight.Name = "AlestoHighlight"
-                        highlight.Adornee = targetPart
-                        highlight.Color3 = Color3.fromRGB(255, 0, 0)
-                        highlight.LineThickness = 0.05
-                        highlight.Parent = targetPart
-                    end
-                else
-                    if targetPart and targetPart:FindFirstChild("AlestoHighlight") then
-                        targetPart.AlestoHighlight:Destroy()
-                    end
-                end
-            end
-        end
-    end
-end)
+-- U meta loopu koristi:
+-- if targetPart and isInVirtualHitbox(targetPart, META_FOV) then
+-- ... existing code ...
 
 -- Vizija (ESP) loop
 RunService.RenderStepped:Connect(function()
@@ -648,6 +655,42 @@ RunService.RenderStepped:Connect(function()
     end
     for j = i, #vizijaBoxes do
         if vizijaBoxes[j] then vizijaBoxes[j].Visible = false end
+    end
+end)
+
+-- Nametag loop
+RunService.RenderStepped:Connect(function()
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
+            local show = NAMETAG_ENABLED and ((VIZIJA_ENEMY_ONLY and isEnemy(plr)) or (not VIZIJA_ENEMY_ONLY))
+            local head = plr.Character.Head
+            local tag = head:FindFirstChild("AlestoNametag")
+            if show then
+                if not tag then
+                    local bb = Instance.new("BillboardGui")
+                    bb.Name = "AlestoNametag"
+                    bb.Adornee = head
+                    bb.Size = UDim2.new(0, 200, 0, 50)
+                    bb.StudsOffset = Vector3.new(0, 2, 0)
+                    bb.AlwaysOnTop = true
+                    bb.Parent = head
+                    local txt = Instance.new("TextLabel", bb)
+                    txt.Size = UDim2.new(1, 0, 1, 0)
+                    txt.BackgroundTransparency = 1
+                    txt.Text = plr.DisplayName or plr.Name
+                    txt.TextColor3 = Color3.fromRGB(255,255,255)
+                    txt.TextStrokeTransparency = 0.5
+                    txt.TextScaled = true
+                    txt.Font = Enum.Font.GothamBold
+                end
+                -- Update scale
+                if tag then
+                    tag.Size = UDim2.new(0, 200 * NAMETAG_SCALE, 0, 50 * NAMETAG_SCALE)
+                end
+            else
+                if tag then tag:Destroy() end
+            end
+        end
     end
 end)
 
