@@ -1,7 +1,7 @@
 --[[
-    Alesto Script - Modern Clean Version (Base GUI)
+    Alesto Script - Modern Clean Version (GUI + ESP)
     by Halilovic35 & AI
-    Prva verzija: samo GUI sa drag & minimize/maximize
+    ESP: 2D box oko protivnika, biranje boje, enemy only
 ]]
 
 -- Services
@@ -9,11 +9,13 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
 
 -- GUI Config
 local Config = {
-    MenuSize = UDim2.new(0, 350, 0, 300),
-    MenuPosition = UDim2.new(0.5, -175, 0.5, -150),
+    MenuSize = UDim2.new(0, 350, 0, 350),
+    MenuPosition = UDim2.new(0.5, -175, 0.5, -175),
     MinimizedSize = UDim2.new(0, 50, 0, 50),
     MinimizedPosition = UDim2.new(0, 100, 0, 100),
     MenuKey = Enum.KeyCode.RightShift,
@@ -30,6 +32,12 @@ local Config = {
 local isMenuOpen = true
 local isMinimized = false
 local dragStart, startPos
+
+-- ESP State
+local ESP_ENABLED = false
+local ESP_COLOR = Color3.fromRGB(0, 150, 255)
+local ESP_ENEMY_ONLY = true
+local espBoxes = {}
 
 -- GUI Elements
 local ScreenGui = Instance.new("ScreenGui")
@@ -77,6 +85,103 @@ MinimizeBtn.Font = Enum.Font.GothamBold
 local MinBtnCorner = Instance.new("UICorner", MinimizeBtn)
 MinBtnCorner.CornerRadius = UDim.new(0, 8)
 
+-- ESP Toggle
+local ESPToggle = Instance.new("TextButton", MainFrame)
+ESPToggle.Size = UDim2.new(0, 140, 0, 40)
+ESPToggle.Position = UDim2.new(0, 20, 0, 60)
+ESPToggle.BackgroundColor3 = Color3.fromRGB(30, 120, 200)
+ESPToggle.Text = "ESP: OFF"
+ESPToggle.TextColor3 = Color3.fromRGB(255,255,255)
+ESPToggle.TextScaled = true
+ESPToggle.Font = Enum.Font.GothamBold
+local ESPCorner = Instance.new("UICorner", ESPToggle)
+ESPCorner.CornerRadius = UDim.new(0, 8)
+
+-- ESP Color Picker (simple RGB sliders)
+local ColorLabel = Instance.new("TextLabel", MainFrame)
+ColorLabel.Size = UDim2.new(0, 120, 0, 30)
+ColorLabel.Position = UDim2.new(0, 20, 0, 110)
+ColorLabel.BackgroundTransparency = 1
+ColorLabel.Text = "ESP Boja"
+ColorLabel.TextColor3 = Config.Colors.Text
+ColorLabel.TextScaled = true
+ColorLabel.Font = Enum.Font.Gotham
+
+local function makeSlider(name, y, default, callback)
+    local label = Instance.new("TextLabel", MainFrame)
+    label.Size = UDim2.new(0, 30, 0, 30)
+    label.Position = UDim2.new(0, 20, 0, y)
+    label.BackgroundTransparency = 1
+    label.Text = name
+    label.TextColor3 = Config.Colors.Text
+    label.TextScaled = true
+    label.Font = Enum.Font.Gotham
+
+    local slider = Instance.new("TextButton", MainFrame)
+    slider.Size = UDim2.new(0, 180, 0, 30)
+    slider.Position = UDim2.new(0, 60, 0, y)
+    slider.BackgroundColor3 = Color3.fromRGB(default, default, default)
+    slider.Text = tostring(default)
+    slider.TextColor3 = Color3.fromRGB(0,0,0)
+    slider.TextScaled = true
+    slider.Font = Enum.Font.Gotham
+    local dragging = false
+    slider.MouseButton1Down:Connect(function()
+        dragging = true
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local rel = math.clamp((input.Position.X - slider.AbsolutePosition.X) / slider.AbsoluteSize.X, 0, 1)
+            local value = math.floor(rel * 255)
+            slider.Text = tostring(value)
+            slider.BackgroundColor3 = Color3.fromRGB(
+                name=="R" and value or ESP_COLOR.R*255,
+                name=="G" and value or ESP_COLOR.G*255,
+                name=="B" and value or ESP_COLOR.B*255
+            )
+            callback(value)
+        end
+    end)
+    return slider
+end
+
+local function updateESPColor()
+    ESPToggle.BackgroundColor3 = ESP_COLOR
+end
+
+local rSlider = makeSlider("R", 150, ESP_COLOR.R*255, function(v)
+    ESP_COLOR = Color3.fromRGB(v, ESP_COLOR.G*255, ESP_COLOR.B*255)
+    updateESPColor()
+end)
+local gSlider = makeSlider("G", 190, ESP_COLOR.G*255, function(v)
+    ESP_COLOR = Color3.fromRGB(ESP_COLOR.R*255, v, ESP_COLOR.B*255)
+    updateESPColor()
+end)
+local bSlider = makeSlider("B", 230, ESP_COLOR.B*255, function(v)
+    ESP_COLOR = Color3.fromRGB(ESP_COLOR.R*255, ESP_COLOR.G*255, v)
+    updateESPColor()
+end)
+
+-- Only Enemies Toggle
+local OnlyEnemiesBtn = Instance.new("TextButton", MainFrame)
+OnlyEnemiesBtn.Size = UDim2.new(0, 180, 0, 35)
+OnlyEnemiesBtn.Position = UDim2.new(0, 20, 0, 280)
+OnlyEnemiesBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+OnlyEnemiesBtn.Text = "ESP: Samo protivnici"
+OnlyEnemiesBtn.TextColor3 = Color3.fromRGB(255,255,255)
+OnlyEnemiesBtn.TextScaled = true
+OnlyEnemiesBtn.Font = Enum.Font.Gotham
+local OnlyEnemiesCorner = Instance.new("UICorner", OnlyEnemiesBtn)
+OnlyEnemiesCorner.CornerRadius = UDim.new(0, 8)
+
+OnlyEnemiesBtn.MouseButton1Click:Connect(function()
+    ESP_ENEMY_ONLY = not ESP_ENEMY_ONLY
+    OnlyEnemiesBtn.Text = ESP_ENEMY_ONLY and "ESP: Samo protivnici" or "ESP: Svi igraci"
+end)
+
 -- Minimized (kockica) GUI
 local MiniFrame = Instance.new("Frame")
 MiniFrame.Name = "MiniFrame"
@@ -116,7 +221,7 @@ local function enableDrag(frame)
             dragInput = input
         end
     end)
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
+    UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             local delta = input.Position - mousePos
             frame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
@@ -162,13 +267,89 @@ UserInputService.InputBegan:Connect(function(input, gpe)
     end
 end)
 
+-- ESP Toggle logic
+ESPToggle.MouseButton1Click:Connect(function()
+    ESP_ENABLED = not ESP_ENABLED
+    ESPToggle.Text = ESP_ENABLED and "ESP: ON" or "ESP: OFF"
+    ESPToggle.BackgroundColor3 = ESP_ENABLED and ESP_COLOR or Color3.fromRGB(30,120,200)
+    if not ESP_ENABLED then
+        for _,v in pairs(espBoxes) do v:Remove() end
+        espBoxes = {}
+    end
+end)
+
+-- ESP Drawing
+local function getTeam(player)
+    local team = nil
+    pcall(function()
+        if player.Team then team = player.Team.Name end
+    end)
+    return team
+end
+
+local function isEnemy(player)
+    local lp = Players.LocalPlayer
+    return getTeam(player) ~= getTeam(lp)
+end
+
+local function getChar(plr)
+    return plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character
+end
+
+local function get2DBox(char)
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    local size = hrp.Size * 1.5
+    local pos, onscreen = Camera:WorldToViewportPoint(hrp.Position)
+    if not onscreen then return end
+    local w, h = size.X * 20, size.Y * 20
+    return pos.X - w/2, pos.Y - h/2, w, h
+end
+
+local function createBox()
+    local box = Drawing and Drawing.new and Drawing.new("Square")
+    if box then
+        box.Thickness = 2
+        box.Filled = false
+        box.Visible = false
+    end
+    return box
+end
+
+-- Main ESP loop
+RunService.RenderStepped:Connect(function()
+    if not ESP_ENABLED then return end
+    -- Clean old boxes
+    for _,v in pairs(espBoxes) do v.Visible = false end
+    local i = 1
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer and getChar(plr) then
+            if (ESP_ENEMY_ONLY and isEnemy(plr)) or (not ESP_ENEMY_ONLY) then
+                local char = getChar(plr)
+                local x, y, w, h = get2DBox(char)
+                if x and y and w and h then
+                    if not espBoxes[i] then espBoxes[i] = createBox() end
+                    local box = espBoxes[i]
+                    box.Visible = true
+                    box.Color = ESP_COLOR
+                    box.Position = Vector2.new(x, y)
+                    box.Size = Vector2.new(w, h)
+                    i = i + 1
+                end
+            end
+        end
+    end
+    -- Hide unused boxes
+    for j = i, #espBoxes do
+        if espBoxes[j] then espBoxes[j].Visible = false end
+    end
+end)
+
 -- Success notification
 pcall(function()
     game.StarterGui:SetCore("SendNotification", {
         Title = "Alesto Script",
-        Text = "GUI loaded! (RightShift za toggle, - za minimizaciju)",
+        Text = "GUI+ESP loaded! (RightShift za toggle, - za minimizaciju)",
         Duration = 5
     })
-end)
-
--- Dalje funkcije (ESP, Hitbox) će biti dodate u sledećim koracima! 
+end) 
