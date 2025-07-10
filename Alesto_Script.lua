@@ -285,7 +285,7 @@ end)
 UserInputService.InputChanged:Connect(function(input)
     if draggingFOV and input.UserInputType == Enum.UserInputType.MouseMovement then
         local rel = math.clamp((input.Position.X - FOVSlider.AbsolutePosition.X) / FOVSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * 19 + 1)
+        local value = math.floor(rel * (MAX_HITBOX_FOV-1) + 1)
         META_FOV = value
         FOVSlider.Text = tostring(value)
     end
@@ -627,9 +627,58 @@ local function isInVirtualHitbox(targetPart, fov)
     return dist <= fov
 end
 
--- U meta loopu koristi:
--- if targetPart and isInVirtualHitbox(targetPart, META_FOV) then
--- ... existing code ...
+-- Ograniči maksimalni FOV za fizički hitbox
+local MAX_HITBOX_FOV = 6
+
+-- U GUI slideru za FOV (hitbox):
+FOVSlider.MouseButton1Down:Connect(function()
+    draggingFOV = true
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingFOV = false end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if draggingFOV and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local rel = math.clamp((input.Position.X - FOVSlider.AbsolutePosition.X) / FOVSlider.AbsoluteSize.X, 0, 1)
+        local value = math.floor(rel * (MAX_HITBOX_FOV-1) + 1)
+        META_FOV = value
+        FOVSlider.Text = tostring(value)
+    end
+end)
+
+-- Meta (hitbox) loop: fizički povećava glavu/tijelo, resetuje na smrt
+RunService.RenderStepped:Connect(function()
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer and isEnemy(plr) and getChar(plr) then
+            local char = getChar(plr)
+            local hum = char:FindFirstChild("Humanoid")
+            if META_HEAD then
+                local head = char:FindFirstChild("Head")
+                if head and hum and hum.Health > 0 then
+                    pcall(function()
+                        head.Size = Vector3.new(META_FOV, META_FOV, META_FOV)
+                        head.CanCollide = false
+                        head.Transparency = 0.5
+                    end)
+                elseif head and hum and hum.Health <= 0 then
+                    head.Size = Vector3.new(2, 1, 1) -- default size
+                end
+            end
+            if META_TORSO then
+                local torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
+                if torso and hum and hum.Health > 0 then
+                    pcall(function()
+                        torso.Size = Vector3.new(META_FOV*2, META_FOV*2, META_FOV*1.5)
+                        torso.CanCollide = false
+                        torso.Transparency = 0.5
+                    end)
+                elseif torso and hum and hum.Health <= 0 then
+                    torso.Size = Vector3.new(2, 2, 1) -- default size
+                end
+            end
+        end
+    end
+end)
 
 -- Vizija (ESP) loop
 RunService.RenderStepped:Connect(function()
