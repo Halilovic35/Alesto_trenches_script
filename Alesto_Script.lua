@@ -1,19 +1,37 @@
 --[[
-    Alesto Script - Modern Clean Version (GUI + ESP + Hitbox)
+    Neutral Panel Script (Stealth Version)
     by Halilovic35 & AI
-    ESP: 2D box oko protivnika, biranje boje, enemy only
-    Hitbox: Glava/Tijelo, FOV 1-20, samo protivnici, sve na bosanskom
+    Sva imena su randomizirana, GUI i funkcije su neutralne
 ]]
 
--- Services
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 
--- GUI Config
+-- Random string generator
+local function randStr(len)
+    local chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    local s = ''
+    for i = 1, len do
+        local r = math.random(1, #chars)
+        s = s .. chars:sub(r, r)
+    end
+    return s
+end
+
+math.randomseed(tick()*1000)
+
+-- Random parent: CoreGui ili PlayerGui
+local parentGui
+if math.random() > 0.5 and Players.LocalPlayer:FindFirstChild("PlayerGui") then
+    parentGui = Players.LocalPlayer.PlayerGui
+else
+    parentGui = game:GetService("CoreGui")
+end
+
+-- Config
 local Config = {
     MenuSize = UDim2.new(0, 350, 0, 420),
     MenuPosition = UDim2.new(0.5, -175, 0.5, -210),
@@ -29,32 +47,31 @@ local Config = {
     }
 }
 
--- State
 local isMenuOpen = true
 local isMinimized = false
-local dragStart, startPos
 
--- ESP State
-local ESP_ENABLED = false
-local ESP_COLOR = Color3.fromRGB(0, 150, 255)
-local ESP_ENEMY_ONLY = true
-local espBoxes = {}
+-- State for features
+local FEATURE1_ENABLED = false
+local FEATURE1_COLOR = Color3.fromRGB(0, 150, 255)
+local FEATURE1_ENEMY_ONLY = true
+local feature1Boxes = {}
+local FEATURE2_HEAD = true
+local FEATURE2_TORSO = false
+local FEATURE2_FOV = 3
 
--- Hitbox State
-local HITBOX_ENABLED = false
-local HITBOX_HEAD = true
-local HITBOX_TORSO = false
-local HITBOX_FOV = 3
-local hitboxParts = {}
+-- Random names
+local guiName = "UI_"..randStr(4)
+local frameName = "Panel_"..randStr(4)
+local miniName = "Mini_"..randStr(4)
 
 -- GUI Elements
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "AlestoScriptGUI"
+ScreenGui.Name = guiName
 ScreenGui.DisplayOrder = 1000
-ScreenGui.Parent = CoreGui
+ScreenGui.Parent = parentGui
 
 local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
+MainFrame.Name = frameName
 MainFrame.Size = Config.MenuSize
 MainFrame.Position = Config.MenuPosition
 MainFrame.BackgroundColor3 = Config.Colors.Primary
@@ -67,7 +84,7 @@ local Corner = Instance.new("UICorner", MainFrame)
 Corner.CornerRadius = UDim.new(0, 10)
 
 local TitleBar = Instance.new("Frame", MainFrame)
-TitleBar.Name = "TitleBar"
+TitleBar.Name = "Bar_"..randStr(3)
 TitleBar.Size = UDim2.new(1, 0, 0, 40)
 TitleBar.BackgroundColor3 = Config.Colors.Secondary
 TitleBar.BorderSizePixel = 0
@@ -77,7 +94,7 @@ TitleCorner.CornerRadius = UDim.new(0, 10)
 local Title = Instance.new("TextLabel", TitleBar)
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
-Title.Text = "Alesto Script"
+Title.Text = "Panel"
 Title.TextColor3 = Config.Colors.Text
 Title.TextScaled = true
 Title.Font = Enum.Font.GothamBold
@@ -93,24 +110,24 @@ MinimizeBtn.Font = Enum.Font.GothamBold
 local MinBtnCorner = Instance.new("UICorner", MinimizeBtn)
 MinBtnCorner.CornerRadius = UDim.new(0, 8)
 
--- ESP Toggle
-local ESPToggle = Instance.new("TextButton", MainFrame)
-ESPToggle.Size = UDim2.new(0, 140, 0, 40)
-ESPToggle.Position = UDim2.new(0, 20, 0, 60)
-ESPToggle.BackgroundColor3 = Color3.fromRGB(30, 120, 200)
-ESPToggle.Text = "ESP: OFF"
-ESPToggle.TextColor3 = Color3.fromRGB(255,255,255)
-ESPToggle.TextScaled = true
-ESPToggle.Font = Enum.Font.GothamBold
-local ESPCorner = Instance.new("UICorner", ESPToggle)
-ESPCorner.CornerRadius = UDim.new(0, 8)
+-- Opcija 1 (bivši ESP)
+local Feature1Toggle = Instance.new("TextButton", MainFrame)
+Feature1Toggle.Size = UDim2.new(0, 140, 0, 40)
+Feature1Toggle.Position = UDim2.new(0, 20, 0, 60)
+Feature1Toggle.BackgroundColor3 = Color3.fromRGB(30, 120, 200)
+Feature1Toggle.Text = "Opcija 1: OFF"
+Feature1Toggle.TextColor3 = Color3.fromRGB(255,255,255)
+Feature1Toggle.TextScaled = true
+Feature1Toggle.Font = Enum.Font.GothamBold
+local F1Corner = Instance.new("UICorner", Feature1Toggle)
+F1Corner.CornerRadius = UDim.new(0, 8)
 
--- ESP Color Picker (simple RGB sliders)
+-- Boja (RGB slideri)
 local ColorLabel = Instance.new("TextLabel", MainFrame)
 ColorLabel.Size = UDim2.new(0, 120, 0, 30)
 ColorLabel.Position = UDim2.new(0, 20, 0, 110)
 ColorLabel.BackgroundTransparency = 1
-ColorLabel.Text = "ESP Boja"
+ColorLabel.Text = "Boja"
 ColorLabel.TextColor3 = Config.Colors.Text
 ColorLabel.TextScaled = true
 ColorLabel.Font = Enum.Font.Gotham
@@ -150,9 +167,9 @@ local function makeSlider(name, y, default, callback, min, max)
                 slider.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
             else
                 slider.BackgroundColor3 = Color3.fromRGB(
-                    name=="R" and value or ESP_COLOR.R*255,
-                    name=="G" and value or ESP_COLOR.G*255,
-                    name=="B" and value or ESP_COLOR.B*255
+                    name=="R" and value or FEATURE1_COLOR.R*255,
+                    name=="G" and value or FEATURE1_COLOR.G*255,
+                    name=="B" and value or FEATURE1_COLOR.B*255
                 )
                 callback(value)
             end
@@ -161,29 +178,29 @@ local function makeSlider(name, y, default, callback, min, max)
     return slider
 end
 
-local function updateESPColor()
-    ESPToggle.BackgroundColor3 = ESP_COLOR
+local function updateF1Color()
+    Feature1Toggle.BackgroundColor3 = FEATURE1_COLOR
 end
 
-local rSlider = makeSlider("R", 150, ESP_COLOR.R*255, function(v)
-    ESP_COLOR = Color3.fromRGB(v, ESP_COLOR.G*255, ESP_COLOR.B*255)
-    updateESPColor()
+local rSlider = makeSlider("R", 150, FEATURE1_COLOR.R*255, function(v)
+    FEATURE1_COLOR = Color3.fromRGB(v, FEATURE1_COLOR.G*255, FEATURE1_COLOR.B*255)
+    updateF1Color()
 end)
-local gSlider = makeSlider("G", 190, ESP_COLOR.G*255, function(v)
-    ESP_COLOR = Color3.fromRGB(ESP_COLOR.R*255, v, ESP_COLOR.B*255)
-    updateESPColor()
+local gSlider = makeSlider("G", 190, FEATURE1_COLOR.G*255, function(v)
+    FEATURE1_COLOR = Color3.fromRGB(FEATURE1_COLOR.R*255, v, FEATURE1_COLOR.B*255)
+    updateF1Color()
 end)
-local bSlider = makeSlider("B", 230, ESP_COLOR.B*255, function(v)
-    ESP_COLOR = Color3.fromRGB(ESP_COLOR.R*255, ESP_COLOR.G*255, v)
-    updateESPColor()
+local bSlider = makeSlider("B", 230, FEATURE1_COLOR.B*255, function(v)
+    FEATURE1_COLOR = Color3.fromRGB(FEATURE1_COLOR.R*255, FEATURE1_COLOR.G*255, v)
+    updateF1Color()
 end)
 
--- Only Enemies Toggle
+-- Opcija 1: Samo protivnici
 local OnlyEnemiesBtn = Instance.new("TextButton", MainFrame)
 OnlyEnemiesBtn.Size = UDim2.new(0, 180, 0, 35)
 OnlyEnemiesBtn.Position = UDim2.new(0, 20, 0, 270)
 OnlyEnemiesBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
-OnlyEnemiesBtn.Text = "ESP: Samo protivnici"
+OnlyEnemiesBtn.Text = "Opcija 1: Samo protivnici"
 OnlyEnemiesBtn.TextColor3 = Color3.fromRGB(255,255,255)
 OnlyEnemiesBtn.TextScaled = true
 OnlyEnemiesBtn.Font = Enum.Font.Gotham
@@ -191,30 +208,30 @@ local OnlyEnemiesCorner = Instance.new("UICorner", OnlyEnemiesBtn)
 OnlyEnemiesCorner.CornerRadius = UDim.new(0, 8)
 
 OnlyEnemiesBtn.MouseButton1Click:Connect(function()
-    ESP_ENEMY_ONLY = not ESP_ENEMY_ONLY
-    OnlyEnemiesBtn.Text = ESP_ENEMY_ONLY and "ESP: Samo protivnici" or "ESP: Svi igraci"
+    FEATURE1_ENEMY_ONLY = not FEATURE1_ENEMY_ONLY
+    OnlyEnemiesBtn.Text = FEATURE1_ENEMY_ONLY and "Opcija 1: Samo protivnici" or "Opcija 1: Svi igraci"
 end)
 
--- Hitbox Changer
+-- Opcija 2 (bivši hitbox)
 local HitboxLabel = Instance.new("TextLabel", MainFrame)
 HitboxLabel.Size = UDim2.new(0, 120, 0, 30)
 HitboxLabel.Position = UDim2.new(0, 20, 0, 320)
 HitboxLabel.BackgroundTransparency = 1
-HitboxLabel.Text = "Hitbox (FOV)"
+HitboxLabel.Text = "FOV"
 HitboxLabel.TextColor3 = Config.Colors.Text
 HitboxLabel.TextScaled = true
 HitboxLabel.Font = Enum.Font.GothamBold
 
-local FOVSlider = makeSlider("FOV", 360, HITBOX_FOV, function(v)
-    HITBOX_FOV = v
+local FOVSlider = makeSlider("FOV", 360, FEATURE2_FOV, function(v)
+    FEATURE2_FOV = v
 end, 1, 20)
 
 local GlavaBtn = Instance.new("TextButton", MainFrame)
 GlavaBtn.Size = UDim2.new(0, 70, 0, 30)
 GlavaBtn.Position = UDim2.new(0, 200, 0, 320)
 GlavaBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
-GlavaBtn.Text = "Glava"
-GlavaBtn.TextColor3 = HITBOX_HEAD and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255)
+GlavaBtn.Text = "Opcija 2: 1"
+GlavaBtn.TextColor3 = FEATURE2_HEAD and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255)
 GlavaBtn.TextScaled = true
 GlavaBtn.Font = Enum.Font.GothamBold
 local GlavaCorner = Instance.new("UICorner", GlavaBtn)
@@ -224,25 +241,25 @@ local TijeloBtn = Instance.new("TextButton", MainFrame)
 TijeloBtn.Size = UDim2.new(0, 70, 0, 30)
 TijeloBtn.Position = UDim2.new(0, 280, 0, 320)
 TijeloBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
-TijeloBtn.Text = "Tijelo"
-TijeloBtn.TextColor3 = HITBOX_TORSO and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255)
+TijeloBtn.Text = "Opcija 2: 2"
+TijeloBtn.TextColor3 = FEATURE2_TORSO and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255)
 TijeloBtn.TextScaled = true
 TijeloBtn.Font = Enum.Font.GothamBold
 local TijeloCorner = Instance.new("UICorner", TijeloBtn)
 TijeloCorner.CornerRadius = UDim.new(0, 8)
 
 GlavaBtn.MouseButton1Click:Connect(function()
-    HITBOX_HEAD = not HITBOX_HEAD
-    GlavaBtn.TextColor3 = HITBOX_HEAD and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255)
+    FEATURE2_HEAD = not FEATURE2_HEAD
+    GlavaBtn.TextColor3 = FEATURE2_HEAD and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255)
 end)
 TijeloBtn.MouseButton1Click:Connect(function()
-    HITBOX_TORSO = not HITBOX_TORSO
-    TijeloBtn.TextColor3 = HITBOX_TORSO and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255)
+    FEATURE2_TORSO = not FEATURE2_TORSO
+    TijeloBtn.TextColor3 = FEATURE2_TORSO and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255)
 end)
 
 -- Minimized (kockica) GUI
 local MiniFrame = Instance.new("Frame")
-MiniFrame.Name = "MiniFrame"
+MiniFrame.Name = miniName
 MiniFrame.Size = Config.MinimizedSize
 MiniFrame.Position = Config.MinimizedPosition
 MiniFrame.BackgroundColor3 = Config.Colors.Minimized
@@ -325,18 +342,18 @@ UserInputService.InputBegan:Connect(function(input, gpe)
     end
 end)
 
--- ESP Toggle logic
-ESPToggle.MouseButton1Click:Connect(function()
-    ESP_ENABLED = not ESP_ENABLED
-    ESPToggle.Text = ESP_ENABLED and "ESP: ON" or "ESP: OFF"
-    ESPToggle.BackgroundColor3 = ESP_ENABLED and ESP_COLOR or Color3.fromRGB(30,120,200)
-    if not ESP_ENABLED then
-        for _,v in pairs(espBoxes) do v:Remove() end
-        espBoxes = {}
+-- Opcija 1 toggle
+Feature1Toggle.MouseButton1Click:Connect(function()
+    FEATURE1_ENABLED = not FEATURE1_ENABLED
+    Feature1Toggle.Text = FEATURE1_ENABLED and "Opcija 1: ON" or "Opcija 1: OFF"
+    Feature1Toggle.BackgroundColor3 = FEATURE1_ENABLED and FEATURE1_COLOR or Color3.fromRGB(30,120,200)
+    if not FEATURE1_ENABLED then
+        for _,v in pairs(feature1Boxes) do v:Remove() end
+        feature1Boxes = {}
     end
 end)
 
--- ESP Drawing
+-- Helperi
 local function getTeam(player)
     local team = nil
     pcall(function()
@@ -360,52 +377,56 @@ local function get2DBox(char)
     local head = char:FindFirstChild("Head")
     local torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
     local minY, maxY = hrp.Position.Y, hrp.Position.Y
-    if HITBOX_HEAD and head then
+    if FEATURE2_HEAD and head then
         minY = math.min(minY, head.Position.Y)
         maxY = math.max(maxY, head.Position.Y)
     end
-    if HITBOX_TORSO and torso then
+    if FEATURE2_TORSO and torso then
         minY = math.min(minY, torso.Position.Y)
         maxY = math.max(maxY, torso.Position.Y)
     end
     local pos, onscreen = Camera:WorldToViewportPoint(hrp.Position)
     if not onscreen then return end
-    local fov = HITBOX_FOV or 3
-    local w = 3.5 * fov * (HITBOX_TORSO and 1.2 or 1)
+    local fov = FEATURE2_FOV or 3
+    local w = 3.5 * fov * (FEATURE2_TORSO and 1.2 or 1)
     local h = (maxY - minY + 2.5) * 10 * fov
     return pos.X - w/2, pos.Y - h/2, w, h
 end
 
 local function createBox()
+    local boxName = "Box_"..randStr(4)
     local box = Drawing and Drawing.new and Drawing.new("Square")
     if box then
         box.Thickness = 2
         box.Filled = false
         box.Visible = false
+        box.Transparency = 1
+        box.ZIndex = 2
+        box.Name = boxName
     end
     return box
 end
 
--- Hitbox changer loop
+-- Opcija 2 (hitbox) loop
 RunService.RenderStepped:Connect(function()
     for _,plr in pairs(Players:GetPlayers()) do
         if plr ~= Players.LocalPlayer and isEnemy(plr) and getChar(plr) then
             local char = getChar(plr)
-            if HITBOX_HEAD then
+            if FEATURE2_HEAD then
                 local head = char:FindFirstChild("Head")
                 if head then
                     pcall(function()
-                        head.Size = Vector3.new(HITBOX_FOV, HITBOX_FOV, HITBOX_FOV)
+                        head.Size = Vector3.new(FEATURE2_FOV, FEATURE2_FOV, FEATURE2_FOV)
                         head.CanCollide = false
                         head.Transparency = 0.5
                     end)
                 end
             end
-            if HITBOX_TORSO then
+            if FEATURE2_TORSO then
                 local torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
                 if torso then
                     pcall(function()
-                        torso.Size = Vector3.new(HITBOX_FOV*2, HITBOX_FOV*2, HITBOX_FOV*1.5)
+                        torso.Size = Vector3.new(FEATURE2_FOV*2, FEATURE2_FOV*2, FEATURE2_FOV*1.5)
                         torso.CanCollide = false
                         torso.Transparency = 0.5
                     end)
@@ -415,22 +436,21 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Main ESP loop
+-- Opcija 1 (ESP) loop
 RunService.RenderStepped:Connect(function()
-    if not ESP_ENABLED then return end
-    -- Clean old boxes
-    for _,v in pairs(espBoxes) do v.Visible = false end
+    if not FEATURE1_ENABLED then return end
+    for _,v in pairs(feature1Boxes) do v.Visible = false end
     local i = 1
     for _,plr in pairs(Players:GetPlayers()) do
         if plr ~= Players.LocalPlayer and getChar(plr) then
-            if (ESP_ENEMY_ONLY and isEnemy(plr)) or (not ESP_ENEMY_ONLY) then
+            if (FEATURE1_ENEMY_ONLY and isEnemy(plr)) or (not FEATURE1_ENEMY_ONLY) then
                 local char = getChar(plr)
                 local x, y, w, h = get2DBox(char)
                 if x and y and w and h then
-                    if not espBoxes[i] then espBoxes[i] = createBox() end
-                    local box = espBoxes[i]
+                    if not feature1Boxes[i] then feature1Boxes[i] = createBox() end
+                    local box = feature1Boxes[i]
                     box.Visible = true
-                    box.Color = ESP_COLOR
+                    box.Color = FEATURE1_COLOR
                     box.Position = Vector2.new(x, y)
                     box.Size = Vector2.new(w, h)
                     i = i + 1
@@ -438,17 +458,16 @@ RunService.RenderStepped:Connect(function()
             end
         end
     end
-    -- Hide unused boxes
-    for j = i, #espBoxes do
-        if espBoxes[j] then espBoxes[j].Visible = false end
+    for j = i, #feature1Boxes do
+        if feature1Boxes[j] then feature1Boxes[j].Visible = false end
     end
 end)
 
--- Success notification
+-- Neutralna notifikacija
 pcall(function()
     game.StarterGui:SetCore("SendNotification", {
-        Title = "Alesto Script",
-        Text = "GUI+ESP+Hitbox loaded! (RightShift za toggle, - za minimizaciju)",
+        Title = "Panel",
+        Text = "Panel učitan! (RightShift za toggle, - za minimizaciju)",
         Duration = 5
     })
 end) 
