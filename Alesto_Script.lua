@@ -719,11 +719,79 @@ end)
 if HitboxFOVLabel then HitboxFOVLabel:Destroy() end
 if HitboxFOVSlider then HitboxFOVSlider:Destroy() end
 
--- Nametag loop (BillboardGui iznad glave protivnika, updateuje tekst i veličinu)
+-- Nametag sekcija u GUI
+local NametagSection = Instance.new("Frame", MainFrame)
+NametagSection.Size = UDim2.new(1, -32, 0, 70)
+NametagSection.Position = UDim2.new(0, 16, 0, 520)
+NametagSection.BackgroundColor3 = Config.Colors.Section
+NametagSection.BorderSizePixel = 0
+local NametagCorner = Instance.new("UICorner", NametagSection)
+NametagCorner.CornerRadius = UDim.new(0, 12)
+
+local NametagLabel = Instance.new("TextLabel", NametagSection)
+NametagLabel.Size = UDim2.new(0, 120, 0, 28)
+NametagLabel.Position = UDim2.new(0, 10, 0, 8)
+NametagLabel.BackgroundTransparency = 1
+NametagLabel.Text = "Nametag"
+NametagLabel.TextColor3 = Config.Colors.Text
+NametagLabel.TextScaled = true
+NametagLabel.Font = Enum.Font.GothamBold
+
+local NametagToggle = Instance.new("TextButton", NametagSection)
+NametagToggle.Size = UDim2.new(0, 100, 0, 28)
+NametagToggle.Position = UDim2.new(0, 140, 0, 8)
+NametagToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+NametagToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
+NametagToggle.TextColor3 = Config.Colors.Text
+NametagToggle.TextScaled = true
+NametagToggle.Font = Enum.Font.GothamBold
+local NametagToggleCorner = Instance.new("UICorner", NametagToggle)
+NametagToggleCorner.CornerRadius = UDim.new(0, 8)
+NametagToggle.MouseButton1Click:Connect(function()
+    NAMETAG_ENABLED = not NAMETAG_ENABLED
+    NametagToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
+    NametagToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+end)
+
+local NametagScaleLabel = Instance.new("TextLabel", NametagSection)
+NametagScaleLabel.Size = UDim2.new(0, 60, 0, 28)
+NametagScaleLabel.Position = UDim2.new(0, 250, 0, 8)
+NametagScaleLabel.BackgroundTransparency = 1
+NametagScaleLabel.Text = "Veličina"
+NametagScaleLabel.TextColor3 = Config.Colors.Text
+NametagScaleLabel.TextScaled = true
+NametagScaleLabel.Font = Enum.Font.Gotham
+
+local NametagScaleSlider = Instance.new("TextButton", NametagSection)
+NametagScaleSlider.Size = UDim2.new(0, 100, 0, 28)
+NametagScaleSlider.Position = UDim2.new(0, 320, 0, 8)
+NametagScaleSlider.BackgroundColor3 = Config.Colors.Accent
+NametagScaleSlider.Text = tostring(NAMETAG_SCALE)
+NametagScaleSlider.TextColor3 = Config.Colors.Text
+NametagScaleSlider.TextScaled = true
+NametagScaleSlider.Font = Enum.Font.GothamBold
+local draggingNametagScale = false
+NametagScaleSlider.MouseButton1Down:Connect(function()
+    draggingNametagScale = true
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingNametagScale = false end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if draggingNametagScale and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local rel = math.clamp((input.Position.X - NametagScaleSlider.AbsolutePosition.X) / NametagScaleSlider.AbsoluteSize.X, 0, 1)
+        local value = math.floor(rel * 40 + 10) / 10 -- 1.0 do 5.0
+        NAMETAG_SCALE = value
+        NametagScaleSlider.Text = tostring(value)
+    end
+end)
+
+-- Nametag loop (BillboardGui iznad glave protivnika, updateuje tekst i veličinu, briše na smrt)
 RunService.RenderStepped:Connect(function()
     for _,plr in pairs(Players:GetPlayers()) do
         if plr ~= Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
-            local show = NAMETAG_ENABLED and ((VIZIJA_ENEMY_ONLY and isEnemy(plr)) or (not VIZIJA_ENEMY_ONLY))
+            local hum = plr.Character:FindFirstChild("Humanoid")
+            local show = NAMETAG_ENABLED and hum and hum.Health > 0 and ((VIZIJA_ENEMY_ONLY and isEnemy(plr)) or (not VIZIJA_ENEMY_ONLY))
             local head = plr.Character.Head
             local tag = head:FindFirstChild("AlestoNametag")
             if show then
