@@ -376,27 +376,18 @@ local NAMETAG_BIND = Enum.KeyCode.N
 local KROZZID_BIND = Enum.KeyCode.K
 local waitingForBind = nil -- "ESP", "HITBOX", "NAMETAG", "KROZZID"
 
--- GUI: Bind sekcija
+-- GUI: Bind sekcija (sve u jednom redu)
 local BindSection = Instance.new("Frame", MainFrame)
-BindSection.Size = UDim2.new(1, -32, 0, 110)
+BindSection.Size = UDim2.new(1, -32, 0, 40)
 BindSection.Position = UDim2.new(0, 16, 0, 570)
 BindSection.BackgroundColor3 = Config.Colors.Section
 BindSection.BorderSizePixel = 0
 local BindCorner = Instance.new("UICorner", BindSection)
 BindCorner.CornerRadius = UDim.new(0, 12)
 
-local BindLabel = Instance.new("TextLabel", BindSection)
-BindLabel.Size = UDim2.new(0, 120, 0, 28)
-BindLabel.Position = UDim2.new(0, 10, 0, 8)
-BindLabel.BackgroundTransparency = 1
-BindLabel.Text = "Bindovi (tipke)"
-BindLabel.TextColor3 = Config.Colors.Text
-BindLabel.TextScaled = true
-BindLabel.Font = Enum.Font.GothamBold
-
 local ESPBindBtn = Instance.new("TextButton", BindSection)
-ESPBindBtn.Size = UDim2.new(0, 100, 0, 28)
-ESPBindBtn.Position = UDim2.new(0, 140, 0, 8)
+ESPBindBtn.Size = UDim2.new(0, 90, 0, 28)
+ESPBindBtn.Position = UDim2.new(0, 10, 0, 6)
 ESPBindBtn.BackgroundColor3 = Config.Colors.Accent
 ESPBindBtn.Text = "ESP: "..tostring(ESP_BIND.Name)
 ESPBindBtn.TextColor3 = Config.Colors.Text
@@ -406,8 +397,8 @@ local ESPBindCorner = Instance.new("UICorner", ESPBindBtn)
 ESPBindCorner.CornerRadius = UDim.new(0, 8)
 
 local HitboxBindBtn = Instance.new("TextButton", BindSection)
-HitboxBindBtn.Size = UDim2.new(0, 100, 0, 28)
-HitboxBindBtn.Position = UDim2.new(0, 250, 0, 8)
+HitboxBindBtn.Size = UDim2.new(0, 90, 0, 28)
+HitboxBindBtn.Position = UDim2.new(0, 110, 0, 6)
 HitboxBindBtn.BackgroundColor3 = Config.Colors.Accent
 HitboxBindBtn.Text = "Hitbox: "..tostring(HITBOX_BIND.Name)
 HitboxBindBtn.TextColor3 = Config.Colors.Text
@@ -417,8 +408,8 @@ local HitboxBindCorner = Instance.new("UICorner", HitboxBindBtn)
 HitboxBindCorner.CornerRadius = UDim.new(0, 8)
 
 local NametagBindBtn = Instance.new("TextButton", BindSection)
-NametagBindBtn.Size = UDim2.new(0, 100, 0, 28)
-NametagBindBtn.Position = UDim2.new(0, 140, 0, 48)
+NametagBindBtn.Size = UDim2.new(0, 110, 0, 28)
+NametagBindBtn.Position = UDim2.new(0, 210, 0, 6)
 NametagBindBtn.BackgroundColor3 = Config.Colors.Accent
 NametagBindBtn.Text = "Nametag: "..tostring(NAMETAG_BIND.Name)
 NametagBindBtn.TextColor3 = Config.Colors.Text
@@ -428,8 +419,8 @@ local NametagBindCorner = Instance.new("UICorner", NametagBindBtn)
 NametagBindCorner.CornerRadius = UDim.new(0, 8)
 
 local KrozzidBindBtn = Instance.new("TextButton", BindSection)
-KrozzidBindBtn.Size = UDim2.new(0, 100, 0, 28)
-KrozzidBindBtn.Position = UDim2.new(0, 250, 0, 48)
+KrozzidBindBtn.Size = UDim2.new(0, 110, 0, 28)
+KrozzidBindBtn.Position = UDim2.new(0, 330, 0, 6)
 KrozzidBindBtn.BackgroundColor3 = Config.Colors.Accent
 KrozzidBindBtn.Text = "Krozzid: "..tostring(KROZZID_BIND.Name)
 KrozzidBindBtn.TextColor3 = Config.Colors.Text
@@ -589,7 +580,7 @@ end
 MinimizeBtn.MouseButton1Click:Connect(minimizeGUI)
 MiniBtn.MouseButton1Click:Connect(maximizeGUI)
 
--- Keyboard toggle
+-- Keyboard toggle (RightShift za cijeli panel)
 UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
     if input.KeyCode == Config.MenuKey then
@@ -728,7 +719,7 @@ end)
 if HitboxFOVLabel then HitboxFOVLabel:Destroy() end
 if HitboxFOVSlider then HitboxFOVSlider:Destroy() end
 
--- Nametag loop (BillboardGui iznad glave protivnika)
+-- Nametag loop (BillboardGui iznad glave protivnika, updateuje tekst i veličinu)
 RunService.RenderStepped:Connect(function()
     for _,plr in pairs(Players:GetPlayers()) do
         if plr ~= Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
@@ -745,6 +736,7 @@ RunService.RenderStepped:Connect(function()
                     bb.AlwaysOnTop = true
                     bb.Parent = head
                     local txt = Instance.new("TextLabel", bb)
+                    txt.Name = "AlestoNametagText"
                     txt.Size = UDim2.new(1, 0, 1, 0)
                     txt.BackgroundTransparency = 1
                     txt.Text = plr.DisplayName or plr.Name
@@ -752,10 +744,11 @@ RunService.RenderStepped:Connect(function()
                     txt.TextStrokeTransparency = 0.5
                     txt.TextScaled = true
                     txt.Font = Enum.Font.GothamBold
-                end
-                -- Update scale
-                if tag then
+                else
+                    -- Update tekst i veličinu
                     tag.Size = UDim2.new(0, 200 * NAMETAG_SCALE, 0, 50 * NAMETAG_SCALE)
+                    local txt = tag:FindFirstChild("AlestoNametagText")
+                    if txt then txt.Text = plr.DisplayName or plr.Name end
                 end
             else
                 if tag then tag:Destroy() end
