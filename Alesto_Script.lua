@@ -1,7 +1,8 @@
 --[[
-    Alesto Script - Modern Clean Version (GUI + ESP)
+    Alesto Script - Modern Clean Version (GUI + ESP + Hitbox)
     by Halilovic35 & AI
     ESP: 2D box oko protivnika, biranje boje, enemy only
+    Hitbox: Glava/Tijelo, FOV 1-20, samo protivnici, sve na bosanskom
 ]]
 
 -- Services
@@ -14,8 +15,8 @@ local Camera = workspace.CurrentCamera
 
 -- GUI Config
 local Config = {
-    MenuSize = UDim2.new(0, 350, 0, 350),
-    MenuPosition = UDim2.new(0.5, -175, 0.5, -175),
+    MenuSize = UDim2.new(0, 350, 0, 420),
+    MenuPosition = UDim2.new(0.5, -175, 0.5, -210),
     MinimizedSize = UDim2.new(0, 50, 0, 50),
     MinimizedPosition = UDim2.new(0, 100, 0, 100),
     MenuKey = Enum.KeyCode.RightShift,
@@ -38,6 +39,13 @@ local ESP_ENABLED = false
 local ESP_COLOR = Color3.fromRGB(0, 150, 255)
 local ESP_ENEMY_ONLY = true
 local espBoxes = {}
+
+-- Hitbox State
+local HITBOX_ENABLED = false
+local HITBOX_HEAD = true
+local HITBOX_TORSO = false
+local HITBOX_FOV = 3
+local hitboxParts = {}
 
 -- GUI Elements
 local ScreenGui = Instance.new("ScreenGui")
@@ -107,7 +115,7 @@ ColorLabel.TextColor3 = Config.Colors.Text
 ColorLabel.TextScaled = true
 ColorLabel.Font = Enum.Font.Gotham
 
-local function makeSlider(name, y, default, callback)
+local function makeSlider(name, y, default, callback, min, max)
     local label = Instance.new("TextLabel", MainFrame)
     label.Size = UDim2.new(0, 30, 0, 30)
     label.Position = UDim2.new(0, 20, 0, y)
@@ -135,14 +143,19 @@ local function makeSlider(name, y, default, callback)
     UserInputService.InputChanged:Connect(function(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             local rel = math.clamp((input.Position.X - slider.AbsolutePosition.X) / slider.AbsoluteSize.X, 0, 1)
-            local value = math.floor(rel * 255)
+            local value = math.floor(rel * ((max or 255)-(min or 0)) + (min or 0))
             slider.Text = tostring(value)
-            slider.BackgroundColor3 = Color3.fromRGB(
-                name=="R" and value or ESP_COLOR.R*255,
-                name=="G" and value or ESP_COLOR.G*255,
-                name=="B" and value or ESP_COLOR.B*255
-            )
-            callback(value)
+            if name == "FOV" then
+                callback(value)
+                slider.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+            else
+                slider.BackgroundColor3 = Color3.fromRGB(
+                    name=="R" and value or ESP_COLOR.R*255,
+                    name=="G" and value or ESP_COLOR.G*255,
+                    name=="B" and value or ESP_COLOR.B*255
+                )
+                callback(value)
+            end
         end
     end)
     return slider
@@ -168,7 +181,7 @@ end)
 -- Only Enemies Toggle
 local OnlyEnemiesBtn = Instance.new("TextButton", MainFrame)
 OnlyEnemiesBtn.Size = UDim2.new(0, 180, 0, 35)
-OnlyEnemiesBtn.Position = UDim2.new(0, 20, 0, 280)
+OnlyEnemiesBtn.Position = UDim2.new(0, 20, 0, 270)
 OnlyEnemiesBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
 OnlyEnemiesBtn.Text = "ESP: Samo protivnici"
 OnlyEnemiesBtn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -180,6 +193,51 @@ OnlyEnemiesCorner.CornerRadius = UDim.new(0, 8)
 OnlyEnemiesBtn.MouseButton1Click:Connect(function()
     ESP_ENEMY_ONLY = not ESP_ENEMY_ONLY
     OnlyEnemiesBtn.Text = ESP_ENEMY_ONLY and "ESP: Samo protivnici" or "ESP: Svi igraci"
+end)
+
+-- Hitbox Changer
+local HitboxLabel = Instance.new("TextLabel", MainFrame)
+HitboxLabel.Size = UDim2.new(0, 120, 0, 30)
+HitboxLabel.Position = UDim2.new(0, 20, 0, 320)
+HitboxLabel.BackgroundTransparency = 1
+HitboxLabel.Text = "Hitbox (FOV)"
+HitboxLabel.TextColor3 = Config.Colors.Text
+HitboxLabel.TextScaled = true
+HitboxLabel.Font = Enum.Font.GothamBold
+
+local FOVSlider = makeSlider("FOV", 360, HITBOX_FOV, function(v)
+    HITBOX_FOV = v
+end, 1, 20)
+
+local GlavaBtn = Instance.new("TextButton", MainFrame)
+GlavaBtn.Size = UDim2.new(0, 70, 0, 30)
+GlavaBtn.Position = UDim2.new(0, 200, 0, 320)
+GlavaBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+GlavaBtn.Text = "Glava"
+GlavaBtn.TextColor3 = HITBOX_HEAD and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255)
+GlavaBtn.TextScaled = true
+GlavaBtn.Font = Enum.Font.GothamBold
+local GlavaCorner = Instance.new("UICorner", GlavaBtn)
+GlavaCorner.CornerRadius = UDim.new(0, 8)
+
+local TijeloBtn = Instance.new("TextButton", MainFrame)
+TijeloBtn.Size = UDim2.new(0, 70, 0, 30)
+TijeloBtn.Position = UDim2.new(0, 280, 0, 320)
+TijeloBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+TijeloBtn.Text = "Tijelo"
+TijeloBtn.TextColor3 = HITBOX_TORSO and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255)
+TijeloBtn.TextScaled = true
+TijeloBtn.Font = Enum.Font.GothamBold
+local TijeloCorner = Instance.new("UICorner", TijeloBtn)
+TijeloCorner.CornerRadius = UDim.new(0, 8)
+
+GlavaBtn.MouseButton1Click:Connect(function()
+    HITBOX_HEAD = not HITBOX_HEAD
+    GlavaBtn.TextColor3 = HITBOX_HEAD and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255)
+end)
+TijeloBtn.MouseButton1Click:Connect(function()
+    HITBOX_TORSO = not HITBOX_TORSO
+    TijeloBtn.TextColor3 = HITBOX_TORSO and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,255,255)
 end)
 
 -- Minimized (kockica) GUI
@@ -299,10 +357,22 @@ end
 local function get2DBox(char)
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
-    local size = hrp.Size * 1.5
+    local head = char:FindFirstChild("Head")
+    local torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
+    local minY, maxY = hrp.Position.Y, hrp.Position.Y
+    if HITBOX_HEAD and head then
+        minY = math.min(minY, head.Position.Y)
+        maxY = math.max(maxY, head.Position.Y)
+    end
+    if HITBOX_TORSO and torso then
+        minY = math.min(minY, torso.Position.Y)
+        maxY = math.max(maxY, torso.Position.Y)
+    end
     local pos, onscreen = Camera:WorldToViewportPoint(hrp.Position)
     if not onscreen then return end
-    local w, h = size.X * 20, size.Y * 20
+    local fov = HITBOX_FOV or 3
+    local w = 3.5 * fov * (HITBOX_TORSO and 1.2 or 1)
+    local h = (maxY - minY + 2.5) * 10 * fov
     return pos.X - w/2, pos.Y - h/2, w, h
 end
 
@@ -315,6 +385,35 @@ local function createBox()
     end
     return box
 end
+
+-- Hitbox changer loop
+RunService.RenderStepped:Connect(function()
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer and isEnemy(plr) and getChar(plr) then
+            local char = getChar(plr)
+            if HITBOX_HEAD then
+                local head = char:FindFirstChild("Head")
+                if head then
+                    pcall(function()
+                        head.Size = Vector3.new(HITBOX_FOV, HITBOX_FOV, HITBOX_FOV)
+                        head.CanCollide = false
+                        head.Transparency = 0.5
+                    end)
+                end
+            end
+            if HITBOX_TORSO then
+                local torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
+                if torso then
+                    pcall(function()
+                        torso.Size = Vector3.new(HITBOX_FOV*2, HITBOX_FOV*2, HITBOX_FOV*1.5)
+                        torso.CanCollide = false
+                        torso.Transparency = 0.5
+                    end)
+                end
+            end
+        end
+    end
+end)
 
 -- Main ESP loop
 RunService.RenderStepped:Connect(function()
@@ -349,7 +448,7 @@ end)
 pcall(function()
     game.StarterGui:SetCore("SendNotification", {
         Title = "Alesto Script",
-        Text = "GUI+ESP loaded! (RightShift za toggle, - za minimizaciju)",
+        Text = "GUI+ESP+Hitbox loaded! (RightShift za toggle, - za minimizaciju)",
         Duration = 5
     })
 end) 
