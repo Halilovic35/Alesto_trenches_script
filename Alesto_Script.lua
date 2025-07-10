@@ -434,7 +434,13 @@ local function isEnemy(player)
 end
 
 local function getChar(plr)
-    return plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character
+    if not plr.Character then return nil end
+    if not plr.Character:FindFirstChild("HumanoidRootPart") then return nil end
+    if not plr.Character:FindFirstChild("Head") then return nil end
+    if plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Health <= 0 then return nil end
+    local pos = plr.Character.HumanoidRootPart.Position
+    if pos.Magnitude < 1 then return nil end
+    return plr.Character
 end
 
 local function get2DBox(char)
