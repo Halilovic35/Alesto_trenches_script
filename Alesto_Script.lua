@@ -372,12 +372,14 @@ end)
 -- Bindovi
 local ESP_BIND = Enum.KeyCode.E
 local HITBOX_BIND = Enum.KeyCode.H
-local waitingForBind = nil -- "ESP" ili "HITBOX"
+local NAMETAG_BIND = Enum.KeyCode.N
+local KROZZID_BIND = Enum.KeyCode.K
+local waitingForBind = nil -- "ESP", "HITBOX", "NAMETAG", "KROZZID"
 
 -- GUI: Bind sekcija
 local BindSection = Instance.new("Frame", MainFrame)
-BindSection.Size = UDim2.new(1, -32, 0, 70)
-BindSection.Position = UDim2.new(0, 16, 0, 400)
+BindSection.Size = UDim2.new(1, -32, 0, 110)
+BindSection.Position = UDim2.new(0, 16, 0, 570)
 BindSection.BackgroundColor3 = Config.Colors.Section
 BindSection.BorderSizePixel = 0
 local BindCorner = Instance.new("UICorner", BindSection)
@@ -414,6 +416,28 @@ HitboxBindBtn.Font = Enum.Font.GothamBold
 local HitboxBindCorner = Instance.new("UICorner", HitboxBindBtn)
 HitboxBindCorner.CornerRadius = UDim.new(0, 8)
 
+local NametagBindBtn = Instance.new("TextButton", BindSection)
+NametagBindBtn.Size = UDim2.new(0, 100, 0, 28)
+NametagBindBtn.Position = UDim2.new(0, 140, 0, 48)
+NametagBindBtn.BackgroundColor3 = Config.Colors.Accent
+NametagBindBtn.Text = "Nametag: "..tostring(NAMETAG_BIND.Name)
+NametagBindBtn.TextColor3 = Config.Colors.Text
+NametagBindBtn.TextScaled = true
+NametagBindBtn.Font = Enum.Font.GothamBold
+local NametagBindCorner = Instance.new("UICorner", NametagBindBtn)
+NametagBindCorner.CornerRadius = UDim.new(0, 8)
+
+local KrozzidBindBtn = Instance.new("TextButton", BindSection)
+KrozzidBindBtn.Size = UDim2.new(0, 100, 0, 28)
+KrozzidBindBtn.Position = UDim2.new(0, 250, 0, 48)
+KrozzidBindBtn.BackgroundColor3 = Config.Colors.Accent
+KrozzidBindBtn.Text = "Krozzid: "..tostring(KROZZID_BIND.Name)
+KrozzidBindBtn.TextColor3 = Config.Colors.Text
+KrozzidBindBtn.TextScaled = true
+KrozzidBindBtn.Font = Enum.Font.GothamBold
+local KrozzidBindCorner = Instance.new("UICorner", KrozzidBindBtn)
+KrozzidBindCorner.CornerRadius = UDim.new(0, 8)
+
 ESPBindBtn.MouseButton1Click:Connect(function()
     ESPBindBtn.Text = "Pritisni tipku..."
     waitingForBind = "ESP"
@@ -421,6 +445,14 @@ end)
 HitboxBindBtn.MouseButton1Click:Connect(function()
     HitboxBindBtn.Text = "Pritisni tipku..."
     waitingForBind = "HITBOX"
+end)
+NametagBindBtn.MouseButton1Click:Connect(function()
+    NametagBindBtn.Text = "Pritisni tipku..."
+    waitingForBind = "NAMETAG"
+end)
+KrozzidBindBtn.MouseButton1Click:Connect(function()
+    KrozzidBindBtn.Text = "Pritisni tipku..."
+    waitingForBind = "KROZZID"
 end)
 
 UserInputService.InputBegan:Connect(function(input, gpe)
@@ -433,6 +465,16 @@ UserInputService.InputBegan:Connect(function(input, gpe)
     elseif waitingForBind == "HITBOX" then
         HITBOX_BIND = input.KeyCode
         HitboxBindBtn.Text = "Hitbox: "..tostring(HITBOX_BIND.Name)
+        waitingForBind = nil
+        return
+    elseif waitingForBind == "NAMETAG" then
+        NAMETAG_BIND = input.KeyCode
+        NametagBindBtn.Text = "Nametag: "..tostring(NAMETAG_BIND.Name)
+        waitingForBind = nil
+        return
+    elseif waitingForBind == "KROZZID" then
+        KROZZID_BIND = input.KeyCode
+        KrozzidBindBtn.Text = "Krozzid: "..tostring(KROZZID_BIND.Name)
         waitingForBind = nil
         return
     end
@@ -454,6 +496,29 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         else
             META_HEAD = true
             HeadBtn.BackgroundColor3 = Config.Colors.Accent
+        end
+    elseif input.KeyCode == NAMETAG_BIND then
+        NAMETAG_ENABLED = not NAMETAG_ENABLED
+        NametagToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
+        NametagToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+    elseif input.KeyCode == KROZZID_BIND then
+        -- Krozzid: pronađi i highlightaj prvog protivnika kroz zid
+        local origin = Camera.CFrame.Position
+        local direction = Camera.CFrame.LookVector * 1000
+        local ignoreList = {Players.LocalPlayer.Character}
+        local target = krozZid(origin, direction, ignoreList)
+        if target and target:FindFirstChild("Head") then
+            -- Highlight protivnika (npr. crveni SelectionBox na glavi)
+            local head = target.Head
+            if not head:FindFirstChild("KrozzidHighlight") then
+                local sb = Instance.new("SelectionBox")
+                sb.Name = "KrozzidHighlight"
+                sb.Adornee = head
+                sb.Color3 = Color3.fromRGB(255,0,0)
+                sb.LineThickness = 0.1
+                sb.Parent = head
+                game.Debris:AddItem(sb, 1.5)
+            end
         end
     end
 end)
