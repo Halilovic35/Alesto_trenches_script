@@ -51,9 +51,13 @@ local Config = {
 local isMenuOpen = true
 local isMinimized = false
 
--- State for features
+-- Hotkey config
+local ESP_HOTKEY = Enum.KeyCode.E
+local HITBOX_HOTKEY = Enum.KeyCode.H
+
+-- State
 local VIZIJA_ENABLED = false
-local VIZIJA_COLOR = Color3.fromRGB(0, 150, 255)
+local HITBOX_ENABLED = false
 local VIZIJA_ENEMY_ONLY = true
 local FORCE_RENDER = true -- Uvijek renderuj igrače
 local vizijaBoxes = {}
@@ -130,40 +134,114 @@ VizijaLabel.TextColor3 = Config.Colors.Text
 VizijaLabel.TextScaled = true
 VizijaLabel.Font = Enum.Font.GothamBold
 
-local VizijaToggle = Instance.new("TextButton", VizijaSection)
-VizijaToggle.Size = UDim2.new(0, 100, 0, 32)
-VizijaToggle.Position = UDim2.new(0, 140, 0, 8)
-VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
-VizijaToggle.TextColor3 = Config.Colors.Text
-VizijaToggle.TextScaled = true
-VizijaToggle.Font = Enum.Font.GothamBold
-local VizijaToggleCorner = Instance.new("UICorner", VizijaToggle)
-VizijaToggleCorner.CornerRadius = UDim.new(0, 8)
+-- Modern toggle (slide) helper
+local function createToggle(parent, label, state, callback)
+    local Frame = Instance.new("Frame", parent)
+    Frame.Size = UDim2.new(0, 120, 0, 32)
+    Frame.BackgroundTransparency = 1
+    
+    local Text = Instance.new("TextLabel", Frame)
+    Text.Size = UDim2.new(0.6, 0, 1, 0)
+    Text.Position = UDim2.new(0, 0, 0, 0)
+    Text.BackgroundTransparency = 1
+    Text.Text = label
+    Text.TextColor3 = Config.Colors.Text
+    Text.TextScaled = true
+    Text.Font = Enum.Font.GothamBold
+    
+    local Toggle = Instance.new("TextButton", Frame)
+    Toggle.Size = UDim2.new(0, 48, 0, 24)
+    Toggle.Position = UDim2.new(0.65, 0, 0.15, 0)
+    Toggle.BackgroundColor3 = state and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+    Toggle.Text = ""
+    Toggle.AutoButtonColor = false
+    local Corner = Instance.new("UICorner", Toggle)
+    Corner.CornerRadius = UDim.new(1, 0)
+    
+    local Circle = Instance.new("Frame", Toggle)
+    Circle.Size = UDim2.new(0, 20, 0, 20)
+    Circle.Position = state and UDim2.new(1, -22, 0, 2) or UDim2.new(0, 2, 0, 2)
+    Circle.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    Circle.BorderSizePixel = 0
+    local CircleCorner = Instance.new("UICorner", Circle)
+    CircleCorner.CornerRadius = UDim.new(1, 0)
+    
+    local function updateToggle(val)
+        Toggle.BackgroundColor3 = val and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+        Circle:TweenPosition(val and UDim2.new(1, -22, 0, 2) or UDim2.new(0, 2, 0, 2), "Out", "Quad", 0.15, true)
+    end
+    
+    Toggle.MouseButton1Click:Connect(function()
+        state = not state
+        updateToggle(state)
+        if callback then callback(state) end
+    end)
+    
+    updateToggle(state)
+    return Frame, function(val)
+        state = val
+        updateToggle(state)
+    end
+end
 
-local OnlyEnemiesBtn = Instance.new("TextButton", VizijaSection)
-OnlyEnemiesBtn.Size = UDim2.new(0, 120, 0, 28)
-OnlyEnemiesBtn.Position = UDim2.new(0, 10, 0, 48)
-OnlyEnemiesBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
-OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
-OnlyEnemiesBtn.TextColor3 = Config.Colors.Text
-OnlyEnemiesBtn.TextScaled = true
-OnlyEnemiesBtn.Font = Enum.Font.Gotham
-local OnlyEnemiesCorner = Instance.new("UICorner", OnlyEnemiesBtn)
-OnlyEnemiesCorner.CornerRadius = UDim.new(0, 8)
+-- ESP Toggle
+local VizijaToggleFrame, setVizijaToggle = createToggle(MainFrame, "Vizija (kutije)", VIZIJA_ENABLED, function(val)
+    VIZIJA_ENABLED = val
+end)
+VizijaToggleFrame.Position = UDim2.new(0, 16, 0, 60)
 
-OnlyEnemiesBtn.MouseButton1Click:Connect(function()
-    VIZIJA_ENEMY_ONLY = not VIZIJA_ENEMY_ONLY
-    OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
+-- Hitbox Toggle
+local HitboxToggleFrame, setHitboxToggle = createToggle(MainFrame, "Meta (hitbox)", HITBOX_ENABLED, function(val)
+    HITBOX_ENABLED = val
+end)
+HitboxToggleFrame.Position = UDim2.new(0, 16, 0, 110)
+
+-- Hotkey GUI
+local HotkeyFrame = Instance.new("Frame", MainFrame)
+HotkeyFrame.Size = UDim2.new(1, -32, 0, 40)
+HotkeyFrame.Position = UDim2.new(0, 16, 0, 160)
+HotkeyFrame.BackgroundTransparency = 1
+local HotkeyLabel = Instance.new("TextLabel", HotkeyFrame)
+HotkeyLabel.Size = UDim2.new(0.5, 0, 1, 0)
+HotkeyLabel.Position = UDim2.new(0, 0, 0, 0)
+HotkeyLabel.BackgroundTransparency = 1
+HotkeyLabel.Text = "ESP tipka: "..ESP_HOTKEY.Name.." | Hitbox tipka: "..HITBOX_HOTKEY.Name
+HotkeyLabel.TextColor3 = Config.Colors.Text
+HotkeyLabel.TextScaled = true
+HotkeyLabel.Font = Enum.Font.Gotham
+
+-- Hotkey change logic (klikni na labelu, pa pritisni tipku)
+HotkeyLabel.MouseButton1Click:Connect(function()
+    HotkeyLabel.Text = "Pritisni tipku za ESP..."
+    local conn
+    conn = UserInputService.InputBegan:Connect(function(input, gpe)
+        if gpe then return end
+        ESP_HOTKEY = input.KeyCode
+        HotkeyLabel.Text = "ESP tipka: "..ESP_HOTKEY.Name.." | Hitbox tipka: "..HITBOX_HOTKEY.Name
+        conn:Disconnect()
+    end)
 end)
 
-VizijaToggle.MouseButton1Click:Connect(function()
-    VIZIJA_ENABLED = not VIZIJA_ENABLED
-    VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
-    VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-    if not VIZIJA_ENABLED then
-        for _,v in pairs(vizijaBoxes) do v:Remove() end
-        vizijaBoxes = {}
+HotkeyLabel.MouseButton2Click:Connect(function()
+    HotkeyLabel.Text = "Pritisni tipku za Hitbox..."
+    local conn
+    conn = UserInputService.InputBegan:Connect(function(input, gpe)
+        if gpe then return end
+        HITBOX_HOTKEY = input.KeyCode
+        HotkeyLabel.Text = "ESP tipka: "..ESP_HOTKEY.Name.." | Hitbox tipka: "..HITBOX_HOTKEY.Name
+        conn:Disconnect()
+    end)
+end)
+
+-- Hotkey logic
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == ESP_HOTKEY then
+        VIZIJA_ENABLED = not VIZIJA_ENABLED
+        setVizijaToggle(VIZIJA_ENABLED)
+    elseif input.KeyCode == HITBOX_HOTKEY then
+        HITBOX_ENABLED = not HITBOX_ENABLED
+        setHitboxToggle(HITBOX_ENABLED)
     end
 end)
 
@@ -495,9 +573,10 @@ end)
 
 -- Meta (hitbox) loop
 RunService.RenderStepped:Connect(function()
+    if not HITBOX_ENABLED then return end
     for _,plr in pairs(Players:GetPlayers()) do
-        if plr ~= Players.LocalPlayer and isEnemy(plr) and getChar(plr) then
-            local char = getChar(plr)
+        if plr ~= Players.LocalPlayer and isEnemy(plr) and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local char = plr.Character
             if META_HEAD then
                 local head = char:FindFirstChild("Head")
                 if head then
@@ -529,21 +608,168 @@ RunService.RenderStepped:Connect(function()
     local i = 1
     for _,plr in pairs(Players:GetPlayers()) do
         if plr ~= Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-            local char = plr.Character
-            local x, y, w, h = get2DBox(char)
-            if x and y and w and h then
-                if not vizijaBoxes[i] then vizijaBoxes[i] = createBox() end
-                local box = vizijaBoxes[i]
-                box.Visible = true
-                box.Color = VIZIJA_COLOR
-                box.Position = Vector2.new(x, y)
-                box.Size = Vector2.new(w, h)
-                i = i + 1
+            if (not VIZIJA_ENEMY_ONLY) or (isEnemy(plr)) then
+                local char = plr.Character
+                local x, y, w, h = get2DBox(char)
+                if x and y and w and h then
+                    if not vizijaBoxes[i] then vizijaBoxes[i] = createBox() end
+                    local box = vizijaBoxes[i]
+                    box.Visible = true
+                    box.Color = VIZIJA_COLOR
+                    box.Position = Vector2.new(x, y)
+                    box.Size = Vector2.new(w, h)
+                    i = i + 1
+                end
             end
         end
     end
     for j = i, #vizijaBoxes do
         if vizijaBoxes[j] then vizijaBoxes[j].Visible = false end
+    end
+end)
+
+-- Accordion sekcije
+local accordionState = {Hitbox = false, ESP = false}
+local function closeAllDropdowns()
+    accordionState.Hitbox = false
+    accordionState.ESP = false
+    HitboxDropdown:TweenSize(UDim2.new(1,0,0,0), "Out", "Quad", 0.2, true)
+    ESPDropdown:TweenSize(UDim2.new(1,0,0,0), "Out", "Quad", 0.2, true)
+end
+
+-- Hitbox sekcija
+local HitboxSection = Instance.new("Frame", MainFrame)
+HitboxSection.Size = UDim2.new(1, -32, 0, 40)
+HitboxSection.Position = UDim2.new(0, 16, 0, 60)
+HitboxSection.BackgroundColor3 = Config.Colors.Section
+HitboxSection.BorderSizePixel = 0
+local HitboxCorner = Instance.new("UICorner", HitboxSection)
+HitboxCorner.CornerRadius = UDim.new(0, 10)
+
+local HitboxLabel = Instance.new("TextLabel", HitboxSection)
+HitboxLabel.Size = UDim2.new(1, -40, 1, 0)
+HitboxLabel.Position = UDim2.new(0, 10, 0, 0)
+HitboxLabel.BackgroundTransparency = 1
+HitboxLabel.Text = "Hitbox"
+HitboxLabel.TextColor3 = Config.Colors.Text
+HitboxLabel.TextScaled = true
+HitboxLabel.Font = Enum.Font.GothamBold
+
+local HitboxToggle = Instance.new("TextButton", HitboxSection)
+HitboxToggle.Size = UDim2.new(0, 32, 0, 32)
+HitboxToggle.Position = UDim2.new(1, -38, 0, 4)
+HitboxToggle.BackgroundColor3 = HITBOX_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+HitboxToggle.Text = ""
+local HitboxToggleCorner = Instance.new("UICorner", HitboxToggle)
+HitboxToggleCorner.CornerRadius = UDim.new(1, 0)
+
+-- Dropdown za Hitbox
+HitboxDropdown = Instance.new("Frame", MainFrame)
+HitboxDropdown.Size = UDim2.new(1, -32, 0, 0)
+HitboxDropdown.Position = UDim2.new(0, 16, 0, 100)
+HitboxDropdown.BackgroundColor3 = Config.Colors.Section
+HitboxDropdown.BorderSizePixel = 0
+HitboxDropdown.ClipsDescendants = true
+local HitboxDropdownCorner = Instance.new("UICorner", HitboxDropdown)
+HitboxDropdownCorner.CornerRadius = UDim.new(0, 10)
+
+-- ESP sekcija
+local ESPSection = Instance.new("Frame", MainFrame)
+ESPSection.Size = UDim2.new(1, -32, 0, 40)
+ESPSection.Position = UDim2.new(0, 16, 0, 150)
+ESPSection.BackgroundColor3 = Config.Colors.Section
+ESPSection.BorderSizePixel = 0
+local ESPCorner = Instance.new("UICorner", ESPSection)
+ESPCorner.CornerRadius = UDim.new(0, 10)
+
+local ESPLabel = Instance.new("TextLabel", ESPSection)
+ESPLabel.Size = UDim2.new(1, -40, 1, 0)
+ESPLabel.Position = UDim2.new(0, 10, 0, 0)
+ESPLabel.BackgroundTransparency = 1
+ESPLabel.Text = "ESP"
+ESPLabel.TextColor3 = Config.Colors.Text
+ESPLabel.TextScaled = true
+ESPLabel.Font = Enum.Font.GothamBold
+
+local ESPToggle = Instance.new("TextButton", ESPSection)
+ESPToggle.Size = UDim2.new(0, 32, 0, 32)
+ESPToggle.Position = UDim2.new(1, -38, 0, 4)
+ESPToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+ESPToggle.Text = ""
+local ESPToggleCorner = Instance.new("UICorner", ESPToggle)
+ESPToggleCorner.CornerRadius = UDim.new(1, 0)
+
+-- Dropdown za ESP
+ESPDrodown = Instance.new("Frame", MainFrame)
+ESPDrodown.Size = UDim2.new(1, -32, 0, 0)
+ESPDrodown.Position = UDim2.new(0, 16, 0, 190)
+ESPDrodown.BackgroundColor3 = Config.Colors.Section
+ESPDrodown.BorderSizePixel = 0
+ESPDrodown.ClipsDescendants = true
+local ESPDropdownCorner = Instance.new("UICorner", ESPDrodown)
+ESPDropdownCorner.CornerRadius = UDim.new(0, 10)
+
+-- Toggle logika
+HitboxToggle.MouseButton1Click:Connect(function()
+    HITBOX_ENABLED = not HITBOX_ENABLED
+    HitboxToggle.BackgroundColor3 = HITBOX_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+end)
+HitboxSection.MouseButton2Click:Connect(function()
+    closeAllDropdowns()
+    accordionState.Hitbox = not accordionState.Hitbox
+    if accordionState.Hitbox then
+        HitboxDropdown:TweenSize(UDim2.new(1,0,0,120), "Out", "Quad", 0.2, true)
+    else
+        HitboxDropdown:TweenSize(UDim2.new(1,0,0,0), "Out", "Quad", 0.2, true)
+    end
+end)
+
+ESPToggle.MouseButton1Click:Connect(function()
+    VIZIJA_ENABLED = not VIZIJA_ENABLED
+    ESPToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+end)
+ESPSection.MouseButton2Click:Connect(function()
+    closeAllDropdowns()
+    accordionState.ESP = not accordionState.ESP
+    if accordionState.ESP then
+        ESPDrodown:TweenSize(UDim2.new(1,0,0,120), "Out", "Quad", 0.2, true)
+    else
+        ESPDrodown:TweenSize(UDim2.new(1,0,0,0), "Out", "Quad", 0.2, true)
+    end
+end)
+
+-- Virtualni hitbox indikator (krug)
+local Drawing = Drawing or getgenv().Drawing
+local hitboxCircles = {}
+RunService.RenderStepped:Connect(function()
+    for _,circle in pairs(hitboxCircles) do circle.Visible = false end
+    if HITBOX_ENABLED then
+        local i = 1
+        for _,plr in pairs(Players:GetPlayers()) do
+            if plr ~= Players.LocalPlayer and isEnemy(plr) and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                local char = plr.Character
+                local hrp = char:FindFirstChild("HumanoidRootPart")
+                local pos, onscreen = Camera:WorldToViewportPoint(hrp.Position)
+                if onscreen then
+                    if not hitboxCircles[i] then
+                        hitboxCircles[i] = Drawing.new("Circle")
+                        hitboxCircles[i].Thickness = 2
+                        hitboxCircles[i].Transparency = 1
+                        hitboxCircles[i].ZIndex = 2
+                        hitboxCircles[i].Filled = false
+                        hitboxCircles[i].Color = Color3.fromRGB(255,0,0)
+                    end
+                    local circle = hitboxCircles[i]
+                    circle.Visible = true
+                    circle.Position = Vector2.new(pos.X, pos.Y)
+                    circle.Radius = META_FOV * 10
+                    i = i + 1
+                end
+            end
+        end
+        for j = i, #hitboxCircles do
+            if hitboxCircles[j] then hitboxCircles[j].Visible = false end
+        end
     end
 end)
 
