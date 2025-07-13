@@ -814,8 +814,135 @@ local MAX_HITBOX_FOV = 200
 if HitboxFOVLabel then HitboxFOVLabel:Destroy() end
 if HitboxFOVSlider then HitboxFOVSlider:Destroy() end
 
--- NOVI PANEL: Sve u jednom (Vizija, Boja kutije, Povecaj glavudju, Imena, Krozzid)
--- (Zadržavamo postojeće sekcije, ali ih rearanžiramo i preimenujemo)
+-- MODERNI SLIDE SWITCH (custom)
+local function createSwitch(parent, state, onToggle, colorOn, colorOff)
+    local frame = Instance.new("Frame", parent)
+    frame.Size = UDim2.new(0, 48, 0, 28)
+    frame.BackgroundTransparency = 1
+    local bg = Instance.new("Frame", frame)
+    bg.Size = UDim2.new(1, 0, 1, 0)
+    bg.Position = UDim2.new(0, 0, 0, 0)
+    bg.BackgroundColor3 = state and colorOn or colorOff
+    bg.BorderSizePixel = 0
+    local bgCorner = Instance.new("UICorner", bg)
+    bgCorner.CornerRadius = UDim.new(1, 0)
+    local knob = Instance.new("Frame", bg)
+    knob.Size = UDim2.new(0, 24, 0, 24)
+    knob.Position = state and UDim2.new(1, -26, 0, 2) or UDim2.new(0, 2, 0, 2)
+    knob.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    knob.BorderSizePixel = 0
+    local knobCorner = Instance.new("UICorner", knob)
+    knobCorner.CornerRadius = UDim.new(1, 0)
+    local dragging = false
+    bg.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+        end
+    end)
+    bg.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and dragging then
+            dragging = false
+            state = not state
+            onToggle(state)
+            bg.BackgroundColor3 = state and colorOn or colorOff
+            knob:TweenPosition(state and UDim2.new(1, -26, 0, 2) or UDim2.new(0, 2, 0, 2), "Out", "Quad", 0.18, true)
+        end
+    end)
+    return frame, function(val)
+        state = val
+        bg.BackgroundColor3 = state and colorOn or colorOff
+        knob.Position = state and UDim2.new(1, -26, 0, 2) or UDim2.new(0, 2, 0, 2)
+    end
+end
+
+-- MODERNE PASTEL BOJE
+local pastelRed = Color3.fromRGB(255, 120, 120)
+local pastelBlue = Color3.fromRGB(120, 180, 255)
+local pastelGreen = Color3.fromRGB(120, 255, 180)
+
+-- PRIMJENA SLIDE SWITCHA ZA SVE TOGGLE-OVE
+-- ESP
+local espSwitch, setESPSwitch = createSwitch(VizijaSection, VIZIJA_ENABLED, function(val)
+    VIZIJA_ENABLED = val
+    VizijaToggle.Text = val and "Uključeno" or "Isključeno"
+    VizijaToggle.BackgroundColor3 = val and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+end, Config.Colors.Accent, Color3.fromRGB(60,60,60))
+espSwitch.Position = UDim2.new(0, 250, 0, 8)
+VizijaToggle.Visible = false
+
+-- OnlyEnemies
+local enemySwitch, setEnemySwitch = createSwitch(VizijaSection, VIZIJA_ENEMY_ONLY, function(val)
+    VIZIJA_ENEMY_ONLY = val
+    OnlyEnemiesBtn.Text = val and "Samo protivnici" or "Svi igrači"
+end, pastelBlue, Color3.fromRGB(60,60,60))
+enemySwitch.Position = UDim2.new(0, 250, 0, 48)
+OnlyEnemiesBtn.Visible = false
+
+-- Nametag
+local imenaSwitch, setImenaSwitch = createSwitch(ImenaSection, NAMETAG_ENABLED, function(val)
+    NAMETAG_ENABLED = val
+    ImenaToggle.Text = val and "Uključeno" or "Isključeno"
+    ImenaToggle.BackgroundColor3 = val and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+end, pastelGreen, Color3.fromRGB(60,60,60))
+imenaSwitch.Position = UDim2.new(0, 200, 0, 8)
+ImenaToggle.Visible = false
+
+-- Krozzid
+local krozzidSwitch, setKrozzidSwitch = createSwitch(ImenaSection, KROZZID_ENABLED, function(val)
+    KROZZID_ENABLED = val
+    KrozzidToggle.Text = val and "Krozzid: Uključeno" or "Krozzid: Isključeno"
+    KrozzidToggle.BackgroundColor3 = val and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+end, pastelRed, Color3.fromRGB(60,60,60))
+krozzidSwitch.Position = UDim2.new(0, 340, 0, 8)
+KrozzidToggle.Visible = false
+
+-- Glava/Tijelo
+local headSwitch, setHeadSwitch = createSwitch(MetaSection, META_HEAD, function(val)
+    META_HEAD = val
+    HeadBtn.BackgroundColor3 = val and pastelRed or Color3.fromRGB(60,60,60)
+end, pastelRed, Color3.fromRGB(60,60,60))
+headSwitch.Position = UDim2.new(0, 10, 0, 80)
+HeadBtn.Visible = false
+local torsoSwitch, setTorsoSwitch = createSwitch(MetaSection, META_TORSO, function(val)
+    META_TORSO = val
+    TorsoBtn.BackgroundColor3 = val and pastelBlue or Color3.fromRGB(60,60,60)
+end, pastelBlue, Color3.fromRGB(60,60,60))
+torsoSwitch.Position = UDim2.new(0, 70, 0, 80)
+TorsoBtn.Visible = false
+
+-- BOJE ZA GLAVU (PASTEL)
+RedBtn.BackgroundColor3 = pastelRed
+BlueBtn.BackgroundColor3 = pastelBlue
+GreenBtn.BackgroundColor3 = pastelGreen
+
+-- GRID/FLEX LAYOUT ZA SVE SEKCIJE
+for _,frame in ipairs({VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
+    local layout = Instance.new("UIListLayout", frame)
+    layout.FillDirection = Enum.FillDirection.Horizontal
+    layout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+    layout.VerticalAlignment = Enum.VerticalAlignment.Center
+    layout.Padding = UDim.new(0, 8)
+end
+
+-- PANEL I SEKCIJE: SHADOW, BORDER, PADDING
+for _,frame in ipairs({MainFrame, VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
+    local border = Instance.new("UIStroke", frame)
+    border.Color = Color3.fromRGB(60, 70, 90)
+    border.Thickness = 2
+    border.Transparency = 0.7
+    local shadow = Instance.new("ImageLabel", frame)
+    shadow.Size = UDim2.new(1, 24, 1, 24)
+    shadow.Position = UDim2.new(0, -12, 0, -12)
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://1316045217"
+    shadow.ImageTransparency = 0.85
+    shadow.ZIndex = 0
+    local pad = Instance.new("UIPadding", frame)
+    pad.PaddingTop = UDim.new(0, 8)
+    pad.PaddingBottom = UDim.new(0, 8)
+    pad.PaddingLeft = UDim.new(0, 12)
+    pad.PaddingRight = UDim.new(0, 12)
+end
 
 -- 1. Vizija (ESP) sekcija ostaje kao prije
 -- 2. Boja kutije sekcija ostaje kao prije
