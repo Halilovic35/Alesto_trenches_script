@@ -385,9 +385,19 @@ BindSection.BorderSizePixel = 0
 local BindCorner = Instance.new("UICorner", BindSection)
 BindCorner.CornerRadius = UDim.new(0, 12)
 
-local ESPBindBtn = Instance.new("TextButton", BindSection)
+-- 6. Bindovi u glavni panel (MetaSection)
+local BindoviLabel = Instance.new("TextLabel", MetaSection)
+BindoviLabel.Size = UDim2.new(0, 120, 0, 28)
+BindoviLabel.Position = UDim2.new(0, 10, 0, 8+32+48+28+8+32+36)
+BindoviLabel.BackgroundTransparency = 1
+BindoviLabel.Text = "Bindovi (tipke)"
+BindoviLabel.TextColor3 = Config.Colors.Text
+BindoviLabel.TextScaled = true
+BindoviLabel.Font = Enum.Font.GothamBold
+
+local ESPBindBtn = Instance.new("TextButton", MetaSection)
 ESPBindBtn.Size = UDim2.new(0, 90, 0, 28)
-ESPBindBtn.Position = UDim2.new(0, 10, 0, 6)
+ESPBindBtn.Position = UDim2.new(0, 10, 0, 8+32+48+28+8+32+36+28)
 ESPBindBtn.BackgroundColor3 = Config.Colors.Accent
 ESPBindBtn.Text = "ESP: "..tostring(ESP_BIND.Name)
 ESPBindBtn.TextColor3 = Config.Colors.Text
@@ -396,31 +406,31 @@ ESPBindBtn.Font = Enum.Font.GothamBold
 local ESPBindCorner = Instance.new("UICorner", ESPBindBtn)
 ESPBindCorner.CornerRadius = UDim.new(0, 8)
 
-local HitboxBindBtn = Instance.new("TextButton", BindSection)
-HitboxBindBtn.Size = UDim2.new(0, 90, 0, 28)
-HitboxBindBtn.Position = UDim2.new(0, 110, 0, 6)
+local HitboxBindBtn = Instance.new("TextButton", MetaSection)
+HitboxBindBtn.Size = UDim2.new(0, 110, 0, 28)
+HitboxBindBtn.Position = UDim2.new(0, 110, 0, 8+32+48+28+8+32+36+28)
 HitboxBindBtn.BackgroundColor3 = Config.Colors.Accent
-HitboxBindBtn.Text = "Hitbox: "..tostring(HITBOX_BIND.Name)
+HitboxBindBtn.Text = "Glavudja: "..tostring(HITBOX_BIND.Name)
 HitboxBindBtn.TextColor3 = Config.Colors.Text
 HitboxBindBtn.TextScaled = true
 HitboxBindBtn.Font = Enum.Font.GothamBold
 local HitboxBindCorner = Instance.new("UICorner", HitboxBindBtn)
 HitboxBindCorner.CornerRadius = UDim.new(0, 8)
 
-local NametagBindBtn = Instance.new("TextButton", BindSection)
-NametagBindBtn.Size = UDim2.new(0, 110, 0, 28)
-NametagBindBtn.Position = UDim2.new(0, 210, 0, 6)
-NametagBindBtn.BackgroundColor3 = Config.Colors.Accent
-NametagBindBtn.Text = "Nametag: "..tostring(NAMETAG_BIND.Name)
-NametagBindBtn.TextColor3 = Config.Colors.Text
-NametagBindBtn.TextScaled = true
-NametagBindBtn.Font = Enum.Font.GothamBold
-local NametagBindCorner = Instance.new("UICorner", NametagBindBtn)
-NametagBindCorner.CornerRadius = UDim.new(0, 8)
+local ImenaBindBtn = Instance.new("TextButton", MetaSection)
+ImenaBindBtn.Size = UDim2.new(0, 110, 0, 28)
+ImenaBindBtn.Position = UDim2.new(0, 230, 0, 8+32+48+28+8+32+36+28)
+ImenaBindBtn.BackgroundColor3 = Config.Colors.Accent
+ImenaBindBtn.Text = "Imena: "..tostring(NAMETAG_BIND.Name)
+ImenaBindBtn.TextColor3 = Config.Colors.Text
+ImenaBindBtn.TextScaled = true
+ImenaBindBtn.Font = Enum.Font.GothamBold
+local ImenaBindCorner = Instance.new("UICorner", ImenaBindBtn)
+ImenaBindCorner.CornerRadius = UDim.new(0, 8)
 
-local KrozzidBindBtn = Instance.new("TextButton", BindSection)
+local KrozzidBindBtn = Instance.new("TextButton", MetaSection)
 KrozzidBindBtn.Size = UDim2.new(0, 110, 0, 28)
-KrozzidBindBtn.Position = UDim2.new(0, 330, 0, 6)
+KrozzidBindBtn.Position = UDim2.new(0, 350, 0, 8+32+48+28+8+32+36+28)
 KrozzidBindBtn.BackgroundColor3 = Config.Colors.Accent
 KrozzidBindBtn.Text = "Krozzid: "..tostring(KROZZID_BIND.Name)
 KrozzidBindBtn.TextColor3 = Config.Colors.Text
@@ -437,8 +447,8 @@ HitboxBindBtn.MouseButton1Click:Connect(function()
     HitboxBindBtn.Text = "Pritisni tipku..."
     waitingForBind = "HITBOX"
 end)
-NametagBindBtn.MouseButton1Click:Connect(function()
-    NametagBindBtn.Text = "Pritisni tipku..."
+ImenaBindBtn.MouseButton1Click:Connect(function()
+    ImenaBindBtn.Text = "Pritisni tipku..."
     waitingForBind = "NAMETAG"
 end)
 KrozzidBindBtn.MouseButton1Click:Connect(function()
@@ -819,6 +829,16 @@ KrozzidToggle.MouseButton1Click:Connect(function()
     end
 end)
 
+-- Krozzid toggle (uključi/isključi wallshot)
+local KROZZID_ENABLED = false
+KrozzidToggle.Text = "Krozzid: Isključeno"
+KrozzidToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
+KrozzidToggle.MouseButton1Click:Connect(function()
+    KROZZID_ENABLED = not KROZZID_ENABLED
+    KrozzidToggle.Text = KROZZID_ENABLED and "Krozzid: Uključeno" or "Krozzid: Isključeno"
+    KrozzidToggle.BackgroundColor3 = KROZZID_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+end)
+
 -- Nametag loop (BillboardGui iznad glave protivnika, updateuje tekst i veličinu, briše na smrt)
 RunService.RenderStepped:Connect(function()
     for _,plr in pairs(Players:GetPlayers()) do
@@ -918,6 +938,42 @@ RunService.RenderStepped:Connect(function()
     end
     for j = i, #vizijaBoxes do
         if vizijaBoxes[j] then vizijaBoxes[j].Visible = false end
+    end
+end)
+
+-- U wallshot funkciji koristi KROZZID_ENABLED za prikaz/skrivanje highlighta
+RunService.RenderStepped:Connect(function()
+    if KROZZID_ENABLED then
+        local origin = Camera.CFrame.Position
+        local direction = Camera.CFrame.LookVector * 1000
+        local ignoreList = {Players.LocalPlayer.Character}
+        local target = krozZid(origin, direction, ignoreList)
+        for _,plr in pairs(Players:GetPlayers()) do
+            if plr ~= Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
+                local head = plr.Character.Head
+                local sb = head:FindFirstChild("KrozzidHighlight")
+                if sb then sb:Destroy() end
+            end
+        end
+        if target and target:FindFirstChild("Head") then
+            local head = target.Head
+            if not head:FindFirstChild("KrozzidHighlight") then
+                local sb = Instance.new("SelectionBox")
+                sb.Name = "KrozzidHighlight"
+                sb.Adornee = head
+                sb.Color3 = Color3.fromRGB(255,0,0)
+                sb.LineThickness = 0.1
+                sb.Parent = head
+            end
+        end
+    else
+        for _,plr in pairs(Players:GetPlayers()) do
+            if plr ~= Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
+                local head = plr.Character.Head
+                local sb = head:FindFirstChild("KrozzidHighlight")
+                if sb then sb:Destroy() end
+            end
+        end
     end
 end)
 
