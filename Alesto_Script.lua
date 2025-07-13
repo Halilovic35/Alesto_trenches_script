@@ -102,9 +102,16 @@ local Title = Instance.new("TextLabel", TitleBar)
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
 Title.Text = "Alesto Panel"
-Title.TextColor3 = Config.Colors.Text
-Title.TextScaled = true
-Title.Font = Enum.Font.GothamBold
+Title.TextColor3 = Color3.fromRGB(200, 255, 255)
+Title.Font = Enum.Font.GothamBlack
+Title.TextStrokeTransparency = 0.5
+Title.TextStrokeColor3 = Color3.fromRGB(0, 200, 255)
+local titleGradient = Instance.new("UIGradient", Title)
+titleGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 255, 200))
+}
+titleGradient.Rotation = 0
 
 local MinimizeBtn = Instance.new("TextButton", TitleBar)
 MinimizeBtn.Size = UDim2.new(0, 38, 0, 38)
