@@ -133,14 +133,17 @@ VizijaSection.BorderSizePixel = 0
 local VizijaCorner = Instance.new("UICorner", VizijaSection)
 VizijaCorner.CornerRadius = UDim.new(0, 12)
 
+-- Vraćam labele, inpute i vrijednosti u sekcije
+-- VIZIJA SEKCIJA
 local VizijaLabel = Instance.new("TextLabel", VizijaSection)
-VizijaLabel.Size = UDim2.new(0, 120, 0, 32)
-VizijaLabel.Position = UDim2.new(0, 10, 0, 8)
+VizijaLabel.Size = UDim2.new(0, 140, 0, 28)
 VizijaLabel.BackgroundTransparency = 1
 VizijaLabel.Text = "Vizija (kutije)"
-VizijaLabel.TextColor3 = Config.Colors.Text
-VizijaLabel.TextScaled = true
+VizijaLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
 VizijaLabel.Font = Enum.Font.GothamBold
+VizijaLabel.TextScaled = true
+VizijaLabel.TextXAlignment = Enum.TextXAlignment.Left
+VizijaLabel.Position = UDim2.new(0, 8, 0, 8)
 
 local VizijaToggle = Instance.new("TextButton", VizijaSection)
 VizijaToggle.Size = UDim2.new(0, 100, 0, 32)
@@ -188,14 +191,16 @@ ColorSection.BorderSizePixel = 0
 local ColorCorner = Instance.new("UICorner", ColorSection)
 ColorCorner.CornerRadius = UDim.new(0, 12)
 
+-- BOJA KUTIJE SEKCIJA
 local ColorLabel = Instance.new("TextLabel", ColorSection)
-ColorLabel.Size = UDim2.new(0, 120, 0, 32)
-ColorLabel.Position = UDim2.new(0, 10, 0, 8)
+ColorLabel.Size = UDim2.new(0, 140, 0, 28)
 ColorLabel.BackgroundTransparency = 1
 ColorLabel.Text = "Boja kutije"
-ColorLabel.TextColor3 = Config.Colors.Text
-ColorLabel.TextScaled = true
+ColorLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
 ColorLabel.Font = Enum.Font.GothamBold
+ColorLabel.TextScaled = true
+ColorLabel.TextXAlignment = Enum.TextXAlignment.Left
+ColorLabel.Position = UDim2.new(0, 8, 0, 8)
 
 -- Color wheel (simple implementation)
 local ColorWheel = Instance.new("ImageButton", ColorSection)
@@ -259,14 +264,16 @@ MetaSection.BorderSizePixel = 0
 local MetaCorner = Instance.new("UICorner", MetaSection)
 MetaCorner.CornerRadius = UDim.new(0, 12)
 
+-- POVECANJE GLAVUDJE SEKCIJA
 local MetaLabel = Instance.new("TextLabel", MetaSection)
-MetaLabel.Size = UDim2.new(0, 120, 0, 32)
-MetaLabel.Position = UDim2.new(0, 10, 0, 8)
+MetaLabel.Size = UDim2.new(0, 140, 0, 28)
 MetaLabel.BackgroundTransparency = 1
 MetaLabel.Text = "Povecaj glavudju"
-MetaLabel.TextColor3 = Config.Colors.Text
-MetaLabel.TextScaled = true
+MetaLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
 MetaLabel.Font = Enum.Font.GothamBold
+MetaLabel.TextScaled = true
+MetaLabel.TextXAlignment = Enum.TextXAlignment.Left
+MetaLabel.Position = UDim2.new(0, 8, 0, 8)
 
 -- MODERNI INPUT BOX ZA FOV (hitbox)
 local FOVInput = Instance.new("TextBox", MetaSection)
@@ -417,14 +424,16 @@ ImenaSection.BorderSizePixel = 0
 local ImenaSectionCorner = Instance.new("UICorner", ImenaSection)
 ImenaSectionCorner.CornerRadius = UDim.new(0, 12)
 
+-- IMENA SEKCIJA
 local ImenaLabel = Instance.new("TextLabel", ImenaSection)
-ImenaLabel.Size = UDim2.new(0, 80, 0, 28)
-ImenaLabel.Position = UDim2.new(0, 10, 0, 8)
+ImenaLabel.Size = UDim2.new(0, 140, 0, 28)
 ImenaLabel.BackgroundTransparency = 1
 ImenaLabel.Text = "Imena"
-ImenaLabel.TextColor3 = Config.Colors.Text
-ImenaLabel.TextScaled = true
+ImenaLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
 ImenaLabel.Font = Enum.Font.GothamBold
+ImenaLabel.TextScaled = true
+ImenaLabel.TextXAlignment = Enum.TextXAlignment.Left
+ImenaLabel.Position = UDim2.new(0, 8, 0, 8)
 
 local ImenaToggle = Instance.new("TextButton", ImenaSection)
 ImenaToggle.Size = UDim2.new(0, 90, 0, 28)
@@ -442,14 +451,16 @@ ImenaToggle.MouseButton1Click:Connect(function()
     ImenaToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
 end)
 
+-- IMENA SEKCIJA
 local ImenaScaleLabel = Instance.new("TextLabel", ImenaSection)
-ImenaScaleLabel.Size = UDim2.new(0, 60, 0, 28)
-ImenaScaleLabel.Position = UDim2.new(0, 200, 0, 8)
+ImenaScaleLabel.Size = UDim2.new(0, 60, 0, 24)
 ImenaScaleLabel.BackgroundTransparency = 1
 ImenaScaleLabel.Text = "Veličina"
-ImenaScaleLabel.TextColor3 = Config.Colors.Text
-ImenaScaleLabel.TextScaled = true
+ImenaScaleLabel.TextColor3 = Color3.fromRGB(180, 220, 255)
 ImenaScaleLabel.Font = Enum.Font.Gotham
+ImenaScaleLabel.TextScaled = true
+ImenaScaleLabel.TextXAlignment = Enum.TextXAlignment.Left
+ImenaScaleLabel.Position = UDim2.new(0, 8, 0, 36)
 
 -- Krozzid toggle u Imena sekciji
 local KrozzidToggle = Instance.new("TextButton", ImenaSection)
@@ -478,14 +489,16 @@ BindoviSection.BorderSizePixel = 0
 local BindoviSectionCorner = Instance.new("UICorner", BindoviSection)
 BindoviSectionCorner.CornerRadius = UDim.new(0, 12)
 
+-- BINDOVI SEKCIJA
 local BindoviLabel = Instance.new("TextLabel", BindoviSection)
-BindoviLabel.Size = UDim2.new(0, 120, 0, 28)
-BindoviLabel.Position = UDim2.new(0, 10, 0, 8)
+BindoviLabel.Size = UDim2.new(0, 140, 0, 28)
 BindoviLabel.BackgroundTransparency = 1
 BindoviLabel.Text = "Bindovi (tipke)"
-BindoviLabel.TextColor3 = Config.Colors.Text
-BindoviLabel.TextScaled = true
+BindoviLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
 BindoviLabel.Font = Enum.Font.GothamBold
+BindoviLabel.TextScaled = true
+BindoviLabel.TextXAlignment = Enum.TextXAlignment.Left
+BindoviLabel.Position = UDim2.new(0, 8, 0, 8)
 
 local ESPBindBtn = Instance.new("TextButton", BindoviSection)
 ESPBindBtn.Size = UDim2.new(0, 80, 0, 28)
