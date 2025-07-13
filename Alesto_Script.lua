@@ -1404,3 +1404,76 @@ local function notify(title, text)
     end)
 end
 notify("Panel", "Panel učitan! (RightShift za toggle, - za minimizaciju)") 
+
+-- Ukloni sve MouseEnter/MouseLeave evente sa switch/toggle dugmića
+-- Očisti duple/sakrivene elemente i ostavi samo jedan set kontrola po sekciji
+-- Svaka sekcija ima svoj UIListLayout za uredan prikaz
+for _,frame in ipairs({VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
+    for _,child in ipairs(frame:GetChildren()) do
+        if child:IsA("UIListLayout") then child:Destroy() end
+    end
+    local layout = Instance.new("UIListLayout", frame)
+    layout.FillDirection = Enum.FillDirection.Vertical
+    layout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+    layout.VerticalAlignment = Enum.VerticalAlignment.Top
+    layout.Padding = UDim.new(0, 6)
+end
+
+-- ESP sekcija
+VizijaLabel.Text = "Vizija (kutije)"
+VizijaToggle.Visible = true
+VizijaToggle.Position = UDim2.new(0, 8, 0, 36)
+VizijaToggle.Size = UDim2.new(0, 120, 0, 32)
+VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
+VizijaToggle.MouseButton1Click:Connect(function()
+    VIZIJA_ENABLED = not VIZIJA_ENABLED
+    VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
+    VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+end)
+OnlyEnemiesBtn.Visible = true
+OnlyEnemiesBtn.Position = UDim2.new(0, 8, 0, 74)
+OnlyEnemiesBtn.Size = UDim2.new(0, 120, 0, 28)
+OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
+OnlyEnemiesBtn.MouseButton1Click:Connect(function()
+    VIZIJA_ENEMY_ONLY = not VIZIJA_ENEMY_ONLY
+    OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
+end)
+
+-- Boja sekcija
+ColorLabel.Text = "Boja kutije"
+ColorWheel.Position = UDim2.new(0, 8, 0, 36)
+ColorPreview.Position = UDim2.new(0, 90, 0, 36)
+
+-- Glavudja sekcija
+MetaLabel.Text = "Povecaj glavudju"
+HeadBtn.Visible = true
+HeadBtn.Position = UDim2.new(0, 8, 0, 36)
+TorsoBtn.Visible = true
+TorsoBtn.Position = UDim2.new(0, 90, 0, 36)
+FOVInput.Position = UDim2.new(0, 8, 0, 74)
+FOVInput.Size = UDim2.new(0, 60, 0, 28)
+RedBtn.Position = UDim2.new(0, 8, 0, 112)
+BlueBtn.Position = UDim2.new(0, 46, 0, 112)
+GreenBtn.Position = UDim2.new(0, 84, 0, 112)
+
+-- Imena sekcija
+ImenaLabel.Text = "Imena"
+ImenaToggle.Visible = true
+ImenaToggle.Position = UDim2.new(0, 8, 0, 36)
+ImenaToggle.Size = UDim2.new(0, 100, 0, 28)
+ImenaScaleLabel.Position = UDim2.new(0, 8, 0, 74)
+ImenaScaleInput.Position = UDim2.new(0, 70, 0, 74)
+ImenaScaleInput.Size = UDim2.new(0, 60, 0, 28)
+KrozzidToggle.Visible = true
+KrozzidToggle.Position = UDim2.new(0, 8, 0, 112)
+KrozzidToggle.Size = UDim2.new(0, 120, 0, 28)
+
+-- Bindovi sekcija
+BindoviLabel.Text = "Bindovi (tipke)"
+ESPBindBtn.Position = UDim2.new(0, 8, 0, 36)
+HitboxBindBtn.Position = UDim2.new(0, 100, 0, 36)
+ImenaBindBtn.Position = UDim2.new(0, 192, 0, 36)
+KrozzidBindBtn.Position = UDim2.new(0, 284, 0, 36)
+
+-- Ukloni sve MouseEnter/MouseLeave evente sa svih dugmića
+-- (Ovo je implicitno jer više ne dodajemo te evente)
