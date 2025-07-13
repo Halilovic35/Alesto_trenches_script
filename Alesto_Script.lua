@@ -256,7 +256,7 @@ local MetaLabel = Instance.new("TextLabel", MetaSection)
 MetaLabel.Size = UDim2.new(0, 120, 0, 32)
 MetaLabel.Position = UDim2.new(0, 10, 0, 8)
 MetaLabel.BackgroundTransparency = 1
-MetaLabel.Text = "Meta (hitbox)"
+MetaLabel.Text = "Povecaj glavudju"
 MetaLabel.TextColor3 = Config.Colors.Text
 MetaLabel.TextScaled = true
 MetaLabel.Font = Enum.Font.GothamBold
@@ -719,70 +719,103 @@ end)
 if HitboxFOVLabel then HitboxFOVLabel:Destroy() end
 if HitboxFOVSlider then HitboxFOVSlider:Destroy() end
 
--- Nametag sekcija u GUI
-local NametagSection = Instance.new("Frame", MainFrame)
-NametagSection.Size = UDim2.new(1, -32, 0, 70)
-NametagSection.Position = UDim2.new(0, 16, 0, 520)
-NametagSection.BackgroundColor3 = Config.Colors.Section
-NametagSection.BorderSizePixel = 0
-local NametagCorner = Instance.new("UICorner", NametagSection)
-NametagCorner.CornerRadius = UDim.new(0, 12)
+-- NOVI PANEL: Sve u jednom (Vizija, Boja kutije, Povecaj glavudju, Imena, Krozzid)
+-- (Zadržavamo postojeće sekcije, ali ih rearanžiramo i preimenujemo)
 
-local NametagLabel = Instance.new("TextLabel", NametagSection)
-NametagLabel.Size = UDim2.new(0, 120, 0, 28)
-NametagLabel.Position = UDim2.new(0, 10, 0, 8)
-NametagLabel.BackgroundTransparency = 1
-NametagLabel.Text = "Nametag"
-NametagLabel.TextColor3 = Config.Colors.Text
-NametagLabel.TextScaled = true
-NametagLabel.Font = Enum.Font.GothamBold
+-- 1. Vizija (ESP) sekcija ostaje kao prije
+-- 2. Boja kutije sekcija ostaje kao prije
+-- 3. Hitbox sekcija preimenuj u "Povecaj glavudju"
+MetaLabel.Text = "Povecaj glavudju"
 
-local NametagToggle = Instance.new("TextButton", NametagSection)
-NametagToggle.Size = UDim2.new(0, 100, 0, 28)
-NametagToggle.Position = UDim2.new(0, 140, 0, 8)
-NametagToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-NametagToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
-NametagToggle.TextColor3 = Config.Colors.Text
-NametagToggle.TextScaled = true
-NametagToggle.Font = Enum.Font.GothamBold
-local NametagToggleCorner = Instance.new("UICorner", NametagToggle)
-NametagToggleCorner.CornerRadius = UDim.new(0, 8)
-NametagToggle.MouseButton1Click:Connect(function()
+-- 4. Nametag sekcija preimenuj u "Imena" i spoji u MetaSection
+local ImenaLabel = Instance.new("TextLabel", MetaSection)
+ImenaLabel.Size = UDim2.new(0, 120, 0, 28)
+ImenaLabel.Position = UDim2.new(0, 10, 0, 8+32+48+28+8) -- ispod ostalih
+ImenaLabel.BackgroundTransparency = 1
+ImenaLabel.Text = "Imena"
+ImenaLabel.TextColor3 = Config.Colors.Text
+ImenaLabel.TextScaled = true
+ImenaLabel.Font = Enum.Font.GothamBold
+
+local ImenaToggle = Instance.new("TextButton", MetaSection)
+ImenaToggle.Size = UDim2.new(0, 100, 0, 28)
+ImenaToggle.Position = UDim2.new(0, 140, 0, 8+32+48+28+8)
+ImenaToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+ImenaToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
+ImenaToggle.TextColor3 = Config.Colors.Text
+ImenaToggle.TextScaled = true
+ImenaToggle.Font = Enum.Font.GothamBold
+local ImenaToggleCorner = Instance.new("UICorner", ImenaToggle)
+ImenaToggleCorner.CornerRadius = UDim.new(0, 8)
+ImenaToggle.MouseButton1Click:Connect(function()
     NAMETAG_ENABLED = not NAMETAG_ENABLED
-    NametagToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
-    NametagToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+    ImenaToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
+    ImenaToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
 end)
 
-local NametagScaleLabel = Instance.new("TextLabel", NametagSection)
-NametagScaleLabel.Size = UDim2.new(0, 60, 0, 28)
-NametagScaleLabel.Position = UDim2.new(0, 250, 0, 8)
-NametagScaleLabel.BackgroundTransparency = 1
-NametagScaleLabel.Text = "Veličina"
-NametagScaleLabel.TextColor3 = Config.Colors.Text
-NametagScaleLabel.TextScaled = true
-NametagScaleLabel.Font = Enum.Font.Gotham
+local ImenaScaleLabel = Instance.new("TextLabel", MetaSection)
+ImenaScaleLabel.Size = UDim2.new(0, 60, 0, 28)
+ImenaScaleLabel.Position = UDim2.new(0, 250, 0, 8+32+48+28+8)
+ImenaScaleLabel.BackgroundTransparency = 1
+ImenaScaleLabel.Text = "Veličina"
+ImenaScaleLabel.TextColor3 = Config.Colors.Text
+ImenaScaleLabel.TextScaled = true
+ImenaScaleLabel.Font = Enum.Font.Gotham
 
-local NametagScaleSlider = Instance.new("TextButton", NametagSection)
-NametagScaleSlider.Size = UDim2.new(0, 100, 0, 28)
-NametagScaleSlider.Position = UDim2.new(0, 320, 0, 8)
-NametagScaleSlider.BackgroundColor3 = Config.Colors.Accent
-NametagScaleSlider.Text = tostring(NAMETAG_SCALE)
-NametagScaleSlider.TextColor3 = Config.Colors.Text
-NametagScaleSlider.TextScaled = true
-NametagScaleSlider.Font = Enum.Font.GothamBold
-local draggingNametagScale = false
-NametagScaleSlider.MouseButton1Down:Connect(function()
-    draggingNametagScale = true
+local ImenaScaleSlider = Instance.new("TextButton", MetaSection)
+ImenaScaleSlider.Size = UDim2.new(0, 100, 0, 28)
+ImenaScaleSlider.Position = UDim2.new(0, 320, 0, 8+32+48+28+8)
+ImenaScaleSlider.BackgroundColor3 = Config.Colors.Accent
+ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
+ImenaScaleSlider.TextColor3 = Config.Colors.Text
+ImenaScaleSlider.TextScaled = true
+ImenaScaleSlider.Font = Enum.Font.GothamBold
+local draggingImenaScale = false
+ImenaScaleSlider.MouseButton1Down:Connect(function()
+    draggingImenaScale = true
 end)
 UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingNametagScale = false end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingImenaScale = false end
 end)
 UserInputService.InputChanged:Connect(function(input)
-    if draggingNametagScale and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local rel = math.clamp((input.Position.X - NametagScaleSlider.AbsolutePosition.X) / NametagScaleSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * 40 + 10) / 10 -- 1.0 do 5.0
+    if draggingImenaScale and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local rel = math.clamp((input.Position.X - ImenaScaleSlider.AbsolutePosition.X) / ImenaScaleSlider.AbsoluteSize.X, 0, 1)
+        local value = math.floor(rel * 49 + 1) / 10 -- 0.1 do 5.0
         NAMETAG_SCALE = value
-        NametagScaleSlider.Text = tostring(value)
+        ImenaScaleSlider.Text = tostring(value)
+    end
+end)
+NAMETAG_SCALE = 0.1
+ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
+
+-- 5. Dodaj Krozzid toggle u isti panel
+local KrozzidToggle = Instance.new("TextButton", MetaSection)
+KrozzidToggle.Size = UDim2.new(0, 120, 0, 28)
+KrozzidToggle.Position = UDim2.new(0, 10, 0, 8+32+48+28+8+32)
+KrozzidToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
+KrozzidToggle.Text = "Krozzid"
+KrozzidToggle.TextColor3 = Config.Colors.Text
+KrozzidToggle.TextScaled = true
+KrozzidToggle.Font = Enum.Font.GothamBold
+local KrozzidToggleCorner = Instance.new("UICorner", KrozzidToggle)
+KrozzidToggleCorner.CornerRadius = UDim.new(0, 8)
+KrozzidToggle.MouseButton1Click:Connect(function()
+    -- Pozovi wallshot funkciju
+    local origin = Camera.CFrame.Position
+    local direction = Camera.CFrame.LookVector * 1000
+    local ignoreList = {Players.LocalPlayer.Character}
+    local target = krozZid(origin, direction, ignoreList)
+    if target and target:FindFirstChild("Head") then
+        local head = target.Head
+        if not head:FindFirstChild("KrozzidHighlight") then
+            local sb = Instance.new("SelectionBox")
+            sb.Name = "KrozzidHighlight"
+            sb.Adornee = head
+            sb.Color3 = Color3.fromRGB(255,0,0)
+            sb.LineThickness = 0.1
+            sb.Parent = head
+            game.Debris:AddItem(sb, 1.5)
+        end
     end
 end)
 
