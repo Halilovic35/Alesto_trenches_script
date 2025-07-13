@@ -102,16 +102,9 @@ local Title = Instance.new("TextLabel", TitleBar)
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
 Title.Text = "Alesto Panel"
-Title.TextColor3 = Color3.fromRGB(200, 255, 255)
-Title.Font = Enum.Font.GothamBlack
-Title.TextStrokeTransparency = 0.5
-Title.TextStrokeColor3 = Color3.fromRGB(0, 200, 255)
-local titleGradient = Instance.new("UIGradient", Title)
-titleGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 200, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 255, 200))
-}
-titleGradient.Rotation = 0
+Title.TextColor3 = Config.Colors.Text
+Title.TextScaled = true
+Title.Font = Enum.Font.GothamBold
 
 local MinimizeBtn = Instance.new("TextButton", TitleBar)
 MinimizeBtn.Size = UDim2.new(0, 38, 0, 38)
@@ -133,45 +126,51 @@ VizijaSection.BorderSizePixel = 0
 local VizijaCorner = Instance.new("UICorner", VizijaSection)
 VizijaCorner.CornerRadius = UDim.new(0, 12)
 
--- Refaktorisani GUI layout: automatsko slaganje, jasne labele, bez ručnih pozicija
-local function clearSection(section)
-    for _,child in ipairs(section:GetChildren()) do
-        if not child:IsA("UICorner") and not child:IsA("UIStroke") and not child:IsA("UIPadding") then
-            child:Destroy()
-        end
-    end
-end
-clearSection(VizijaSection)
-clearSection(ColorSection)
-clearSection(MetaSection)
-clearSection(ImenaSection)
-clearSection(BindoviSection)
-
--- ESP sekcija
 local VizijaLabel = Instance.new("TextLabel", VizijaSection)
-VizijaLabel.Text = "Vizija (kutije)"
-VizijaLabel.Size = UDim2.new(1, 0, 0, 24)
+VizijaLabel.Size = UDim2.new(0, 120, 0, 32)
+VizijaLabel.Position = UDim2.new(0, 10, 0, 8)
 VizijaLabel.BackgroundTransparency = 1
-VizijaLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
-VizijaLabel.Font = Enum.Font.GothamBold
+VizijaLabel.Text = "Vizija (kutije)"
+VizijaLabel.TextColor3 = Config.Colors.Text
 VizijaLabel.TextScaled = true
-VizijaLabel.LayoutOrder = 1
-local VizijaToggleLabel = Instance.new("TextLabel", VizijaSection)
-VizijaToggleLabel.Text = "ESP"
-VizijaToggleLabel.Size = UDim2.new(1, 0, 0, 18)
-VizijaToggleLabel.BackgroundTransparency = 1
-VizijaToggleLabel.TextColor3 = Color3.fromRGB(180, 220, 255)
-VizijaToggleLabel.Font = Enum.Font.Gotham
-VizijaToggleLabel.TextScaled = true
-VizijaToggleLabel.LayoutOrder = 2
-VizijaToggle.Parent = VizijaSection
-VizijaToggle.Size = UDim2.new(1, 0, 0, 32)
-VizijaToggle.Position = nil
-VizijaToggle.LayoutOrder = 3
-OnlyEnemiesBtn.Parent = VizijaSection
-OnlyEnemiesBtn.Size = UDim2.new(1, 0, 0, 28)
-OnlyEnemiesBtn.Position = nil
-OnlyEnemiesBtn.LayoutOrder = 4
+VizijaLabel.Font = Enum.Font.GothamBold
+
+local VizijaToggle = Instance.new("TextButton", VizijaSection)
+VizijaToggle.Size = UDim2.new(0, 100, 0, 32)
+VizijaToggle.Position = UDim2.new(0, 140, 0, 8)
+VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
+VizijaToggle.TextColor3 = Config.Colors.Text
+VizijaToggle.TextScaled = true
+VizijaToggle.Font = Enum.Font.GothamBold
+local VizijaToggleCorner = Instance.new("UICorner", VizijaToggle)
+VizijaToggleCorner.CornerRadius = UDim.new(0, 8)
+
+local OnlyEnemiesBtn = Instance.new("TextButton", VizijaSection)
+OnlyEnemiesBtn.Size = UDim2.new(0, 120, 0, 28)
+OnlyEnemiesBtn.Position = UDim2.new(0, 10, 0, 48)
+OnlyEnemiesBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
+OnlyEnemiesBtn.TextColor3 = Config.Colors.Text
+OnlyEnemiesBtn.TextScaled = true
+OnlyEnemiesBtn.Font = Enum.Font.Gotham
+local OnlyEnemiesCorner = Instance.new("UICorner", OnlyEnemiesBtn)
+OnlyEnemiesCorner.CornerRadius = UDim.new(0, 8)
+
+OnlyEnemiesBtn.MouseButton1Click:Connect(function()
+    VIZIJA_ENEMY_ONLY = not VIZIJA_ENEMY_ONLY
+    OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
+end)
+
+VizijaToggle.MouseButton1Click:Connect(function()
+    VIZIJA_ENABLED = not VIZIJA_ENABLED
+    VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
+    VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+    if not VIZIJA_ENABLED then
+        for _,v in pairs(vizijaBoxes) do v:Remove() end
+        vizijaBoxes = {}
+    end
+end)
 
 -- Section: Boja kutije (Color Wheel)
 local ColorSection = Instance.new("Frame", MainFrame)
@@ -182,16 +181,14 @@ ColorSection.BorderSizePixel = 0
 local ColorCorner = Instance.new("UICorner", ColorSection)
 ColorCorner.CornerRadius = UDim.new(0, 12)
 
--- BOJA KUTIJE SEKCIJA
 local ColorLabel = Instance.new("TextLabel", ColorSection)
-ColorLabel.Size = UDim2.new(0, 140, 0, 28)
+ColorLabel.Size = UDim2.new(0, 120, 0, 32)
+ColorLabel.Position = UDim2.new(0, 10, 0, 8)
 ColorLabel.BackgroundTransparency = 1
 ColorLabel.Text = "Boja kutije"
-ColorLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
-ColorLabel.Font = Enum.Font.GothamBold
+ColorLabel.TextColor3 = Config.Colors.Text
 ColorLabel.TextScaled = true
-ColorLabel.TextXAlignment = Enum.TextXAlignment.Left
-ColorLabel.Position = UDim2.new(0, 8, 0, 8)
+ColorLabel.Font = Enum.Font.GothamBold
 
 -- Color wheel (simple implementation)
 local ColorWheel = Instance.new("ImageButton", ColorSection)
@@ -255,74 +252,47 @@ MetaSection.BorderSizePixel = 0
 local MetaCorner = Instance.new("UICorner", MetaSection)
 MetaCorner.CornerRadius = UDim.new(0, 12)
 
--- POVECANJE GLAVUDJE SEKCIJA
 local MetaLabel = Instance.new("TextLabel", MetaSection)
-MetaLabel.Size = UDim2.new(0, 140, 0, 28)
+MetaLabel.Size = UDim2.new(0, 120, 0, 32)
+MetaLabel.Position = UDim2.new(0, 10, 0, 8)
 MetaLabel.BackgroundTransparency = 1
 MetaLabel.Text = "Povecaj glavudju"
-MetaLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
-MetaLabel.Font = Enum.Font.GothamBold
+MetaLabel.TextColor3 = Config.Colors.Text
 MetaLabel.TextScaled = true
-MetaLabel.TextXAlignment = Enum.TextXAlignment.Left
-MetaLabel.Position = UDim2.new(0, 8, 0, 8)
+MetaLabel.Font = Enum.Font.GothamBold
 
--- MODERNI INPUT BOX ZA FOV (hitbox)
-local FOVInput = Instance.new("TextBox", MetaSection)
-FOVInput.Size = UDim2.new(0, 60, 0, 28)
-FOVInput.Position = UDim2.new(0, 70, 0, 48)
-FOVInput.BackgroundColor3 = Color3.fromRGB(30,40,60)
-FOVInput.TextColor3 = Config.Colors.Text
-FOVInput.Text = tostring(META_FOV)
-FOVInput.TextScaled = true
-FOVInput.Font = Enum.Font.GothamBold
-FOVInput.PlaceholderText = "FOV"
-FOVInput.ClearTextOnFocus = false
-FOVInput.TextStrokeTransparency = 0.7
-FOVInput.TextStrokeColor3 = Color3.fromRGB(0,0,0)
-local FOVInputCorner = Instance.new("UICorner", FOVInput)
-FOVInputCorner.CornerRadius = UDim.new(0, 8)
-FOVInput.FocusLost:Connect(function(enter)
-    if enter then
-        local val = tonumber(FOVInput.Text)
-        if val and val >= 1 and val <= MAX_HITBOX_FOV then
-            META_FOV = val
-            FOVInput.Text = tostring(val)
-        else
-            FOVInput.Text = tostring(META_FOV)
-        end
+local FOVLabel = Instance.new("TextLabel", MetaSection)
+FOVLabel.Size = UDim2.new(0, 60, 0, 28)
+FOVLabel.Position = UDim2.new(0, 10, 0, 48)
+FOVLabel.BackgroundTransparency = 1
+FOVLabel.Text = "FOV"
+FOVLabel.TextColor3 = Config.Colors.Text
+FOVLabel.TextScaled = true
+FOVLabel.Font = Enum.Font.Gotham
+
+local FOVSlider = Instance.new("TextButton", MetaSection)
+FOVSlider.Size = UDim2.new(0, 180, 0, 28)
+FOVSlider.Position = UDim2.new(0, 70, 0, 48)
+FOVSlider.BackgroundColor3 = Config.Colors.Accent
+FOVSlider.Text = tostring(META_FOV)
+FOVSlider.TextColor3 = Config.Colors.Text
+FOVSlider.TextScaled = true
+FOVSlider.Font = Enum.Font.GothamBold
+local draggingFOV = false
+FOVSlider.MouseButton1Down:Connect(function()
+    draggingFOV = true
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingFOV = false end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if draggingFOV and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local rel = math.clamp((input.Position.X - FOVSlider.AbsolutePosition.X) / FOVSlider.AbsoluteSize.X, 0, 1)
+        local value = math.floor(rel * (MAX_HITBOX_FOV-1) + 1)
+        META_FOV = value
+        FOVSlider.Text = tostring(value)
     end
 end)
-
--- MODERNI INPUT BOX ZA SCALE (veličina imena)
-local ImenaScaleInput = Instance.new("TextBox", ImenaSection)
-ImenaScaleInput.Size = UDim2.new(0, 60, 0, 28)
-ImenaScaleInput.Position = UDim2.new(0, 200, 0, 8)
-ImenaScaleInput.BackgroundColor3 = Color3.fromRGB(30,40,60)
-ImenaScaleInput.TextColor3 = Config.Colors.Text
-ImenaScaleInput.Text = tostring(NAMETAG_SCALE)
-ImenaScaleInput.TextScaled = true
-ImenaScaleInput.Font = Enum.Font.GothamBold
-ImenaScaleInput.PlaceholderText = "Veličina"
-ImenaScaleInput.ClearTextOnFocus = false
-ImenaScaleInput.TextStrokeTransparency = 0.7
-ImenaScaleInput.TextStrokeColor3 = Color3.fromRGB(0,0,0)
-local ImenaScaleInputCorner = Instance.new("UICorner", ImenaScaleInput)
-ImenaScaleInputCorner.CornerRadius = UDim.new(0, 8)
-ImenaScaleInput.FocusLost:Connect(function(enter)
-    if enter then
-        local val = tonumber(ImenaScaleInput.Text)
-        if val and val >= 0.1 and val <= 5.0 then
-            NAMETAG_SCALE = val
-            ImenaScaleInput.Text = tostring(val)
-        else
-            ImenaScaleInput.Text = tostring(NAMETAG_SCALE)
-        end
-    end
-end)
-
--- Ukloni stare slidere za FOV i scale ako postoje
-if FOVSlider then FOVSlider:Destroy() end
-if ImenaScaleSlider then ImenaScaleSlider:Destroy() end
 
 local HeadBtn = Instance.new("TextButton", MetaSection)
 HeadBtn.Size = UDim2.new(0, 70, 0, 28)
@@ -415,16 +385,14 @@ ImenaSection.BorderSizePixel = 0
 local ImenaSectionCorner = Instance.new("UICorner", ImenaSection)
 ImenaSectionCorner.CornerRadius = UDim.new(0, 12)
 
--- IMENA SEKCIJA
 local ImenaLabel = Instance.new("TextLabel", ImenaSection)
-ImenaLabel.Size = UDim2.new(0, 140, 0, 28)
+ImenaLabel.Size = UDim2.new(0, 80, 0, 28)
+ImenaLabel.Position = UDim2.new(0, 10, 0, 8)
 ImenaLabel.BackgroundTransparency = 1
 ImenaLabel.Text = "Imena"
-ImenaLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
-ImenaLabel.Font = Enum.Font.GothamBold
+ImenaLabel.TextColor3 = Config.Colors.Text
 ImenaLabel.TextScaled = true
-ImenaLabel.TextXAlignment = Enum.TextXAlignment.Left
-ImenaLabel.Position = UDim2.new(0, 8, 0, 8)
+ImenaLabel.Font = Enum.Font.GothamBold
 
 local ImenaToggle = Instance.new("TextButton", ImenaSection)
 ImenaToggle.Size = UDim2.new(0, 90, 0, 28)
@@ -442,16 +410,40 @@ ImenaToggle.MouseButton1Click:Connect(function()
     ImenaToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
 end)
 
--- IMENA SEKCIJA
 local ImenaScaleLabel = Instance.new("TextLabel", ImenaSection)
-ImenaScaleLabel.Size = UDim2.new(0, 60, 0, 24)
+ImenaScaleLabel.Size = UDim2.new(0, 60, 0, 28)
+ImenaScaleLabel.Position = UDim2.new(0, 200, 0, 8)
 ImenaScaleLabel.BackgroundTransparency = 1
 ImenaScaleLabel.Text = "Veličina"
-ImenaScaleLabel.TextColor3 = Color3.fromRGB(180, 220, 255)
-ImenaScaleLabel.Font = Enum.Font.Gotham
+ImenaScaleLabel.TextColor3 = Config.Colors.Text
 ImenaScaleLabel.TextScaled = true
-ImenaScaleLabel.TextXAlignment = Enum.TextXAlignment.Left
-ImenaScaleLabel.Position = UDim2.new(0, 8, 0, 36)
+ImenaScaleLabel.Font = Enum.Font.Gotham
+
+local ImenaScaleSlider = Instance.new("TextButton", ImenaSection)
+ImenaScaleSlider.Size = UDim2.new(0, 60, 0, 28)
+ImenaScaleSlider.Position = UDim2.new(0, 270, 0, 8)
+ImenaScaleSlider.BackgroundColor3 = Config.Colors.Accent
+ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
+ImenaScaleSlider.TextColor3 = Config.Colors.Text
+ImenaScaleSlider.TextScaled = true
+ImenaScaleSlider.Font = Enum.Font.GothamBold
+local draggingImenaScale = false
+ImenaScaleSlider.MouseButton1Down:Connect(function()
+    draggingImenaScale = true
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingImenaScale = false end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if draggingImenaScale and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local rel = math.clamp((input.Position.X - ImenaScaleSlider.AbsolutePosition.X) / ImenaScaleSlider.AbsoluteSize.X, 0, 1)
+        local value = math.floor(rel * 49 + 1) / 10 -- 0.1 do 5.0
+        NAMETAG_SCALE = value
+        ImenaScaleSlider.Text = tostring(value)
+    end
+end)
+NAMETAG_SCALE = 0.1
+ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
 
 -- Krozzid toggle u Imena sekciji
 local KrozzidToggle = Instance.new("TextButton", ImenaSection)
@@ -480,16 +472,14 @@ BindoviSection.BorderSizePixel = 0
 local BindoviSectionCorner = Instance.new("UICorner", BindoviSection)
 BindoviSectionCorner.CornerRadius = UDim.new(0, 12)
 
--- BINDOVI SEKCIJA
 local BindoviLabel = Instance.new("TextLabel", BindoviSection)
-BindoviLabel.Size = UDim2.new(0, 140, 0, 28)
+BindoviLabel.Size = UDim2.new(0, 120, 0, 28)
+BindoviLabel.Position = UDim2.new(0, 10, 0, 8)
 BindoviLabel.BackgroundTransparency = 1
 BindoviLabel.Text = "Bindovi (tipke)"
-BindoviLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
-BindoviLabel.Font = Enum.Font.GothamBold
+BindoviLabel.TextColor3 = Config.Colors.Text
 BindoviLabel.TextScaled = true
-BindoviLabel.TextXAlignment = Enum.TextXAlignment.Left
-BindoviLabel.Position = UDim2.new(0, 8, 0, 8)
+BindoviLabel.Font = Enum.Font.GothamBold
 
 local ESPBindBtn = Instance.new("TextButton", BindoviSection)
 ESPBindBtn.Size = UDim2.new(0, 80, 0, 28)
@@ -806,154 +796,27 @@ end
 local MAX_HITBOX_FOV = 200
 
 -- U GUI slideru za FOV (hitbox):
--- FOVSlider.MouseButton1Down:Connect(function()
---     draggingFOV = true
--- end)
--- UserInputService.InputEnded:Connect(function(input)
---     if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingFOV = false end
--- end)
--- UserInputService.InputChanged:Connect(function(input)
---     if draggingFOV and input.UserInputType == Enum.UserInputType.MouseMovement then
---         local rel = math.clamp((input.Position.X - FOVSlider.AbsolutePosition.X) / FOVSlider.AbsoluteSize.X, 0, 1)
---         local value = math.floor(rel * (MAX_HITBOX_FOV-1) + 1)
---         META_FOV = value
---         FOVSlider.Text = tostring(value)
---     end
--- end)
+FOVSlider.MouseButton1Down:Connect(function()
+    draggingFOV = true
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingFOV = false end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if draggingFOV and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local rel = math.clamp((input.Position.X - FOVSlider.AbsolutePosition.X) / FOVSlider.AbsoluteSize.X, 0, 1)
+        local value = math.floor(rel * (MAX_HITBOX_FOV-1) + 1)
+        META_FOV = value
+        FOVSlider.Text = tostring(value)
+    end
+end)
 
 -- Ukloni stari slider za HB veličinu do 200 (ako postoji)
 if HitboxFOVLabel then HitboxFOVLabel:Destroy() end
 if HitboxFOVSlider then HitboxFOVSlider:Destroy() end
 
--- MODERNI SLIDE SWITCH (custom)
-local function createSwitch(parent, state, onToggle, colorOn, colorOff)
-    local frame = Instance.new("Frame", parent)
-    frame.Size = UDim2.new(0, 48, 0, 28)
-    frame.BackgroundTransparency = 1
-    local bg = Instance.new("Frame", frame)
-    bg.Size = UDim2.new(1, 0, 1, 0)
-    bg.Position = UDim2.new(0, 0, 0, 0)
-    bg.BackgroundColor3 = state and colorOn or colorOff
-    bg.BorderSizePixel = 0
-    local bgCorner = Instance.new("UICorner", bg)
-    bgCorner.CornerRadius = UDim.new(1, 0)
-    local knob = Instance.new("Frame", bg)
-    knob.Size = UDim2.new(0, 24, 0, 24)
-    knob.Position = state and UDim2.new(1, -26, 0, 2) or UDim2.new(0, 2, 0, 2)
-    knob.BackgroundColor3 = Color3.fromRGB(255,255,255)
-    knob.BorderSizePixel = 0
-    local knobCorner = Instance.new("UICorner", knob)
-    knobCorner.CornerRadius = UDim.new(1, 0)
-    local dragging = false
-    bg.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-        end
-    end)
-    bg.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 and dragging then
-            dragging = false
-            state = not state
-            onToggle(state)
-            bg.BackgroundColor3 = state and colorOn or colorOff
-            knob:TweenPosition(state and UDim2.new(1, -26, 0, 2) or UDim2.new(0, 2, 0, 2), "Out", "Quad", 0.18, true)
-        end
-    end)
-    return frame, function(val)
-        state = val
-        bg.BackgroundColor3 = state and colorOn or colorOff
-        knob.Position = state and UDim2.new(1, -26, 0, 2) or UDim2.new(0, 2, 0, 2)
-    end
-end
-
--- MODERNE PASTEL BOJE
-local pastelRed = Color3.fromRGB(255, 120, 120)
-local pastelBlue = Color3.fromRGB(120, 180, 255)
-local pastelGreen = Color3.fromRGB(120, 255, 180)
-
--- PRIMJENA SLIDE SWITCHA ZA SVE TOGGLE-OVE
--- ESP
-local espSwitch, setESPSwitch = createSwitch(VizijaSection, VIZIJA_ENABLED, function(val)
-    VIZIJA_ENABLED = val
-    VizijaToggle.Text = val and "Uključeno" or "Isključeno"
-    VizijaToggle.BackgroundColor3 = val and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-end, Config.Colors.Accent, Color3.fromRGB(60,60,60))
-espSwitch.Position = UDim2.new(0, 250, 0, 8)
-VizijaToggle.Visible = false
-
--- OnlyEnemies
-local enemySwitch, setEnemySwitch = createSwitch(VizijaSection, VIZIJA_ENEMY_ONLY, function(val)
-    VIZIJA_ENEMY_ONLY = val
-    OnlyEnemiesBtn.Text = val and "Samo protivnici" or "Svi igrači"
-end, pastelBlue, Color3.fromRGB(60,60,60))
-enemySwitch.Position = UDim2.new(0, 250, 0, 48)
-OnlyEnemiesBtn.Visible = false
-
--- Nametag
-local imenaSwitch, setImenaSwitch = createSwitch(ImenaSection, NAMETAG_ENABLED, function(val)
-    NAMETAG_ENABLED = val
-    ImenaToggle.Text = val and "Uključeno" or "Isključeno"
-    ImenaToggle.BackgroundColor3 = val and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-end, pastelGreen, Color3.fromRGB(60,60,60))
-imenaSwitch.Position = UDim2.new(0, 200, 0, 8)
-ImenaToggle.Visible = false
-
--- Krozzid
-local krozzidSwitch, setKrozzidSwitch = createSwitch(ImenaSection, KROZZID_ENABLED, function(val)
-    KROZZID_ENABLED = val
-    KrozzidToggle.Text = val and "Krozzid: Uključeno" or "Krozzid: Isključeno"
-    KrozzidToggle.BackgroundColor3 = val and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-end, pastelRed, Color3.fromRGB(60,60,60))
-krozzidSwitch.Position = UDim2.new(0, 340, 0, 8)
-KrozzidToggle.Visible = false
-
--- Glava/Tijelo
-local headSwitch, setHeadSwitch = createSwitch(MetaSection, META_HEAD, function(val)
-    META_HEAD = val
-    HeadBtn.BackgroundColor3 = val and pastelRed or Color3.fromRGB(60,60,60)
-end, pastelRed, Color3.fromRGB(60,60,60))
-headSwitch.Position = UDim2.new(0, 10, 0, 80)
-HeadBtn.Visible = false
-local torsoSwitch, setTorsoSwitch = createSwitch(MetaSection, META_TORSO, function(val)
-    META_TORSO = val
-    TorsoBtn.BackgroundColor3 = val and pastelBlue or Color3.fromRGB(60,60,60)
-end, pastelBlue, Color3.fromRGB(60,60,60))
-torsoSwitch.Position = UDim2.new(0, 70, 0, 80)
-TorsoBtn.Visible = false
-
--- BOJE ZA GLAVU (PASTEL)
-RedBtn.BackgroundColor3 = pastelRed
-BlueBtn.BackgroundColor3 = pastelBlue
-GreenBtn.BackgroundColor3 = pastelGreen
-
--- GRID/FLEX LAYOUT ZA SVE SEKCIJE
-for _,frame in ipairs({VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
-    local layout = Instance.new("UIListLayout", frame)
-    layout.FillDirection = Enum.FillDirection.Horizontal
-    layout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-    layout.VerticalAlignment = Enum.VerticalAlignment.Center
-    layout.Padding = UDim.new(0, 8)
-end
-
--- PANEL I SEKCIJE: SHADOW, BORDER, PADDING
-for _,frame in ipairs({MainFrame, VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
-    local border = Instance.new("UIStroke", frame)
-    border.Color = Color3.fromRGB(60, 70, 90)
-    border.Thickness = 2
-    border.Transparency = 0.7
-    local shadow = Instance.new("ImageLabel", frame)
-    shadow.Size = UDim2.new(1, 24, 1, 24)
-    shadow.Position = UDim2.new(0, -12, 0, -12)
-    shadow.BackgroundTransparency = 1
-    shadow.Image = "rbxassetid://1316045217"
-    shadow.ImageTransparency = 0.85
-    shadow.ZIndex = 0
-    local pad = Instance.new("UIPadding", frame)
-    pad.PaddingTop = UDim.new(0, 8)
-    pad.PaddingBottom = UDim.new(0, 8)
-    pad.PaddingLeft = UDim.new(0, 12)
-    pad.PaddingRight = UDim.new(0, 12)
-end
+-- NOVI PANEL: Sve u jednom (Vizija, Boja kutije, Povecaj glavudju, Imena, Krozzid)
+-- (Zadržavamo postojeće sekcije, ali ih rearanžiramo i preimenujemo)
 
 -- 1. Vizija (ESP) sekcija ostaje kao prije
 -- 2. Boja kutije sekcija ostaje kao prije
@@ -995,32 +858,31 @@ ImenaScaleLabel.TextColor3 = Config.Colors.Text
 ImenaScaleLabel.TextScaled = true
 ImenaScaleLabel.Font = Enum.Font.Gotham
 
--- MODERNI INPUT BOX ZA SCALE (veličina imena)
-local ImenaScaleInput = Instance.new("TextBox", MetaSection)
-ImenaScaleInput.Size = UDim2.new(0, 100, 0, 28)
-ImenaScaleInput.Position = UDim2.new(0, 320, 0, 8+32+48+28+8)
-ImenaScaleInput.BackgroundColor3 = Config.Colors.Accent
-ImenaScaleInput.TextColor3 = Config.Colors.Text
-ImenaScaleInput.Text = tostring(NAMETAG_SCALE)
-ImenaScaleInput.TextScaled = true
-ImenaScaleInput.Font = Enum.Font.GothamBold
-ImenaScaleInput.PlaceholderText = "Veličina"
-ImenaScaleInput.ClearTextOnFocus = false
-ImenaScaleInput.TextStrokeTransparency = 0.7
-ImenaScaleInput.TextStrokeColor3 = Color3.fromRGB(0,0,0)
-local ImenaScaleInputCorner = Instance.new("UICorner", ImenaScaleInput)
-ImenaScaleInputCorner.CornerRadius = UDim.new(0, 8)
-ImenaScaleInput.FocusLost:Connect(function(enter)
-    if enter then
-        local val = tonumber(ImenaScaleInput.Text)
-        if val and val >= 0.1 and val <= 5.0 then
-            NAMETAG_SCALE = val
-            ImenaScaleInput.Text = tostring(val)
-        else
-            ImenaScaleInput.Text = tostring(NAMETAG_SCALE)
-        end
+local ImenaScaleSlider = Instance.new("TextButton", MetaSection)
+ImenaScaleSlider.Size = UDim2.new(0, 100, 0, 28)
+ImenaScaleSlider.Position = UDim2.new(0, 320, 0, 8+32+48+28+8)
+ImenaScaleSlider.BackgroundColor3 = Config.Colors.Accent
+ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
+ImenaScaleSlider.TextColor3 = Config.Colors.Text
+ImenaScaleSlider.TextScaled = true
+ImenaScaleSlider.Font = Enum.Font.GothamBold
+local draggingImenaScale = false
+ImenaScaleSlider.MouseButton1Down:Connect(function()
+    draggingImenaScale = true
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingImenaScale = false end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if draggingImenaScale and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local rel = math.clamp((input.Position.X - ImenaScaleSlider.AbsolutePosition.X) / ImenaScaleSlider.AbsoluteSize.X, 0, 1)
+        local value = math.floor(rel * 49 + 1) / 10 -- 0.1 do 5.0
+        NAMETAG_SCALE = value
+        ImenaScaleSlider.Text = tostring(value)
     end
 end)
+NAMETAG_SCALE = 0.1
+ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
 
 -- 5. Dodaj Krozzid toggle u isti panel
 local KrozzidToggle = Instance.new("TextButton", MetaSection)
@@ -1239,232 +1101,3 @@ local function krozZid(origin, direction, ignoreList)
     end
     return foundTarget
 end 
-
--- MODERNI UI REDIZAJN
--- 1. Gradient pozadina glavnog panela
-local MainGradient = Instance.new("UIGradient", MainFrame)
-MainGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 35, 50)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 25, 35))
-}
-MainGradient.Rotation = 45
-
--- 2. Blur/shadow efekt iza panela
-local blur = Instance.new("BlurEffect")
-blur.Size = 12
-blur.Parent = game:GetService("Lighting")
-
-local shadow = Instance.new("ImageLabel", MainFrame)
-shadow.Size = UDim2.new(1, 40, 1, 40)
-shadow.Position = UDim2.new(0, -20, 0, -20)
-shadow.BackgroundTransparency = 1
-shadow.Image = "rbxassetid://1316045217" -- soft shadow
-shadow.ImageTransparency = 0.7
-shadow.ZIndex = 0
-
--- 3. Animacije na hover/click za gumbe i slidere
-local function addButtonAnim(btn)
-    btn.MouseEnter:Connect(function()
-        btn.BackgroundColor3 = Config.Colors.Accent:lerp(Color3.fromRGB(0,200,255), 0.3)
-    end)
-    btn.MouseLeave:Connect(function()
-        btn.BackgroundColor3 = Config.Colors.Accent
-    end)
-    btn.MouseButton1Down:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
-    end)
-    btn.MouseButton1Up:Connect(function()
-        btn.BackgroundColor3 = Config.Colors.Accent
-    end)
-end
-for _,section in ipairs({ESPBindBtn, HitboxBindBtn, ImenaBindBtn, KrozzidBindBtn, ImenaToggle, ImenaScaleInput, KrozzidToggle, FOVInput, HeadBtn, TorsoBtn, RedBtn, BlueBtn, GreenBtn, VizijaToggle, OnlyEnemiesBtn, ColorWheel}) do
-    if section then pcall(function() addButtonAnim(section) end) end
-end
-
--- 4. Zaobljeni kutovi i suptilni border na svim sekcijama
-for _,frame in ipairs({MainFrame, VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
-    if frame then
-        local border = Instance.new("UIStroke", frame)
-        border.Color = Color3.fromRGB(60, 70, 90)
-        border.Thickness = 2
-        border.Transparency = 0.7
-    end
-end
-
--- 5. Moderni font
-for _,label in ipairs(MainFrame:GetDescendants()) do
-    if label:IsA("TextLabel") or label:IsA("TextButton") then
-        label.Font = Enum.Font.GothamSemibold
-    end
-end
-
--- 6. Ikonice uz naslove sekcija
-local function addIcon(label, assetId)
-    local icon = Instance.new("ImageLabel", label.Parent)
-    icon.Size = UDim2.new(0, 24, 0, 24)
-    icon.Position = UDim2.new(0, -32, 0, 2)
-    icon.BackgroundTransparency = 1
-    icon.Image = assetId
-    icon.ZIndex = label.ZIndex or 2
-end
-addIcon(Title, "rbxassetid://6031094678") -- panel
-addIcon(VizijaLabel, "rbxassetid://6031071050") -- vizija
-addIcon(ColorLabel, "rbxassetid://6023426926") -- boja
-addIcon(MetaLabel, "rbxassetid://6031068425") -- glavudja
-addIcon(ImenaLabel, "rbxassetid://6031071053") -- imena
-addIcon(BindoviLabel, "rbxassetid://6031068433") -- bindovi
-
--- 7. Poboljšani color picker (dodaj outline i value bubble)
-ColorWheel.ImageTransparency = 0.1
-local colorOutline = Instance.new("UIStroke", ColorWheel)
-colorOutline.Color = Color3.fromRGB(0, 150, 255)
-colorOutline.Thickness = 2
-local colorBubble = Instance.new("TextLabel", ColorSection)
-colorBubble.Size = UDim2.new(0, 40, 0, 24)
-colorBubble.Position = UDim2.new(0, 220, 0, 8)
-colorBubble.BackgroundTransparency = 0.2
-colorBubble.BackgroundColor3 = Color3.fromRGB(30,40,60)
-colorBubble.TextColor3 = Config.Colors.Text
-colorBubble.TextScaled = true
-colorBubble.Font = Enum.Font.GothamBold
-colorBubble.Text = "RGB: "..math.floor(VIZIJA_COLOR.r*255)..","..math.floor(VIZIJA_COLOR.g*255)..","..math.floor(VIZIJA_COLOR.b*255)
-
--- 8. Responsive padding i razmaci
-for _,frame in ipairs({VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
-    local pad = Instance.new("UIPadding", frame)
-    pad.PaddingTop = UDim.new(0, 8)
-    pad.PaddingBottom = UDim.new(0, 8)
-    pad.PaddingLeft = UDim.new(0, 12)
-    pad.PaddingRight = UDim.new(0, 12)
-end
-
--- 9. Animacija otvaranja/zatvaranja panela
-MainFrame.Visible = false
-TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = Config.MenuPosition, Size = MainFrame.Size, Visible = true}):Play()
-
--- 10. Custom switch/toggle dizajn
-local function styleToggle(btn)
-    btn.AutoButtonColor = false
-    btn.BackgroundColor3 = btn.BackgroundColor3
-    btn.TextColor3 = btn.TextColor3
-    btn.TextStrokeTransparency = 0.7
-    btn.TextStrokeColor3 = Color3.fromRGB(0,0,0)
-end
-for _,btn in ipairs({VizijaToggle, OnlyEnemiesBtn, ImenaToggle, KrozzidToggle, HeadBtn, TorsoBtn}) do
-    if btn then pcall(function() styleToggle(btn) end) end
-end
-
--- 11. Slider s value bubble
--- local function addSliderBubble(slider, getValue)
---     local bubble = Instance.new("TextLabel", slider)
---     bubble.Size = UDim2.new(0, 40, 0, 20)
---     bubble.Position = UDim2.new(1, 8, 0, 0)
---     bubble.BackgroundTransparency = 0.3
---     bubble.BackgroundColor3 = Color3.fromRGB(30,40,60)
---     bubble.TextColor3 = Config.Colors.Text
---     bubble.TextScaled = true
---     bubble.Font = Enum.Font.GothamBold
---     bubble.Text = getValue()
---     slider.MouseMoved:Connect(function()
---         bubble.Text = getValue()
---     end)
--- end
--- addSliderBubble(FOVSlider, function() return tostring(META_FOV) end)
--- addSliderBubble(ImenaScaleSlider, function() return tostring(NAMETAG_SCALE) end)
-
--- 12. Sekcije s blagim shadowom i headerom
-for _,frame in ipairs({VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
-    local shadow = Instance.new("ImageLabel", frame)
-    shadow.Size = UDim2.new(1, 24, 1, 24)
-    shadow.Position = UDim2.new(0, -12, 0, -12)
-    shadow.BackgroundTransparency = 1
-    shadow.Image = "rbxassetid://1316045217"
-    shadow.ImageTransparency = 0.85
-    shadow.ZIndex = 0
-end
-
--- 13. Notifikacije u istom stilu kao panel
-local function notify(title, text)
-    pcall(function()
-        game.StarterGui:SetCore("SendNotification", {
-            Title = title,
-            Text = text,
-            Duration = 5,
-            Icon = "rbxassetid://6031094678"
-        })
-    end)
-end
-notify("Panel", "Panel učitan! (RightShift za toggle, - za minimizaciju)") 
-
--- Ukloni sve MouseEnter/MouseLeave evente sa switch/toggle dugmića
--- Očisti duple/sakrivene elemente i ostavi samo jedan set kontrola po sekciji
--- Svaka sekcija ima svoj UIListLayout za uredan prikaz
-for _,frame in ipairs({VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
-    for _,child in ipairs(frame:GetChildren()) do
-        if child:IsA("UIListLayout") then child:Destroy() end
-    end
-    local layout = Instance.new("UIListLayout", frame)
-    layout.FillDirection = Enum.FillDirection.Vertical
-    layout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-    layout.VerticalAlignment = Enum.VerticalAlignment.Top
-    layout.Padding = UDim.new(0, 6)
-end
-
--- ESP sekcija
-VizijaLabel.Text = "Vizija (kutije)"
-VizijaToggle.Visible = true
-VizijaToggle.Position = UDim2.new(0, 8, 0, 36)
-VizijaToggle.Size = UDim2.new(0, 120, 0, 32)
-VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
-VizijaToggle.MouseButton1Click:Connect(function()
-    VIZIJA_ENABLED = not VIZIJA_ENABLED
-    VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
-    VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-end)
-OnlyEnemiesBtn.Visible = true
-OnlyEnemiesBtn.Position = UDim2.new(0, 8, 0, 74)
-OnlyEnemiesBtn.Size = UDim2.new(0, 120, 0, 28)
-OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
-OnlyEnemiesBtn.MouseButton1Click:Connect(function()
-    VIZIJA_ENEMY_ONLY = not VIZIJA_ENEMY_ONLY
-    OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
-end)
-
--- Boja sekcija
-ColorLabel.Text = "Boja kutije"
-ColorWheel.Position = UDim2.new(0, 8, 0, 36)
-ColorPreview.Position = UDim2.new(0, 90, 0, 36)
-
--- Glavudja sekcija
-MetaLabel.Text = "Povecaj glavudju"
-HeadBtn.Visible = true
-HeadBtn.Position = UDim2.new(0, 8, 0, 36)
-TorsoBtn.Visible = true
-TorsoBtn.Position = UDim2.new(0, 90, 0, 36)
-FOVInput.Position = UDim2.new(0, 8, 0, 74)
-FOVInput.Size = UDim2.new(0, 60, 0, 28)
-RedBtn.Position = UDim2.new(0, 8, 0, 112)
-BlueBtn.Position = UDim2.new(0, 46, 0, 112)
-GreenBtn.Position = UDim2.new(0, 84, 0, 112)
-
--- Imena sekcija
-ImenaLabel.Text = "Imena"
-ImenaToggle.Visible = true
-ImenaToggle.Position = UDim2.new(0, 8, 0, 36)
-ImenaToggle.Size = UDim2.new(0, 100, 0, 28)
-ImenaScaleLabel.Position = UDim2.new(0, 8, 0, 74)
-ImenaScaleInput.Position = UDim2.new(0, 70, 0, 74)
-ImenaScaleInput.Size = UDim2.new(0, 60, 0, 28)
-KrozzidToggle.Visible = true
-KrozzidToggle.Position = UDim2.new(0, 8, 0, 112)
-KrozzidToggle.Size = UDim2.new(0, 120, 0, 28)
-
--- Bindovi sekcija
-BindoviLabel.Text = "Bindovi (tipke)"
-ESPBindBtn.Position = UDim2.new(0, 8, 0, 36)
-HitboxBindBtn.Position = UDim2.new(0, 100, 0, 36)
-ImenaBindBtn.Position = UDim2.new(0, 192, 0, 36)
-KrozzidBindBtn.Position = UDim2.new(0, 284, 0, 36)
-
--- Ukloni sve MouseEnter/MouseLeave evente sa svih dugmića
--- (Ovo je implicitno jer više ne dodajemo te evente)
