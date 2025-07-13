@@ -133,54 +133,45 @@ VizijaSection.BorderSizePixel = 0
 local VizijaCorner = Instance.new("UICorner", VizijaSection)
 VizijaCorner.CornerRadius = UDim.new(0, 12)
 
--- Vraćam labele, inpute i vrijednosti u sekcije
--- VIZIJA SEKCIJA
+-- Refaktorisani GUI layout: automatsko slaganje, jasne labele, bez ručnih pozicija
+local function clearSection(section)
+    for _,child in ipairs(section:GetChildren()) do
+        if not child:IsA("UICorner") and not child:IsA("UIStroke") and not child:IsA("UIPadding") then
+            child:Destroy()
+        end
+    end
+end
+clearSection(VizijaSection)
+clearSection(ColorSection)
+clearSection(MetaSection)
+clearSection(ImenaSection)
+clearSection(BindoviSection)
+
+-- ESP sekcija
 local VizijaLabel = Instance.new("TextLabel", VizijaSection)
-VizijaLabel.Size = UDim2.new(0, 140, 0, 28)
-VizijaLabel.BackgroundTransparency = 1
 VizijaLabel.Text = "Vizija (kutije)"
+VizijaLabel.Size = UDim2.new(1, 0, 0, 24)
+VizijaLabel.BackgroundTransparency = 1
 VizijaLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
 VizijaLabel.Font = Enum.Font.GothamBold
 VizijaLabel.TextScaled = true
-VizijaLabel.TextXAlignment = Enum.TextXAlignment.Left
-VizijaLabel.Position = UDim2.new(0, 8, 0, 8)
-
-local VizijaToggle = Instance.new("TextButton", VizijaSection)
-VizijaToggle.Size = UDim2.new(0, 100, 0, 32)
-VizijaToggle.Position = UDim2.new(0, 140, 0, 8)
-VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
-VizijaToggle.TextColor3 = Config.Colors.Text
-VizijaToggle.TextScaled = true
-VizijaToggle.Font = Enum.Font.GothamBold
-local VizijaToggleCorner = Instance.new("UICorner", VizijaToggle)
-VizijaToggleCorner.CornerRadius = UDim.new(0, 8)
-
-local OnlyEnemiesBtn = Instance.new("TextButton", VizijaSection)
-OnlyEnemiesBtn.Size = UDim2.new(0, 120, 0, 28)
-OnlyEnemiesBtn.Position = UDim2.new(0, 10, 0, 48)
-OnlyEnemiesBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
-OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
-OnlyEnemiesBtn.TextColor3 = Config.Colors.Text
-OnlyEnemiesBtn.TextScaled = true
-OnlyEnemiesBtn.Font = Enum.Font.Gotham
-local OnlyEnemiesCorner = Instance.new("UICorner", OnlyEnemiesBtn)
-OnlyEnemiesCorner.CornerRadius = UDim.new(0, 8)
-
-OnlyEnemiesBtn.MouseButton1Click:Connect(function()
-    VIZIJA_ENEMY_ONLY = not VIZIJA_ENEMY_ONLY
-    OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
-end)
-
-VizijaToggle.MouseButton1Click:Connect(function()
-    VIZIJA_ENABLED = not VIZIJA_ENABLED
-    VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
-    VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
-    if not VIZIJA_ENABLED then
-        for _,v in pairs(vizijaBoxes) do v:Remove() end
-        vizijaBoxes = {}
-    end
-end)
+VizijaLabel.LayoutOrder = 1
+local VizijaToggleLabel = Instance.new("TextLabel", VizijaSection)
+VizijaToggleLabel.Text = "ESP"
+VizijaToggleLabel.Size = UDim2.new(1, 0, 0, 18)
+VizijaToggleLabel.BackgroundTransparency = 1
+VizijaToggleLabel.TextColor3 = Color3.fromRGB(180, 220, 255)
+VizijaToggleLabel.Font = Enum.Font.Gotham
+VizijaToggleLabel.TextScaled = true
+VizijaToggleLabel.LayoutOrder = 2
+VizijaToggle.Parent = VizijaSection
+VizijaToggle.Size = UDim2.new(1, 0, 0, 32)
+VizijaToggle.Position = nil
+VizijaToggle.LayoutOrder = 3
+OnlyEnemiesBtn.Parent = VizijaSection
+OnlyEnemiesBtn.Size = UDim2.new(1, 0, 0, 28)
+OnlyEnemiesBtn.Position = nil
+OnlyEnemiesBtn.LayoutOrder = 4
 
 -- Section: Boja kutije (Color Wheel)
 local ColorSection = Instance.new("Frame", MainFrame)
