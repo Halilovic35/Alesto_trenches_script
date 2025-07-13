@@ -1101,3 +1101,159 @@ local function krozZid(origin, direction, ignoreList)
     end
     return foundTarget
 end 
+
+-- MODERNI UI REDIZAJN
+-- 1. Gradient pozadina glavnog panela
+local MainGradient = Instance.new("UIGradient", MainFrame)
+MainGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 35, 50)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 25, 35))
+}
+MainGradient.Rotation = 45
+
+-- 2. Blur/shadow efekt iza panela
+local blur = Instance.new("BlurEffect")
+blur.Size = 12
+blur.Parent = game:GetService("Lighting")
+
+local shadow = Instance.new("ImageLabel", MainFrame)
+shadow.Size = UDim2.new(1, 40, 1, 40)
+shadow.Position = UDim2.new(0, -20, 0, -20)
+shadow.BackgroundTransparency = 1
+shadow.Image = "rbxassetid://1316045217" -- soft shadow
+shadow.ImageTransparency = 0.7
+shadow.ZIndex = 0
+
+-- 3. Animacije na hover/click za gumbe i slidere
+local function addButtonAnim(btn)
+    btn.MouseEnter:Connect(function()
+        btn.BackgroundColor3 = Config.Colors.Accent:lerp(Color3.fromRGB(0,200,255), 0.3)
+    end)
+    btn.MouseLeave:Connect(function()
+        btn.BackgroundColor3 = Config.Colors.Accent
+    end)
+    btn.MouseButton1Down:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+    end)
+    btn.MouseButton1Up:Connect(function()
+        btn.BackgroundColor3 = Config.Colors.Accent
+    end)
+end
+for _,section in ipairs({ESPBindBtn, HitboxBindBtn, ImenaBindBtn, KrozzidBindBtn, ImenaToggle, ImenaScaleSlider, KrozzidToggle, FOVSlider, HeadBtn, TorsoBtn, RedBtn, BlueBtn, GreenBtn, VizijaToggle, OnlyEnemiesBtn, ColorWheel}) do
+    if section then pcall(function() addButtonAnim(section) end) end
+end
+
+-- 4. Zaobljeni kutovi i suptilni border na svim sekcijama
+for _,frame in ipairs({MainFrame, VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
+    if frame then
+        local border = Instance.new("UIStroke", frame)
+        border.Color = Color3.fromRGB(60, 70, 90)
+        border.Thickness = 2
+        border.Transparency = 0.7
+    end
+end
+
+-- 5. Moderni font
+for _,label in ipairs(MainFrame:GetDescendants()) do
+    if label:IsA("TextLabel") or label:IsA("TextButton") then
+        label.Font = Enum.Font.GothamSemibold
+    end
+end
+
+-- 6. Ikonice uz naslove sekcija
+local function addIcon(label, assetId)
+    local icon = Instance.new("ImageLabel", label.Parent)
+    icon.Size = UDim2.new(0, 24, 0, 24)
+    icon.Position = UDim2.new(0, -32, 0, 2)
+    icon.BackgroundTransparency = 1
+    icon.Image = assetId
+    icon.ZIndex = label.ZIndex or 2
+end
+addIcon(Title, "rbxassetid://6031094678") -- panel
+addIcon(VizijaLabel, "rbxassetid://6031071050") -- vizija
+addIcon(ColorLabel, "rbxassetid://6023426926") -- boja
+addIcon(MetaLabel, "rbxassetid://6031068425") -- glavudja
+addIcon(ImenaLabel, "rbxassetid://6031071053") -- imena
+addIcon(BindoviLabel, "rbxassetid://6031068433") -- bindovi
+
+-- 7. Poboljšani color picker (dodaj outline i value bubble)
+ColorWheel.ImageTransparency = 0.1
+local colorOutline = Instance.new("UIStroke", ColorWheel)
+colorOutline.Color = Color3.fromRGB(0, 150, 255)
+colorOutline.Thickness = 2
+local colorBubble = Instance.new("TextLabel", ColorSection)
+colorBubble.Size = UDim2.new(0, 40, 0, 24)
+colorBubble.Position = UDim2.new(0, 220, 0, 8)
+colorBubble.BackgroundTransparency = 0.2
+colorBubble.BackgroundColor3 = Color3.fromRGB(30,40,60)
+colorBubble.TextColor3 = Config.Colors.Text
+colorBubble.TextScaled = true
+colorBubble.Font = Enum.Font.GothamBold
+colorBubble.Text = "RGB: "..math.floor(VIZIJA_COLOR.r*255)..","..math.floor(VIZIJA_COLOR.g*255)..","..math.floor(VIZIJA_COLOR.b*255)
+
+-- 8. Responsive padding i razmaci
+for _,frame in ipairs({VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
+    local pad = Instance.new("UIPadding", frame)
+    pad.PaddingTop = UDim.new(0, 8)
+    pad.PaddingBottom = UDim.new(0, 8)
+    pad.PaddingLeft = UDim.new(0, 12)
+    pad.PaddingRight = UDim.new(0, 12)
+end
+
+-- 9. Animacija otvaranja/zatvaranja panela
+MainFrame.Visible = false
+TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = Config.MenuPosition, Size = MainFrame.Size, Visible = true}):Play()
+
+-- 10. Custom switch/toggle dizajn
+local function styleToggle(btn)
+    btn.AutoButtonColor = false
+    btn.BackgroundColor3 = btn.BackgroundColor3
+    btn.TextColor3 = btn.TextColor3
+    btn.TextStrokeTransparency = 0.7
+    btn.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+end
+for _,btn in ipairs({VizijaToggle, OnlyEnemiesBtn, ImenaToggle, KrozzidToggle, HeadBtn, TorsoBtn}) do
+    if btn then pcall(function() styleToggle(btn) end) end
+end
+
+-- 11. Slider s value bubble
+local function addSliderBubble(slider, getValue)
+    local bubble = Instance.new("TextLabel", slider)
+    bubble.Size = UDim2.new(0, 40, 0, 20)
+    bubble.Position = UDim2.new(1, 8, 0, 0)
+    bubble.BackgroundTransparency = 0.3
+    bubble.BackgroundColor3 = Color3.fromRGB(30,40,60)
+    bubble.TextColor3 = Config.Colors.Text
+    bubble.TextScaled = true
+    bubble.Font = Enum.Font.GothamBold
+    bubble.Text = getValue()
+    slider.MouseMoved:Connect(function()
+        bubble.Text = getValue()
+    end)
+end
+addSliderBubble(FOVSlider, function() return tostring(META_FOV) end)
+addSliderBubble(ImenaScaleSlider, function() return tostring(NAMETAG_SCALE) end)
+
+-- 12. Sekcije s blagim shadowom i headerom
+for _,frame in ipairs({VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
+    local shadow = Instance.new("ImageLabel", frame)
+    shadow.Size = UDim2.new(1, 24, 1, 24)
+    shadow.Position = UDim2.new(0, -12, 0, -12)
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://1316045217"
+    shadow.ImageTransparency = 0.85
+    shadow.ZIndex = 0
+end
+
+-- 13. Notifikacije u istom stilu kao panel
+local function notify(title, text)
+    pcall(function()
+        game.StarterGui:SetCore("SendNotification", {
+            Title = title,
+            Text = text,
+            Duration = 5,
+            Icon = "rbxassetid://6031094678"
+        })
+    end)
+end
+notify("Panel", "Panel učitan! (RightShift za toggle, - za minimizaciju)") 
