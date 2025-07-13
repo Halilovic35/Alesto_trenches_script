@@ -79,7 +79,7 @@ ScreenGui.Parent = parentGui
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = frameName
-MainFrame.Size = Config.MenuSize
+MainFrame.Size = UDim2.new(0, 370, 0, 600)
 MainFrame.Position = Config.MenuPosition
 MainFrame.BackgroundColor3 = Config.Colors.Primary
 MainFrame.BorderSizePixel = 0
@@ -245,7 +245,7 @@ end)
 
 -- Section: Meta (Hitbox)
 local MetaSection = Instance.new("Frame", MainFrame)
-MetaSection.Size = UDim2.new(1, -32, 0, 110)
+MetaSection.Size = UDim2.new(1, -32, 0, 220)
 MetaSection.Position = UDim2.new(0, 16, 0, 280)
 MetaSection.BackgroundColor3 = Config.Colors.Section
 MetaSection.BorderSizePixel = 0
@@ -376,28 +376,114 @@ local NAMETAG_BIND = Enum.KeyCode.N
 local KROZZID_BIND = Enum.KeyCode.K
 local waitingForBind = nil -- "ESP", "HITBOX", "NAMETAG", "KROZZID"
 
--- GUI: Bind sekcija (sve u jednom redu)
-local BindSection = Instance.new("Frame", MainFrame)
-BindSection.Size = UDim2.new(1, -32, 0, 40)
-BindSection.Position = UDim2.new(0, 16, 0, 570)
-BindSection.BackgroundColor3 = Config.Colors.Section
-BindSection.BorderSizePixel = 0
-local BindCorner = Instance.new("UICorner", BindSection)
-BindCorner.CornerRadius = UDim.new(0, 12)
+-- Nova sekcija: Imena + Krozzid
+local ImenaSection = Instance.new("Frame", MainFrame)
+ImenaSection.Size = UDim2.new(1, -32, 0, 70)
+ImenaSection.Position = UDim2.new(0, 16, 0, 500)
+ImenaSection.BackgroundColor3 = Config.Colors.Section
+ImenaSection.BorderSizePixel = 0
+local ImenaSectionCorner = Instance.new("UICorner", ImenaSection)
+ImenaSectionCorner.CornerRadius = UDim.new(0, 12)
 
--- 6. Bindovi u glavni panel (MetaSection)
-local BindoviLabel = Instance.new("TextLabel", MetaSection)
+local ImenaLabel = Instance.new("TextLabel", ImenaSection)
+ImenaLabel.Size = UDim2.new(0, 80, 0, 28)
+ImenaLabel.Position = UDim2.new(0, 10, 0, 8)
+ImenaLabel.BackgroundTransparency = 1
+ImenaLabel.Text = "Imena"
+ImenaLabel.TextColor3 = Config.Colors.Text
+ImenaLabel.TextScaled = true
+ImenaLabel.Font = Enum.Font.GothamBold
+
+local ImenaToggle = Instance.new("TextButton", ImenaSection)
+ImenaToggle.Size = UDim2.new(0, 90, 0, 28)
+ImenaToggle.Position = UDim2.new(0, 100, 0, 8)
+ImenaToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+ImenaToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
+ImenaToggle.TextColor3 = Config.Colors.Text
+ImenaToggle.TextScaled = true
+ImenaToggle.Font = Enum.Font.GothamBold
+local ImenaToggleCorner = Instance.new("UICorner", ImenaToggle)
+ImenaToggleCorner.CornerRadius = UDim.new(0, 8)
+ImenaToggle.MouseButton1Click:Connect(function()
+    NAMETAG_ENABLED = not NAMETAG_ENABLED
+    ImenaToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
+    ImenaToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+end)
+
+local ImenaScaleLabel = Instance.new("TextLabel", ImenaSection)
+ImenaScaleLabel.Size = UDim2.new(0, 60, 0, 28)
+ImenaScaleLabel.Position = UDim2.new(0, 200, 0, 8)
+ImenaScaleLabel.BackgroundTransparency = 1
+ImenaScaleLabel.Text = "Veličina"
+ImenaScaleLabel.TextColor3 = Config.Colors.Text
+ImenaScaleLabel.TextScaled = true
+ImenaScaleLabel.Font = Enum.Font.Gotham
+
+local ImenaScaleSlider = Instance.new("TextButton", ImenaSection)
+ImenaScaleSlider.Size = UDim2.new(0, 60, 0, 28)
+ImenaScaleSlider.Position = UDim2.new(0, 270, 0, 8)
+ImenaScaleSlider.BackgroundColor3 = Config.Colors.Accent
+ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
+ImenaScaleSlider.TextColor3 = Config.Colors.Text
+ImenaScaleSlider.TextScaled = true
+ImenaScaleSlider.Font = Enum.Font.GothamBold
+local draggingImenaScale = false
+ImenaScaleSlider.MouseButton1Down:Connect(function()
+    draggingImenaScale = true
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingImenaScale = false end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if draggingImenaScale and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local rel = math.clamp((input.Position.X - ImenaScaleSlider.AbsolutePosition.X) / ImenaScaleSlider.AbsoluteSize.X, 0, 1)
+        local value = math.floor(rel * 49 + 1) / 10 -- 0.1 do 5.0
+        NAMETAG_SCALE = value
+        ImenaScaleSlider.Text = tostring(value)
+    end
+end)
+NAMETAG_SCALE = 0.1
+ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
+
+-- Krozzid toggle u Imena sekciji
+local KrozzidToggle = Instance.new("TextButton", ImenaSection)
+KrozzidToggle.Size = UDim2.new(0, 120, 0, 28)
+KrozzidToggle.Position = UDim2.new(0, 10, 0, 40)
+KrozzidToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
+KrozzidToggle.Text = "Krozzid: Isključeno"
+KrozzidToggle.TextColor3 = Config.Colors.Text
+KrozzidToggle.TextScaled = true
+KrozzidToggle.Font = Enum.Font.GothamBold
+local KrozzidToggleCorner = Instance.new("UICorner", KrozzidToggle)
+KrozzidToggleCorner.CornerRadius = UDim.new(0, 8)
+local KROZZID_ENABLED = false
+KrozzidToggle.MouseButton1Click:Connect(function()
+    KROZZID_ENABLED = not KROZZID_ENABLED
+    KrozzidToggle.Text = KROZZID_ENABLED and "Krozzid: Uključeno" or "Krozzid: Isključeno"
+    KrozzidToggle.BackgroundColor3 = KROZZID_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+end)
+
+-- Nova sekcija: Bindovi
+local BindoviSection = Instance.new("Frame", MainFrame)
+BindoviSection.Size = UDim2.new(1, -32, 0, 60)
+BindoviSection.Position = UDim2.new(0, 16, 0, 580)
+BindoviSection.BackgroundColor3 = Config.Colors.Section
+BindoviSection.BorderSizePixel = 0
+local BindoviSectionCorner = Instance.new("UICorner", BindoviSection)
+BindoviSectionCorner.CornerRadius = UDim.new(0, 12)
+
+local BindoviLabel = Instance.new("TextLabel", BindoviSection)
 BindoviLabel.Size = UDim2.new(0, 120, 0, 28)
-BindoviLabel.Position = UDim2.new(0, 10, 0, 8+32+48+28+8+32+36)
+BindoviLabel.Position = UDim2.new(0, 10, 0, 8)
 BindoviLabel.BackgroundTransparency = 1
 BindoviLabel.Text = "Bindovi (tipke)"
 BindoviLabel.TextColor3 = Config.Colors.Text
 BindoviLabel.TextScaled = true
 BindoviLabel.Font = Enum.Font.GothamBold
 
-local ESPBindBtn = Instance.new("TextButton", MetaSection)
-ESPBindBtn.Size = UDim2.new(0, 90, 0, 28)
-ESPBindBtn.Position = UDim2.new(0, 10, 0, 8+32+48+28+8+32+36+28)
+local ESPBindBtn = Instance.new("TextButton", BindoviSection)
+ESPBindBtn.Size = UDim2.new(0, 80, 0, 28)
+ESPBindBtn.Position = UDim2.new(0, 140, 0, 8)
 ESPBindBtn.BackgroundColor3 = Config.Colors.Accent
 ESPBindBtn.Text = "ESP: "..tostring(ESP_BIND.Name)
 ESPBindBtn.TextColor3 = Config.Colors.Text
@@ -406,9 +492,9 @@ ESPBindBtn.Font = Enum.Font.GothamBold
 local ESPBindCorner = Instance.new("UICorner", ESPBindBtn)
 ESPBindCorner.CornerRadius = UDim.new(0, 8)
 
-local HitboxBindBtn = Instance.new("TextButton", MetaSection)
-HitboxBindBtn.Size = UDim2.new(0, 110, 0, 28)
-HitboxBindBtn.Position = UDim2.new(0, 110, 0, 8+32+48+28+8+32+36+28)
+local HitboxBindBtn = Instance.new("TextButton", BindoviSection)
+HitboxBindBtn.Size = UDim2.new(0, 90, 0, 28)
+HitboxBindBtn.Position = UDim2.new(0, 230, 0, 8)
 HitboxBindBtn.BackgroundColor3 = Config.Colors.Accent
 HitboxBindBtn.Text = "Glavudja: "..tostring(HITBOX_BIND.Name)
 HitboxBindBtn.TextColor3 = Config.Colors.Text
@@ -417,9 +503,9 @@ HitboxBindBtn.Font = Enum.Font.GothamBold
 local HitboxBindCorner = Instance.new("UICorner", HitboxBindBtn)
 HitboxBindCorner.CornerRadius = UDim.new(0, 8)
 
-local ImenaBindBtn = Instance.new("TextButton", MetaSection)
-ImenaBindBtn.Size = UDim2.new(0, 110, 0, 28)
-ImenaBindBtn.Position = UDim2.new(0, 230, 0, 8+32+48+28+8+32+36+28)
+local ImenaBindBtn = Instance.new("TextButton", BindoviSection)
+ImenaBindBtn.Size = UDim2.new(0, 90, 0, 28)
+ImenaBindBtn.Position = UDim2.new(0, 330, 0, 8)
 ImenaBindBtn.BackgroundColor3 = Config.Colors.Accent
 ImenaBindBtn.Text = "Imena: "..tostring(NAMETAG_BIND.Name)
 ImenaBindBtn.TextColor3 = Config.Colors.Text
@@ -428,9 +514,9 @@ ImenaBindBtn.Font = Enum.Font.GothamBold
 local ImenaBindCorner = Instance.new("UICorner", ImenaBindBtn)
 ImenaBindCorner.CornerRadius = UDim.new(0, 8)
 
-local KrozzidBindBtn = Instance.new("TextButton", MetaSection)
-KrozzidBindBtn.Size = UDim2.new(0, 110, 0, 28)
-KrozzidBindBtn.Position = UDim2.new(0, 350, 0, 8+32+48+28+8+32+36+28)
+local KrozzidBindBtn = Instance.new("TextButton", BindoviSection)
+KrozzidBindBtn.Size = UDim2.new(0, 90, 0, 28)
+KrozzidBindBtn.Position = UDim2.new(0, 430, 0, 8)
 KrozzidBindBtn.BackgroundColor3 = Config.Colors.Accent
 KrozzidBindBtn.Text = "Krozzid: "..tostring(KROZZID_BIND.Name)
 KrozzidBindBtn.TextColor3 = Config.Colors.Text
