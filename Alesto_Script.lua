@@ -261,38 +261,63 @@ MetaLabel.TextColor3 = Config.Colors.Text
 MetaLabel.TextScaled = true
 MetaLabel.Font = Enum.Font.GothamBold
 
-local FOVLabel = Instance.new("TextLabel", MetaSection)
-FOVLabel.Size = UDim2.new(0, 60, 0, 28)
-FOVLabel.Position = UDim2.new(0, 10, 0, 48)
-FOVLabel.BackgroundTransparency = 1
-FOVLabel.Text = "FOV"
-FOVLabel.TextColor3 = Config.Colors.Text
-FOVLabel.TextScaled = true
-FOVLabel.Font = Enum.Font.Gotham
-
-local FOVSlider = Instance.new("TextButton", MetaSection)
-FOVSlider.Size = UDim2.new(0, 180, 0, 28)
-FOVSlider.Position = UDim2.new(0, 70, 0, 48)
-FOVSlider.BackgroundColor3 = Config.Colors.Accent
-FOVSlider.Text = tostring(META_FOV)
-FOVSlider.TextColor3 = Config.Colors.Text
-FOVSlider.TextScaled = true
-FOVSlider.Font = Enum.Font.GothamBold
-local draggingFOV = false
-FOVSlider.MouseButton1Down:Connect(function()
-    draggingFOV = true
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingFOV = false end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if draggingFOV and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local rel = math.clamp((input.Position.X - FOVSlider.AbsolutePosition.X) / FOVSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * (MAX_HITBOX_FOV-1) + 1)
-        META_FOV = value
-        FOVSlider.Text = tostring(value)
+-- MODERNI INPUT BOX ZA FOV (hitbox)
+local FOVInput = Instance.new("TextBox", MetaSection)
+FOVInput.Size = UDim2.new(0, 60, 0, 28)
+FOVInput.Position = UDim2.new(0, 70, 0, 48)
+FOVInput.BackgroundColor3 = Color3.fromRGB(30,40,60)
+FOVInput.TextColor3 = Config.Colors.Text
+FOVInput.Text = tostring(META_FOV)
+FOVInput.TextScaled = true
+FOVInput.Font = Enum.Font.GothamBold
+FOVInput.PlaceholderText = "FOV"
+FOVInput.ClearTextOnFocus = false
+FOVInput.TextStrokeTransparency = 0.7
+FOVInput.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+local FOVInputCorner = Instance.new("UICorner", FOVInput)
+FOVInputCorner.CornerRadius = UDim.new(0, 8)
+FOVInput.FocusLost:Connect(function(enter)
+    if enter then
+        local val = tonumber(FOVInput.Text)
+        if val and val >= 1 and val <= MAX_HITBOX_FOV then
+            META_FOV = val
+            FOVInput.Text = tostring(val)
+        else
+            FOVInput.Text = tostring(META_FOV)
+        end
     end
 end)
+
+-- MODERNI INPUT BOX ZA SCALE (veličina imena)
+local ImenaScaleInput = Instance.new("TextBox", ImenaSection)
+ImenaScaleInput.Size = UDim2.new(0, 60, 0, 28)
+ImenaScaleInput.Position = UDim2.new(0, 200, 0, 8)
+ImenaScaleInput.BackgroundColor3 = Color3.fromRGB(30,40,60)
+ImenaScaleInput.TextColor3 = Config.Colors.Text
+ImenaScaleInput.Text = tostring(NAMETAG_SCALE)
+ImenaScaleInput.TextScaled = true
+ImenaScaleInput.Font = Enum.Font.GothamBold
+ImenaScaleInput.PlaceholderText = "Veličina"
+ImenaScaleInput.ClearTextOnFocus = false
+ImenaScaleInput.TextStrokeTransparency = 0.7
+ImenaScaleInput.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+local ImenaScaleInputCorner = Instance.new("UICorner", ImenaScaleInput)
+ImenaScaleInputCorner.CornerRadius = UDim.new(0, 8)
+ImenaScaleInput.FocusLost:Connect(function(enter)
+    if enter then
+        local val = tonumber(ImenaScaleInput.Text)
+        if val and val >= 0.1 and val <= 5.0 then
+            NAMETAG_SCALE = val
+            ImenaScaleInput.Text = tostring(val)
+        else
+            ImenaScaleInput.Text = tostring(NAMETAG_SCALE)
+        end
+    end
+end)
+
+-- Ukloni stare slidere za FOV i scale ako postoje
+if FOVSlider then FOVSlider:Destroy() end
+if ImenaScaleSlider then ImenaScaleSlider:Destroy() end
 
 local HeadBtn = Instance.new("TextButton", MetaSection)
 HeadBtn.Size = UDim2.new(0, 70, 0, 28)
@@ -418,32 +443,6 @@ ImenaScaleLabel.Text = "Veličina"
 ImenaScaleLabel.TextColor3 = Config.Colors.Text
 ImenaScaleLabel.TextScaled = true
 ImenaScaleLabel.Font = Enum.Font.Gotham
-
-local ImenaScaleSlider = Instance.new("TextButton", ImenaSection)
-ImenaScaleSlider.Size = UDim2.new(0, 60, 0, 28)
-ImenaScaleSlider.Position = UDim2.new(0, 270, 0, 8)
-ImenaScaleSlider.BackgroundColor3 = Config.Colors.Accent
-ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
-ImenaScaleSlider.TextColor3 = Config.Colors.Text
-ImenaScaleSlider.TextScaled = true
-ImenaScaleSlider.Font = Enum.Font.GothamBold
-local draggingImenaScale = false
-ImenaScaleSlider.MouseButton1Down:Connect(function()
-    draggingImenaScale = true
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingImenaScale = false end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if draggingImenaScale and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local rel = math.clamp((input.Position.X - ImenaScaleSlider.AbsolutePosition.X) / ImenaScaleSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * 49 + 1) / 10 -- 0.1 do 5.0
-        NAMETAG_SCALE = value
-        ImenaScaleSlider.Text = tostring(value)
-    end
-end)
-NAMETAG_SCALE = 0.1
-ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
 
 -- Krozzid toggle u Imena sekciji
 local KrozzidToggle = Instance.new("TextButton", ImenaSection)
@@ -796,20 +795,20 @@ end
 local MAX_HITBOX_FOV = 200
 
 -- U GUI slideru za FOV (hitbox):
-FOVSlider.MouseButton1Down:Connect(function()
-    draggingFOV = true
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingFOV = false end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if draggingFOV and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local rel = math.clamp((input.Position.X - FOVSlider.AbsolutePosition.X) / FOVSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * (MAX_HITBOX_FOV-1) + 1)
-        META_FOV = value
-        FOVSlider.Text = tostring(value)
-    end
-end)
+-- FOVSlider.MouseButton1Down:Connect(function()
+--     draggingFOV = true
+-- end)
+-- UserInputService.InputEnded:Connect(function(input)
+--     if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingFOV = false end
+-- end)
+-- UserInputService.InputChanged:Connect(function(input)
+--     if draggingFOV and input.UserInputType == Enum.UserInputType.MouseMovement then
+--         local rel = math.clamp((input.Position.X - FOVSlider.AbsolutePosition.X) / FOVSlider.AbsoluteSize.X, 0, 1)
+--         local value = math.floor(rel * (MAX_HITBOX_FOV-1) + 1)
+--         META_FOV = value
+--         FOVSlider.Text = tostring(value)
+--     end
+-- end)
 
 -- Ukloni stari slider za HB veličinu do 200 (ako postoji)
 if HitboxFOVLabel then HitboxFOVLabel:Destroy() end
@@ -858,31 +857,32 @@ ImenaScaleLabel.TextColor3 = Config.Colors.Text
 ImenaScaleLabel.TextScaled = true
 ImenaScaleLabel.Font = Enum.Font.Gotham
 
-local ImenaScaleSlider = Instance.new("TextButton", MetaSection)
-ImenaScaleSlider.Size = UDim2.new(0, 100, 0, 28)
-ImenaScaleSlider.Position = UDim2.new(0, 320, 0, 8+32+48+28+8)
-ImenaScaleSlider.BackgroundColor3 = Config.Colors.Accent
-ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
-ImenaScaleSlider.TextColor3 = Config.Colors.Text
-ImenaScaleSlider.TextScaled = true
-ImenaScaleSlider.Font = Enum.Font.GothamBold
-local draggingImenaScale = false
-ImenaScaleSlider.MouseButton1Down:Connect(function()
-    draggingImenaScale = true
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingImenaScale = false end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if draggingImenaScale and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local rel = math.clamp((input.Position.X - ImenaScaleSlider.AbsolutePosition.X) / ImenaScaleSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * 49 + 1) / 10 -- 0.1 do 5.0
-        NAMETAG_SCALE = value
-        ImenaScaleSlider.Text = tostring(value)
+-- MODERNI INPUT BOX ZA SCALE (veličina imena)
+local ImenaScaleInput = Instance.new("TextBox", MetaSection)
+ImenaScaleInput.Size = UDim2.new(0, 100, 0, 28)
+ImenaScaleInput.Position = UDim2.new(0, 320, 0, 8+32+48+28+8)
+ImenaScaleInput.BackgroundColor3 = Config.Colors.Accent
+ImenaScaleInput.TextColor3 = Config.Colors.Text
+ImenaScaleInput.Text = tostring(NAMETAG_SCALE)
+ImenaScaleInput.TextScaled = true
+ImenaScaleInput.Font = Enum.Font.GothamBold
+ImenaScaleInput.PlaceholderText = "Veličina"
+ImenaScaleInput.ClearTextOnFocus = false
+ImenaScaleInput.TextStrokeTransparency = 0.7
+ImenaScaleInput.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+local ImenaScaleInputCorner = Instance.new("UICorner", ImenaScaleInput)
+ImenaScaleInputCorner.CornerRadius = UDim.new(0, 8)
+ImenaScaleInput.FocusLost:Connect(function(enter)
+    if enter then
+        local val = tonumber(ImenaScaleInput.Text)
+        if val and val >= 0.1 and val <= 5.0 then
+            NAMETAG_SCALE = val
+            ImenaScaleInput.Text = tostring(val)
+        else
+            ImenaScaleInput.Text = tostring(NAMETAG_SCALE)
+        end
     end
 end)
-NAMETAG_SCALE = 0.1
-ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
 
 -- 5. Dodaj Krozzid toggle u isti panel
 local KrozzidToggle = Instance.new("TextButton", MetaSection)
@@ -1139,7 +1139,7 @@ local function addButtonAnim(btn)
         btn.BackgroundColor3 = Config.Colors.Accent
     end)
 end
-for _,section in ipairs({ESPBindBtn, HitboxBindBtn, ImenaBindBtn, KrozzidBindBtn, ImenaToggle, ImenaScaleSlider, KrozzidToggle, FOVSlider, HeadBtn, TorsoBtn, RedBtn, BlueBtn, GreenBtn, VizijaToggle, OnlyEnemiesBtn, ColorWheel}) do
+for _,section in ipairs({ESPBindBtn, HitboxBindBtn, ImenaBindBtn, KrozzidBindBtn, ImenaToggle, ImenaScaleInput, KrozzidToggle, FOVInput, HeadBtn, TorsoBtn, RedBtn, BlueBtn, GreenBtn, VizijaToggle, OnlyEnemiesBtn, ColorWheel}) do
     if section then pcall(function() addButtonAnim(section) end) end
 end
 
@@ -1217,22 +1217,22 @@ for _,btn in ipairs({VizijaToggle, OnlyEnemiesBtn, ImenaToggle, KrozzidToggle, H
 end
 
 -- 11. Slider s value bubble
-local function addSliderBubble(slider, getValue)
-    local bubble = Instance.new("TextLabel", slider)
-    bubble.Size = UDim2.new(0, 40, 0, 20)
-    bubble.Position = UDim2.new(1, 8, 0, 0)
-    bubble.BackgroundTransparency = 0.3
-    bubble.BackgroundColor3 = Color3.fromRGB(30,40,60)
-    bubble.TextColor3 = Config.Colors.Text
-    bubble.TextScaled = true
-    bubble.Font = Enum.Font.GothamBold
-    bubble.Text = getValue()
-    slider.MouseMoved:Connect(function()
-        bubble.Text = getValue()
-    end)
-end
-addSliderBubble(FOVSlider, function() return tostring(META_FOV) end)
-addSliderBubble(ImenaScaleSlider, function() return tostring(NAMETAG_SCALE) end)
+-- local function addSliderBubble(slider, getValue)
+--     local bubble = Instance.new("TextLabel", slider)
+--     bubble.Size = UDim2.new(0, 40, 0, 20)
+--     bubble.Position = UDim2.new(1, 8, 0, 0)
+--     bubble.BackgroundTransparency = 0.3
+--     bubble.BackgroundColor3 = Color3.fromRGB(30,40,60)
+--     bubble.TextColor3 = Config.Colors.Text
+--     bubble.TextScaled = true
+--     bubble.Font = Enum.Font.GothamBold
+--     bubble.Text = getValue()
+--     slider.MouseMoved:Connect(function()
+--         bubble.Text = getValue()
+--     end)
+-- end
+-- addSliderBubble(FOVSlider, function() return tostring(META_FOV) end)
+-- addSliderBubble(ImenaScaleSlider, function() return tostring(NAMETAG_SCALE) end)
 
 -- 12. Sekcije s blagim shadowom i headerom
 for _,frame in ipairs({VizijaSection, ColorSection, MetaSection, ImenaSection, BindoviSection}) do
