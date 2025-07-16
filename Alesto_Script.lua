@@ -14,6 +14,10 @@ local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
+local FOV_MIN = 20
+local FOV_MAX = 120
+local FOV_DEFAULT = 70
+local currentFOV = FOV_DEFAULT
 
 -- Random string generator
 local function randStr(len)
@@ -810,6 +814,73 @@ UserInputService.InputChanged:Connect(function(input)
         local value = math.floor(rel * (MAX_HITBOX_FOV-1) + 1)
         META_FOV = value
         FOVSlider.Text = tostring(value)
+    end
+end)
+
+-- FOV ZOOM TOGGLE I SLIDER
+local FOV_ENABLED = false
+local FOVToggle = Instance.new("TextButton", MainFrame)
+FOVToggle.Size = UDim2.new(0, 90, 0, 28)
+FOVToggle.Position = UDim2.new(0, 320, 0, 200)
+FOVToggle.BackgroundColor3 = FOV_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+FOVToggle.Text = FOV_ENABLED and "FOV ON" or "FOV OFF"
+FOVToggle.TextColor3 = Config.Colors.Text
+FOVToggle.TextScaled = true
+FOVToggle.Font = Enum.Font.GothamBold
+local FOVToggleCorner = Instance.new("UICorner", FOVToggle)
+FOVToggleCorner.CornerRadius = UDim.new(0, 8)
+FOVToggle.MouseButton1Click:Connect(function()
+    FOV_ENABLED = not FOV_ENABLED
+    FOVToggle.Text = FOV_ENABLED and "FOV ON" or "FOV OFF"
+    FOVToggle.BackgroundColor3 = FOV_ENABLED and Config.Colors.Accent or Color3.fromRGB(60,60,60)
+    if not FOV_ENABLED then
+        Camera.FieldOfView = FOV_DEFAULT
+    else
+        Camera.FieldOfView = currentFOV
+    end
+end)
+
+-- FOV slider (već postoji, ali dodajemo update za currentFOV)
+local FOVGuiLabel = Instance.new("TextLabel", MainFrame)
+FOVGuiLabel.Size = UDim2.new(0, 100, 0, 28)
+FOVGuiLabel.Position = UDim2.new(0, 16, 0, 200)
+FOVGuiLabel.BackgroundTransparency = 1
+FOVGuiLabel.Text = "FOV (zoom)"
+FOVGuiLabel.TextColor3 = Config.Colors.Text
+FOVGuiLabel.TextScaled = true
+FOVGuiLabel.Font = Enum.Font.GothamBold
+
+local FOVGuiSlider = Instance.new("TextButton", MainFrame)
+FOVGuiSlider.Size = UDim2.new(0, 180, 0, 28)
+FOVGuiSlider.Position = UDim2.new(0, 120, 0, 200)
+FOVGuiSlider.BackgroundColor3 = Config.Colors.Accent
+FOVGuiSlider.Text = tostring(currentFOV)
+FOVGuiSlider.TextColor3 = Config.Colors.Text
+FOVGuiSlider.TextScaled = true
+FOVGuiSlider.Font = Enum.Font.GothamBold
+local draggingFOVGui = false
+FOVGuiSlider.MouseButton1Down:Connect(function()
+    draggingFOVGui = true
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingFOVGui = false end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if draggingFOVGui and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local rel = math.clamp((input.Position.X - FOVGuiSlider.AbsolutePosition.X) / FOVGuiSlider.AbsoluteSize.X, 0, 1)
+        local value = math.floor(rel * (FOV_MAX-FOV_MIN) + FOV_MIN)
+        currentFOV = value
+        FOVGuiSlider.Text = tostring(value)
+        if FOV_ENABLED then
+            Camera.FieldOfView = value
+        end
+    end
+end)
+
+-- FOV efekt loop
+RunService.RenderStepped:Connect(function()
+    if FOV_ENABLED then
+        Camera.FieldOfView = currentFOV
     end
 end)
 
