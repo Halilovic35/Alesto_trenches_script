@@ -1,3 +1,10 @@
+pcall(function()
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Alesto Script",
+        Text = "Skripta je uspješno pokrenuta!",
+        Duration = 5
+    })
+end)
 --[[
     script by Alesto
 ]]
@@ -22,12 +29,7 @@ end
 math.randomseed(tick()*1000)
 
 -- Random parent: CoreGui ili PlayerGui
-local parentGui
-if math.random() > 0.5 and Players.LocalPlayer:FindFirstChild("PlayerGui") then
-    parentGui = Players.LocalPlayer.PlayerGui
-else
-    parentGui = game:GetService("CoreGui")
-end
+local parentGui = Players.LocalPlayer:FindFirstChild("PlayerGui") or Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Config
 local Config = {
@@ -991,9 +993,13 @@ RunService.RenderStepped:Connect(function()
                         torso.Size = Vector3.new(META_FOV*2, META_FOV*2, META_FOV*1.5)
                         torso.CanCollide = false
                         torso.Transparency = 0.5
+                        if BODY_COLOR_ENABLED then
+                            torso.Color = BODY_COLOR
+                        end
                     end)
                 elseif torso and hum and hum.Health <= 0 then
                     torso.Size = Vector3.new(2, 2, 1) -- default size
+                    torso.Color = Color3.fromRGB(163, 162, 165)
                 end
             end
         end
