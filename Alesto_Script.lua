@@ -36,7 +36,7 @@ math.randomseed(tick()*1000)
 local parentGui = game:GetService("CoreGui")
 
 -- Config
--- 1. MODERNI COLOR PALETTE
+local Config = {}
 Config.Colors = {
     Primary = Color3.fromRGB(24, 24, 32),
     Secondary = Color3.fromRGB(32, 32, 44),
