@@ -163,7 +163,7 @@ CombatTab.Position = UDim2.new(0, 0, 0, 0)
 CombatTab.BackgroundColor3 = Config.Colors.Accent
 CombatTab.Text = "Combat"
 CombatTab.TextColor3 = Config.Colors.Text
-CombatTab.TextScaled = true
+CombatTab.TextSize = 14
 CombatTab.Font = Enum.Font.GothamBold
 local CombatTabCorner = Instance.new("UICorner", CombatTab)
 CombatTabCorner.CornerRadius = UDim.new(0, 12)
@@ -174,7 +174,7 @@ VizijaTab.Position = UDim2.new(0.5, 2, 0, 0)
 VizijaTab.BackgroundColor3 = Config.Colors.Secondary
 VizijaTab.Text = "Vizija"
 VizijaTab.TextColor3 = Config.Colors.Text
-VizijaTab.TextScaled = true
+VizijaTab.TextSize = 14
 VizijaTab.Font = Enum.Font.GothamBold
 local VizijaTabCorner = Instance.new("UICorner", VizijaTab)
 VizijaTabCorner.CornerRadius = UDim.new(0, 12)
@@ -362,22 +362,24 @@ HeadBInputCorner.CornerRadius = UDim.new(0, 6)
 
 -- Head Color Picker (Modern)
 local HeadColorPicker = Instance.new("Frame", HeadHitboxSection)
-HeadColorPicker.Size = UDim2.new(0, 80, 0, 80)
-HeadColorPicker.Position = UDim2.new(1, -100, 0, 100)
+HeadColorPicker.Size = UDim2.new(0, 60, 0, 60)
+HeadColorPicker.Position = UDim2.new(1, -80, 0, 100)
 HeadColorPicker.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 local HeadColorPickerCorner = Instance.new("UICorner", HeadColorPicker)
 HeadColorPickerCorner.CornerRadius = UDim.new(0, 8)
 
--- Head Color Picker Gradient
+-- Head Color Picker Gradient (Full spectrum)
 local HeadColorGradient = Instance.new("UIGradient", HeadColorPicker)
 HeadColorGradient.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 0)),
-    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 0)),
-    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)),
-    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(255, 0, 255)),
+    ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+    ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
 })
+HeadColorGradient.Rotation = 0
 
 -- Head Color Picker Cursor
 local HeadColorCursor = Instance.new("Frame", HeadColorPicker)
@@ -506,22 +508,24 @@ BodyBInputCorner.CornerRadius = UDim.new(0, 6)
 
 -- Body Color Picker (Modern)
 local BodyColorPicker = Instance.new("Frame", BodyHitboxSection)
-BodyColorPicker.Size = UDim2.new(0, 80, 0, 80)
-BodyColorPicker.Position = UDim2.new(1, -100, 0, 100)
+BodyColorPicker.Size = UDim2.new(0, 60, 0, 60)
+BodyColorPicker.Position = UDim2.new(1, -80, 0, 100)
 BodyColorPicker.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 local BodyColorPickerCorner = Instance.new("UICorner", BodyColorPicker)
 BodyColorPickerCorner.CornerRadius = UDim.new(0, 8)
 
--- Body Color Picker Gradient
+-- Body Color Picker Gradient (Full spectrum)
 local BodyColorGradient = Instance.new("UIGradient", BodyColorPicker)
 BodyColorGradient.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 0)),
-    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 0)),
-    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)),
-    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(255, 0, 255)),
+    ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+    ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
 })
+BodyColorGradient.Rotation = 0
 
 -- Body Color Picker Cursor
 local BodyColorCursor = Instance.new("Frame", BodyColorPicker)
@@ -606,8 +610,8 @@ KrozzidToggleKnobCorner.CornerRadius = UDim.new(0, 10)
 
 -- Imena Toggle (moved to VizijaSection)
 local ImenaLabel = Instance.new("TextLabel", VizijaSection)
-ImenaLabel.Size = UDim2.new(1, -100, 0, 120)
-ImenaLabel.Position = UDim2.new(0, 16, 0, 150)
+ImenaLabel.Size = UDim2.new(1, -100, 0, 20)
+ImenaLabel.Position = UDim2.new(0, 16, 0, 200)
 ImenaLabel.BackgroundTransparency = 1
 ImenaLabel.Text = "Imena"
 ImenaLabel.TextColor3 = Config.Colors.Text
@@ -617,7 +621,7 @@ ImenaLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 local ImenaToggle = Instance.new("TextButton", VizijaSection)
 ImenaToggle.Size = UDim2.new(0, 50, 0, 25)
-ImenaToggle.Position = UDim2.new(1, -66, 0, 150)
+ImenaToggle.Position = UDim2.new(1, -66, 0, 200)
 ImenaToggle.BackgroundColor3 = Config.Colors.ToggleOff
 ImenaToggle.Text = ""
 local ImenaToggleCorner = Instance.new("UICorner", ImenaToggle)
@@ -630,10 +634,10 @@ ImenaToggleKnob.BackgroundColor3 = Config.Colors.Text
 local ImenaToggleKnobCorner = Instance.new("UICorner", ImenaToggleKnob)
 ImenaToggleKnobCorner.CornerRadius = UDim.new(0, 10)
 
--- Imena FOV
+-- Imena FOV Slider
 local ImenaFOVLabel = Instance.new("TextLabel", VizijaSection)
 ImenaFOVLabel.Size = UDim2.new(1, 0, 0, 20)
-ImenaFOVLabel.Position = UDim2.new(0, 16, 0, 185)
+ImenaFOVLabel.Position = UDim2.new(0, 16, 0, 235)
 ImenaFOVLabel.BackgroundTransparency = 1
 ImenaFOVLabel.Text = "FOV Imena"
 ImenaFOVLabel.TextColor3 = Config.Colors.Text
@@ -641,16 +645,31 @@ ImenaFOVLabel.TextScaled = true
 ImenaFOVLabel.Font = Enum.Font.Gotham
 ImenaFOVLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-local ImenaFOVBox = Instance.new("TextBox", VizijaSection)
-ImenaFOVBox.Size = UDim2.new(0, 60, 0, 25)
-ImenaFOVBox.Position = UDim2.new(1, -76, 0, 185)
-ImenaFOVBox.BackgroundColor3 = Config.Colors.Secondary
-ImenaFOVBox.Text = "1.0"
-ImenaFOVBox.TextColor3 = Config.Colors.Text
-ImenaFOVBox.TextScaled = true
-ImenaFOVBox.Font = Enum.Font.Gotham
-local ImenaFOVBoxCorner = Instance.new("UICorner", ImenaFOVBox)
-ImenaFOVBoxCorner.CornerRadius = UDim.new(0, 8)
+-- Imena FOV Slider Background
+local ImenaFOVSlider = Instance.new("Frame", VizijaSection)
+ImenaFOVSlider.Size = UDim2.new(0, 120, 0, 6)
+ImenaFOVSlider.Position = UDim2.new(1, -140, 0, 240)
+ImenaFOVSlider.BackgroundColor3 = Config.Colors.Slider
+local ImenaFOVSliderCorner = Instance.new("UICorner", ImenaFOVSlider)
+ImenaFOVSliderCorner.CornerRadius = UDim.new(0, 3)
+
+-- Imena FOV Slider Fill
+local ImenaFOVSliderBar = Instance.new("Frame", ImenaFOVSlider)
+ImenaFOVSliderBar.Size = UDim2.new(0.5, 0, 1, 0)
+ImenaFOVSliderBar.Position = UDim2.new(0, 0, 0, 0)
+ImenaFOVSliderBar.BackgroundColor3 = Config.Colors.SliderBar
+local ImenaFOVSliderBarCorner = Instance.new("UICorner", ImenaFOVSliderBar)
+ImenaFOVSliderBarCorner.CornerRadius = UDim.new(0, 3)
+
+-- Imena FOV Value Display
+local ImenaFOVValue = Instance.new("TextLabel", VizijaSection)
+ImenaFOVValue.Size = UDim2.new(0, 40, 0, 20)
+ImenaFOVValue.Position = UDim2.new(1, -50, 0, 235)
+ImenaFOVValue.BackgroundTransparency = 1
+ImenaFOVValue.Text = "1.0"
+ImenaFOVValue.TextColor3 = Config.Colors.Text
+ImenaFOVValue.TextScaled = true
+ImenaFOVValue.Font = Enum.Font.GothamBold
 
 -- Vizija Section Content
 local VizijaEnabledLabel = Instance.new("TextLabel", VizijaSection)
@@ -725,22 +744,24 @@ ESPBInputCorner.CornerRadius = UDim.new(0, 6)
 
 -- ESP Color Picker (Modern)
 local ESPColorPicker = Instance.new("Frame", VizijaSection)
-ESPColorPicker.Size = UDim2.new(0, 80, 0, 80)
-ESPColorPicker.Position = UDim2.new(1, -100, 0, 100)
+ESPColorPicker.Size = UDim2.new(0, 60, 0, 60)
+ESPColorPicker.Position = UDim2.new(1, -80, 0, 100)
 ESPColorPicker.BackgroundColor3 = Color3.fromRGB(255, 20, 147)
 local ESPColorPickerCorner = Instance.new("UICorner", ESPColorPicker)
 ESPColorPickerCorner.CornerRadius = UDim.new(0, 8)
 
--- ESP Color Picker Gradient
+-- ESP Color Picker Gradient (Full spectrum)
 local ESPColorGradient = Instance.new("UIGradient", ESPColorPicker)
 ESPColorGradient.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 0)),
-    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 0)),
-    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)),
-    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(255, 0, 255)),
+    ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+    ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
 })
+ESPColorGradient.Rotation = 0
 
 -- ESP Color Picker Cursor
 local ESPColorCursor = Instance.new("Frame", ESPColorPicker)
@@ -822,10 +843,6 @@ end)
 
 local bodyHitboxEnabled = createToggle(BodyHitboxToggle, BodyHitboxToggleKnob, function(enabled)
     META_TORSO = enabled
-end)
-
-local noClipEnabled = createToggle(NoClipToggle, NoClipToggleKnob, function(enabled)
-    -- No clip functionality
 end)
 
 local infJumpEnabled = createToggle(InfJumpToggle, InfJumpToggleKnob, function(enabled)
@@ -1361,10 +1378,10 @@ local function createColorPicker(colorPicker, cursor, rInput, gInput, bInput, ca
             -- Update cursor position
             cursor.Position = UDim2.new(relativeX, -4, relativeY, -4)
             
-            -- Calculate color based on position
+            -- Calculate color based on position (full spectrum)
             local hue = relativeX * 360
-            local saturation = 1 - relativeY
-            local value = 1
+            local saturation = 1
+            local value = 1 - relativeY
             
             local color = Color3.fromHSV(hue, saturation, value)
             
@@ -1372,6 +1389,9 @@ local function createColorPicker(colorPicker, cursor, rInput, gInput, bInput, ca
             rInput.Text = tostring(math.floor(color.R * 255))
             gInput.Text = tostring(math.floor(color.G * 255))
             bInput.Text = tostring(math.floor(color.B * 255))
+            
+            -- Update color picker background
+            colorPicker.BackgroundColor3 = color
             
             -- Call callback
             if callback then
@@ -1388,6 +1408,10 @@ end)
 
 createSlider(BodyFOVSlider, BodyFOVSliderBar, BodyFOVValue, HITBOX_FOV_MIN, HITBOX_FOV_MAX, META_TORSO_FOV, function(value)
     META_TORSO_FOV = value
+end)
+
+createSlider(ImenaFOVSlider, ImenaFOVSliderBar, ImenaFOVValue, 0.1, 5, 1.0, function(value)
+    NAMETAG_SCALE = value
 end)
 
 createColorPicker(HeadColorPicker, HeadColorCursor, HeadRInput, HeadGInput, HeadBInput, function(color)
