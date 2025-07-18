@@ -44,13 +44,13 @@ local Config = {}
 Config.Colors = {
     Primary = Color3.fromRGB(24, 24, 32),
     Secondary = Color3.fromRGB(32, 32, 44),
-    Accent = Color3.fromRGB(0, 120, 255), -- Blue accent color
+    Accent = Color3.fromRGB(255, 20, 147), -- Pink accent color
     Text = Color3.fromRGB(255, 255, 255),
     Minimized = Color3.fromRGB(40, 40, 50),
     Section = Color3.fromRGB(36, 36, 48),
     ToggleOff = Color3.fromRGB(60, 60, 60),
     Slider = Color3.fromRGB(60, 60, 80),
-    SliderBar = Color3.fromRGB(0, 120, 255)
+    SliderBar = Color3.fromRGB(255, 20, 147)
 }
 
 -- Add missing config variables
@@ -99,9 +99,9 @@ print("GUI parentan")
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = frameName
--- MainFrame size
-MainFrame.Size = UDim2.new(0, 700, 0, 950)
-Config.MenuPosition = UDim2.new(0.5, -350, 0.5, -475)
+-- MainFrame size - smanjeno da stane na ekran
+MainFrame.Size = UDim2.new(0, 600, 0, 750)
+Config.MenuPosition = UDim2.new(0.5, -300, 0.5, -375)
 MainFrame.Position = Config.MenuPosition
 MainFrame.BackgroundColor3 = Config.Colors.Primary
 MainFrame.BorderSizePixel = 0
@@ -184,8 +184,8 @@ VizijaTabCorner.CornerRadius = UDim.new(0, 12)
 local CombatSection = Instance.new("Frame", MainFrame)
 CombatSection.Name = "CombatSection"
 -- CombatSection i VizijaSection size
-CombatSection.Size = UDim2.new(1, -48, 1, -180)
-CombatSection.Position = UDim2.new(0, 24, 0, 120)
+CombatSection.Size = UDim2.new(1, -40, 1, -140)
+CombatSection.Position = UDim2.new(0, 20, 0, 100)
 CombatSection.BackgroundColor3 = Config.Colors.Section
 CombatSection.BorderSizePixel = 0
 local CombatSectionCorner = Instance.new("UICorner", CombatSection)
@@ -194,8 +194,8 @@ CombatSectionCorner.CornerRadius = UDim.new(0, 16)
 local VizijaSection = Instance.new("Frame", MainFrame)
 VizijaSection.Name = "VizijaSection"
 -- CombatSection i VizijaSection size
-VizijaSection.Size = UDim2.new(1, -48, 1, -180)
-VizijaSection.Position = UDim2.new(0, 24, 0, 120)
+VizijaSection.Size = UDim2.new(1, -40, 1, -140)
+VizijaSection.Position = UDim2.new(0, 20, 0, 100)
 VizijaSection.BackgroundColor3 = Config.Colors.Section
 VizijaSection.BorderSizePixel = 0
 local VizijaSectionCorner = Instance.new("UICorner", VizijaSection)
@@ -247,8 +247,8 @@ end)
 -- Combat Section Content
 -- Povećaj Glavudju Section
 local HeadHitboxSection = Instance.new("Frame", CombatSection)
-HeadHitboxSection.Size = UDim2.new(1, -48, 0, 200)
-HeadHitboxSection.Position = UDim2.new(0, 24, 0, 24)
+HeadHitboxSection.Size = UDim2.new(1, -40, 0, 160)
+HeadHitboxSection.Position = UDim2.new(0, 20, 0, 20)
 HeadHitboxSection.BackgroundColor3 = Config.Colors.Primary
 HeadHitboxSection.BorderSizePixel = 0
 local HeadHitboxSectionCorner = Instance.new("UICorner", HeadHitboxSection)
@@ -280,7 +280,7 @@ HeadHitboxToggleKnob.BackgroundColor3 = Config.Colors.Text
 local HeadHitboxToggleKnobCorner = Instance.new("UICorner", HeadHitboxToggleKnob)
 HeadHitboxToggleKnobCorner.CornerRadius = UDim.new(0, 10)
 
--- Head FOV Value
+-- Head FOV Slider
 local HeadFOVLabel = Instance.new("TextLabel", HeadHitboxSection)
 HeadFOVLabel.Size = UDim2.new(1, 0, 0, 20)
 HeadFOVLabel.Position = UDim2.new(0, 16, 0, 45)
@@ -291,16 +291,29 @@ HeadFOVLabel.TextScaled = true
 HeadFOVLabel.Font = Enum.Font.Gotham
 HeadFOVLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-local HeadFOVBox = Instance.new("TextBox", HeadHitboxSection)
-HeadFOVBox.Size = UDim2.new(0, 60, 0, 25)
-HeadFOVBox.Position = UDim2.new(1, -76, 0, 45)
-HeadFOVBox.BackgroundColor3 = Config.Colors.Secondary
-HeadFOVBox.Text = tostring(META_HEAD_FOV)
-HeadFOVBox.TextColor3 = Config.Colors.Text
-HeadFOVBox.TextScaled = true
-HeadFOVBox.Font = Enum.Font.Gotham
-local HeadFOVBoxCorner = Instance.new("UICorner", HeadFOVBox)
-HeadFOVBoxCorner.CornerRadius = UDim.new(0, 8)
+local HeadFOVSlider = Instance.new("Frame", HeadHitboxSection)
+HeadFOVSlider.Size = UDim2.new(0, 120, 0, 6)
+HeadFOVSlider.Position = UDim2.new(1, -140, 0, 50)
+HeadFOVSlider.BackgroundColor3 = Config.Colors.Slider
+local HeadFOVSliderCorner = Instance.new("UICorner", HeadFOVSlider)
+HeadFOVSliderCorner.CornerRadius = UDim.new(0, 3)
+
+local HeadFOVSliderBar = Instance.new("Frame", HeadFOVSlider)
+HeadFOVSliderBar.Size = UDim2.new(0.5, 0, 1, 0)
+HeadFOVSliderBar.Position = UDim2.new(0, 0, 0, 0)
+HeadFOVSliderBar.BackgroundColor3 = Config.Colors.SliderBar
+local HeadFOVSliderBarCorner = Instance.new("UICorner", HeadFOVSliderBar)
+HeadFOVSliderBarCorner.CornerRadius = UDim.new(0, 3)
+
+local HeadFOVValue = Instance.new("TextLabel", HeadHitboxSection)
+HeadFOVValue.Size = UDim2.new(0, 40, 0, 20)
+HeadFOVValue.Position = UDim2.new(1, -50, 0, 45)
+HeadFOVValue.BackgroundTransparency = 1
+HeadFOVValue.Text = tostring(META_HEAD_FOV)
+HeadFOVValue.TextColor3 = Config.Colors.Text
+HeadFOVValue.TextScaled = true
+HeadFOVValue.Font = Enum.Font.Gotham
+HeadFOVValue.TextXAlignment = Enum.TextXAlignment.Center
 
 -- Head Color Section
 local HeadColorLabel = Instance.new("TextLabel", HeadHitboxSection)
@@ -349,16 +362,16 @@ HeadBInputCorner.CornerRadius = UDim.new(0, 6)
 
 -- Head Color Picker
 local HeadColorPicker = Instance.new("Frame", HeadHitboxSection)
-HeadColorPicker.Size = UDim2.new(0, 120, 0, 120)
-HeadColorPicker.Position = UDim2.new(1, -156, 0, 120)
+HeadColorPicker.Size = UDim2.new(0, 80, 0, 80)
+HeadColorPicker.Position = UDim2.new(1, -100, 0, 100)
 HeadColorPicker.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 local HeadColorPickerCorner = Instance.new("UICorner", HeadColorPicker)
 HeadColorPickerCorner.CornerRadius = UDim.new(0, 8)
 
 -- Povećaj Tijelo Section
 local BodyHitboxSection = Instance.new("Frame", CombatSection)
-BodyHitboxSection.Size = UDim2.new(1, -48, 0, 200)
-BodyHitboxSection.Position = UDim2.new(0, 24, 0, 240)
+BodyHitboxSection.Size = UDim2.new(1, -40, 0, 160)
+BodyHitboxSection.Position = UDim2.new(0, 20, 0, 200)
 BodyHitboxSection.BackgroundColor3 = Config.Colors.Primary
 BodyHitboxSection.BorderSizePixel = 0
 local BodyHitboxSectionCorner = Instance.new("UICorner", BodyHitboxSection)
@@ -459,8 +472,8 @@ BodyBInputCorner.CornerRadius = UDim.new(0, 6)
 
 -- Body Color Picker
 local BodyColorPicker = Instance.new("Frame", BodyHitboxSection)
-BodyColorPicker.Size = UDim2.new(0, 120, 0, 120)
-BodyColorPicker.Position = UDim2.new(1, -156, 0, 95)
+BodyColorPicker.Size = UDim2.new(0, 80, 0, 80)
+BodyColorPicker.Position = UDim2.new(1, -100, 0, 100)
 BodyColorPicker.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 local BodyColorPickerCorner = Instance.new("UICorner", BodyColorPicker)
 BodyColorPickerCorner.CornerRadius = UDim.new(0, 8)
@@ -659,8 +672,8 @@ ESPBInputCorner.CornerRadius = UDim.new(0, 6)
 
 -- ESP Color Picker
 local ESPColorPicker = Instance.new("Frame", VizijaSection)
-ESPColorPicker.Size = UDim2.new(0, 120, 0, 120)
-ESPColorPicker.Position = UDim2.new(1, -156, 0, 75)
+ESPColorPicker.Size = UDim2.new(0, 80, 0, 80)
+ESPColorPicker.Position = UDim2.new(1, -100, 0, 100)
 ESPColorPicker.BackgroundColor3 = Color3.fromRGB(255, 20, 147)
 local ESPColorPickerCorner = Instance.new("UICorner", ESPColorPicker)
 ESPColorPickerCorner.CornerRadius = UDim.new(0, 8)
