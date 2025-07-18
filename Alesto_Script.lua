@@ -99,9 +99,9 @@ print("GUI parentan")
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = frameName
--- MainFrame size - duplo veći
-MainFrame.Size = UDim2.new(0, 900, 0, 1400)
-Config.MenuPosition = UDim2.new(0.5, -450, 0.5, -700)
+-- MainFrame size
+MainFrame.Size = UDim2.new(0, 700, 0, 950)
+Config.MenuPosition = UDim2.new(0.5, -350, 0.5, -475)
 MainFrame.Position = Config.MenuPosition
 MainFrame.BackgroundColor3 = Config.Colors.Primary
 MainFrame.BorderSizePixel = 0
@@ -183,9 +183,9 @@ VizijaTabCorner.CornerRadius = UDim.new(0, 12)
 
 local CombatSection = Instance.new("Frame", MainFrame)
 CombatSection.Name = "CombatSection"
--- CombatSection i VizijaSection size - proporcionalno veći
-CombatSection.Size = UDim2.new(1, -64, 1, -240)
-CombatSection.Position = UDim2.new(0, 32, 0, 160)
+-- CombatSection i VizijaSection size
+CombatSection.Size = UDim2.new(1, -48, 1, -180)
+CombatSection.Position = UDim2.new(0, 24, 0, 120)
 CombatSection.BackgroundColor3 = Config.Colors.Section
 CombatSection.BorderSizePixel = 0
 local CombatSectionCorner = Instance.new("UICorner", CombatSection)
@@ -193,9 +193,9 @@ CombatSectionCorner.CornerRadius = UDim.new(0, 16)
 
 local VizijaSection = Instance.new("Frame", MainFrame)
 VizijaSection.Name = "VizijaSection"
--- CombatSection i VizijaSection size - proporcionalno veći
-VizijaSection.Size = UDim2.new(1, -64, 1, -240)
-VizijaSection.Position = UDim2.new(0, 32, 0, 160)
+-- CombatSection i VizijaSection size
+VizijaSection.Size = UDim2.new(1, -48, 1, -180)
+VizijaSection.Position = UDim2.new(0, 24, 0, 120)
 VizijaSection.BackgroundColor3 = Config.Colors.Section
 VizijaSection.BorderSizePixel = 0
 local VizijaSectionCorner = Instance.new("UICorner", VizijaSection)
@@ -247,8 +247,8 @@ end)
 -- Combat Section Content
 -- Povećaj Glavudju Section
 local HeadHitboxSection = Instance.new("Frame", CombatSection)
-HeadHitboxSection.Size = UDim2.new(1, -64, 0, 280)
-HeadHitboxSection.Position = UDim2.new(0, 32, 0, 32)
+HeadHitboxSection.Size = UDim2.new(1, -48, 0, 200)
+HeadHitboxSection.Position = UDim2.new(0, 24, 0, 24)
 HeadHitboxSection.BackgroundColor3 = Config.Colors.Primary
 HeadHitboxSection.BorderSizePixel = 0
 local HeadHitboxSectionCorner = Instance.new("UICorner", HeadHitboxSection)
@@ -349,16 +349,16 @@ HeadBInputCorner.CornerRadius = UDim.new(0, 6)
 
 -- Head Color Picker
 local HeadColorPicker = Instance.new("Frame", HeadHitboxSection)
-HeadColorPicker.Size = UDim2.new(0, 180, 0, 180)
-HeadColorPicker.Position = UDim2.new(1, -220, 0, 180)
+HeadColorPicker.Size = UDim2.new(0, 120, 0, 120)
+HeadColorPicker.Position = UDim2.new(1, -156, 0, 120)
 HeadColorPicker.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 local HeadColorPickerCorner = Instance.new("UICorner", HeadColorPicker)
 HeadColorPickerCorner.CornerRadius = UDim.new(0, 8)
 
 -- Povećaj Tijelo Section
 local BodyHitboxSection = Instance.new("Frame", CombatSection)
-BodyHitboxSection.Size = UDim2.new(1, -64, 0, 280)
-BodyHitboxSection.Position = UDim2.new(0, 32, 0, 328)
+BodyHitboxSection.Size = UDim2.new(1, -48, 0, 200)
+BodyHitboxSection.Position = UDim2.new(0, 24, 0, 240)
 BodyHitboxSection.BackgroundColor3 = Config.Colors.Primary
 BodyHitboxSection.BorderSizePixel = 0
 local BodyHitboxSectionCorner = Instance.new("UICorner", BodyHitboxSection)
@@ -459,8 +459,8 @@ BodyBInputCorner.CornerRadius = UDim.new(0, 6)
 
 -- Body Color Picker
 local BodyColorPicker = Instance.new("Frame", BodyHitboxSection)
-BodyColorPicker.Size = UDim2.new(0, 180, 0, 180)
-BodyColorPicker.Position = UDim2.new(1, -220, 0, 180)
+BodyColorPicker.Size = UDim2.new(0, 120, 0, 120)
+BodyColorPicker.Position = UDim2.new(1, -156, 0, 95)
 BodyColorPicker.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 local BodyColorPickerCorner = Instance.new("UICorner", BodyColorPicker)
 BodyColorPickerCorner.CornerRadius = UDim.new(0, 8)
@@ -659,8 +659,8 @@ ESPBInputCorner.CornerRadius = UDim.new(0, 6)
 
 -- ESP Color Picker
 local ESPColorPicker = Instance.new("Frame", VizijaSection)
-ESPColorPicker.Size = UDim2.new(0, 180, 0, 180)
-ESPColorPicker.Position = UDim2.new(1, -220, 0, 180)
+ESPColorPicker.Size = UDim2.new(0, 120, 0, 120)
+ESPColorPicker.Position = UDim2.new(1, -156, 0, 75)
 ESPColorPicker.BackgroundColor3 = Color3.fromRGB(255, 20, 147)
 local ESPColorPickerCorner = Instance.new("UICorner", ESPColorPicker)
 ESPColorPickerCorner.CornerRadius = UDim.new(0, 8)
