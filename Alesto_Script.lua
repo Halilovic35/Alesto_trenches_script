@@ -793,73 +793,54 @@ local function createToggle(toggle, knob, callback)
         end
     end)
     
-
+    -- Toggle function
+    local function toggleState()
+        isOn = not isOn
+        
+        local targetColor = isOn and Config.Colors.Accent or Config.Colors.ToggleOff
+        local targetPosition = isOn and UDim2.new(1, -23, 0, 2) or UDim2.new(0, 2, 0, 2)
+        
+        -- Animate toggle background with bounce effect
+        local colorTween = TweenService:Create(toggle, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            BackgroundColor3 = targetColor
+        })
+        colorTween:Play()
+        
+        -- Animate knob position with bounce effect
+        local positionTween = TweenService:Create(knob, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Position = targetPosition
+        })
+        positionTween:Play()
+        
+        -- Scale animation for feedback
+        local scaleTween = TweenService:Create(toggle, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 52, 0, 27)
+        })
+        scaleTween:Play()
+        
+        scaleTween.Completed:Connect(function()
+            TweenService:Create(toggle, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Size = UDim2.new(0, 50, 0, 25)
+            }):Play()
+        end)
+        
+        if callback then
+            callback(isOn)
+        end
+    end
     
-    -- Right Shift functionality
-    UserInputService.InputBegan:Connect(function(input)
+    -- Right Shift functionality for this specific toggle
+    local connection
+    connection = UserInputService.InputBegan:Connect(function(input)
         if input.KeyCode == Enum.KeyCode.RightShift then
-            isOn = not isOn
-            
-            local targetColor = isOn and Config.Colors.Accent or Config.Colors.ToggleOff
-            local targetPosition = isOn and UDim2.new(1, -23, 0, 2) or UDim2.new(0, 2, 0, 2)
-            
-            -- Animate toggle background with bounce effect
-            local colorTween = TweenService:Create(toggle, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                BackgroundColor3 = targetColor
-            })
-            colorTween:Play()
-            
-            -- Animate knob position with bounce effect
-            local positionTween = TweenService:Create(knob, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                Position = targetPosition
-            })
-            positionTween:Play()
-            
-            -- Scale animation for feedback
-            local scaleTween = TweenService:Create(toggle, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                Size = UDim2.new(0, 52, 0, 27)
-            })
-            scaleTween:Play()
-            
-            scaleTween.Completed:Connect(function()
-                TweenService:Create(toggle, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                    Size = UDim2.new(0, 50, 0, 25)
-                }):Play()
-            end)
-            
-            if callback then
-                callback(isOn)
-            end
+            toggleState()
         end
     end)
     
     return function() return isOn end
 end
 
--- Create toggles
-local headHitboxEnabled = createToggle(HeadHitboxToggle, HeadHitboxToggleKnob, function(enabled)
-    META_HEAD = enabled
-end)
-
-local bodyHitboxEnabled = createToggle(BodyHitboxToggle, BodyHitboxToggleKnob, function(enabled)
-    META_TORSO = enabled
-end)
-
-local infJumpEnabled = createToggle(InfJumpToggle, InfJumpToggleKnob, function(enabled)
-    -- Inf jump functionality
-end)
-
-local imenaEnabled = createToggle(ImenaToggle, ImenaToggleKnob, function(enabled)
-    NAMETAG_ENABLED = enabled
-end)
-
-local krozzidEnabled = createToggle(KrozzidToggle, KrozzidToggleKnob, function(enabled)
-    CROSSHAIR_ENABLED = enabled
-end)
-
-local vizijaEnabled = createToggle(VizijaEnabledToggle, VizijaEnabledToggleKnob, function(enabled)
-    VIZIJA_ENABLED = enabled
-end)
+-- Toggle functionality is now handled globally with Right Shift
 
 -- Add hover effects to input boxes
 local function addInputHoverEffects(input)
@@ -1284,11 +1265,7 @@ local function updateCrosshairVisibility()
     CrosshairGui.Enabled = CROSSHAIR_ENABLED
 end
 
--- Connect crosshair toggle to visibility
-krozzidEnabled = createToggle(KrozzidToggle, KrozzidToggleKnob, function(enabled)
-    CROSSHAIR_ENABLED = enabled
-    updateCrosshairVisibility()
-end)
+-- Crosshair visibility is now handled globally
 
 -- FOV circle (optional)
 local FOVCircle = Instance.new("Part")
@@ -1315,18 +1292,21 @@ end)
 local function createSlider(slider, sliderBar, valueLabel, minValue, maxValue, currentValue, callback)
     local isDragging = false
     
+    -- Mouse down on slider
     slider.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isDragging = true
         end
     end)
     
+    -- Mouse up anywhere
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isDragging = false
         end
     end)
     
+    -- Mouse movement
     UserInputService.InputChanged:Connect(function(input)
         if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             local mousePos = UserInputService:GetMouseLocation()
@@ -1340,7 +1320,11 @@ local function createSlider(slider, sliderBar, valueLabel, minValue, maxValue, c
             sliderBar.Size = UDim2.new(relativeX, 0, 1, 0)
             
             -- Update value label
-            valueLabel.Text = tostring(math.floor(newValue))
+            if maxValue <= 10 then
+                valueLabel.Text = string.format("%.1f", newValue)
+            else
+                valueLabel.Text = tostring(math.floor(newValue))
+            end
             
             -- Call callback
             if callback then
@@ -1348,24 +1332,36 @@ local function createSlider(slider, sliderBar, valueLabel, minValue, maxValue, c
             end
         end
     end)
+    
+    -- Initialize slider position
+    local initialRelative = (currentValue - minValue) / (maxValue - minValue)
+    sliderBar.Size = UDim2.new(initialRelative, 0, 1, 0)
+    if maxValue <= 10 then
+        valueLabel.Text = string.format("%.1f", currentValue)
+    else
+        valueLabel.Text = tostring(math.floor(currentValue))
+    end
 end
 
 -- Color picker functionality
 local function createColorPicker(colorPicker, cursor, rInput, gInput, bInput, callback)
     local isDragging = false
     
+    -- Mouse down on color picker
     colorPicker.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isDragging = true
         end
     end)
     
+    -- Mouse up anywhere
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isDragging = false
         end
     end)
     
+    -- Mouse movement
     UserInputService.InputChanged:Connect(function(input)
         if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             local mousePos = UserInputService:GetMouseLocation()
@@ -1399,7 +1395,65 @@ local function createColorPicker(colorPicker, cursor, rInput, gInput, bInput, ca
             end
         end
     end)
+    
+    -- Initialize cursor position based on current color
+    local currentR = tonumber(rInput.Text) or 255
+    local currentG = tonumber(gInput.Text) or 0
+    local currentB = tonumber(bInput.Text) or 0
+    
+    local currentColor = Color3.fromRGB(currentR, currentG, currentB)
+    local h, s, v = currentColor:ToHSV()
+    
+    local relativeX = h / 360
+    local relativeY = 1 - v
+    
+    cursor.Position = UDim2.new(relativeX, -4, relativeY, -4)
 end
+
+-- Global toggle functionality
+local toggleStates = {}
+local function toggleAllToggles()
+    for toggle, data in pairs(toggleStates) do
+        local isOn = not data.isOn
+        toggleStates[toggle].isOn = isOn
+        
+        local targetColor = isOn and Config.Colors.Accent or Config.Colors.ToggleOff
+        local targetPosition = isOn and UDim2.new(1, -23, 0, 2) or UDim2.new(0, 2, 0, 2)
+        
+        -- Animate toggle background
+        TweenService:Create(toggle, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            BackgroundColor3 = targetColor
+        }):Play()
+        
+        -- Animate knob position
+        TweenService:Create(data.knob, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Position = targetPosition
+        }):Play()
+        
+        -- Call callback
+        if data.callback then
+            data.callback(isOn)
+        end
+    end
+end
+
+-- Register all toggles
+toggleStates[HeadHitboxToggle] = {knob = HeadHitboxToggleKnob, isOn = false, callback = function(enabled) META_HEAD = enabled end}
+toggleStates[BodyHitboxToggle] = {knob = BodyHitboxToggleKnob, isOn = false, callback = function(enabled) META_TORSO = enabled end}
+toggleStates[InfJumpToggle] = {knob = InfJumpToggleKnob, isOn = false, callback = function(enabled) end}
+toggleStates[ImenaToggle] = {knob = ImenaToggleKnob, isOn = false, callback = function(enabled) NAMETAG_ENABLED = enabled end}
+toggleStates[KrozzidToggle] = {knob = KrozzidToggleKnob, isOn = false, callback = function(enabled) 
+    CROSSHAIR_ENABLED = enabled 
+    updateCrosshairVisibility()
+end}
+toggleStates[VizijaEnabledToggle] = {knob = VizijaEnabledToggleKnob, isOn = false, callback = function(enabled) VIZIJA_ENABLED = enabled end}
+
+-- Right Shift to toggle all
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        toggleAllToggles()
+    end
+end)
 
 -- Initialize sliders and color pickers
 createSlider(HeadFOVSlider, HeadFOVSliderBar, HeadFOVValue, HITBOX_FOV_MIN, HITBOX_FOV_MAX, META_HEAD_FOV, function(value)
