@@ -19,6 +19,10 @@ local FOV_MAX = 120
 local FOV_DEFAULT = 70
 local currentFOV = FOV_DEFAULT
 
+-- Hitbox FOV range
+local HITBOX_FOV_MIN = 1
+local HITBOX_FOV_MAX = 200
+
 -- Random string generator
 local function randStr(len)
     local chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -40,7 +44,7 @@ local Config = {}
 Config.Colors = {
     Primary = Color3.fromRGB(24, 24, 32),
     Secondary = Color3.fromRGB(32, 32, 44),
-    Accent = Color3.fromRGB(255, 60, 180), -- pink
+    Accent = Color3.fromRGB(255, 20, 147), -- pink umesto plava
     Text = Color3.fromRGB(255, 255, 255),
     Minimized = Color3.fromRGB(40, 40, 50),
     Section = Color3.fromRGB(36, 36, 48),
@@ -60,13 +64,13 @@ local isMinimized = false
 
 -- State for features
 local VIZIJA_ENABLED = false
-local VIZIJA_COLOR = Color3.fromRGB(0, 150, 255)
+local VIZIJA_COLOR = Color3.fromRGB(255, 20, 147)
 local VIZIJA_ENEMY_ONLY = true
 local FORCE_RENDER = true -- Uvijek renderuj igrače
 local vizijaBoxes = {}
 local META_HEAD = true
 local META_TORSO = false
-local META_FOV = 3
+local META_FOV = 6 -- promeni default na 6
 
 -- Opcije boje glave za hitbox
 local HITBOX_HEAD_COLOR = Color3.fromRGB(255, 0, 0) -- default crvena
@@ -111,7 +115,7 @@ TitleCorner.CornerRadius = UDim.new(0, 16)
 local Title = Instance.new("TextLabel", TitleBar)
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
-Title.Text = "Alesto Panel"
+Title.Text = "Alesto Hub | Combat & ESP"
 Title.TextColor3 = Config.Colors.Text
 Title.TextScaled = true
 Title.Font = Enum.Font.GothamBold
@@ -161,7 +165,7 @@ ESPTabCorner.CornerRadius = UDim.new(0, 12)
 -- SVE SEKCIJE (Combat/ESP) SU U POSEBNIM FRAME-ovima, SAKRIVAJU SE OVISNO O TABU
 local CombatSection = Instance.new("Frame", MainFrame)
 CombatSection.Name = "CombatSection"
-CombatSection.Size = UDim2.new(1, -32, 1, -100)
+CombatSection.Size = UDim2.new(1, -32, 1, -120)
 CombatSection.Position = UDim2.new(0, 16, 0, 100)
 CombatSection.BackgroundColor3 = Config.Colors.Section
 CombatSection.BorderSizePixel = 0
@@ -170,7 +174,7 @@ CombatSectionCorner.CornerRadius = UDim.new(0, 16)
 
 local ESPSection = Instance.new("Frame", MainFrame)
 ESPSection.Name = "ESPSection"
-ESPSection.Size = UDim2.new(1, -32, 1, -100)
+ESPSection.Size = UDim2.new(1, -32, 1, -120)
 ESPSection.Position = UDim2.new(0, 16, 0, 100)
 ESPSection.BackgroundColor3 = Config.Colors.Section
 ESPSection.BorderSizePixel = 0
@@ -193,7 +197,7 @@ end)
 
 -- Section: Vizija (ESP)
 local VizijaSection = Instance.new("Frame", ESPSection)
-VizijaSection.Size = UDim2.new(1, -32, 0, 90)
+VizijaSection.Size = UDim2.new(1, -32, 0, 80)
 VizijaSection.Position = UDim2.new(0, 16, 0, 16)
 VizijaSection.BackgroundColor3 = Config.Colors.Section
 VizijaSection.BorderSizePixel = 0
@@ -223,7 +227,7 @@ VizijaToggleCorner.CornerRadius = UDim.new(0, 8)
 local OnlyEnemiesBtn = Instance.new("TextButton", VizijaSection)
 OnlyEnemiesBtn.Size = UDim2.new(0, 120, 0, 28)
 OnlyEnemiesBtn.Position = UDim2.new(0, 10, 0, 48)
-OnlyEnemiesBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+OnlyEnemiesBtn.BackgroundColor3 = Config.Colors.ToggleOff
 OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
 OnlyEnemiesBtn.TextColor3 = Config.Colors.Text
 OnlyEnemiesBtn.TextScaled = true
@@ -234,6 +238,7 @@ OnlyEnemiesCorner.CornerRadius = UDim.new(0, 8)
 OnlyEnemiesBtn.MouseButton1Click:Connect(function()
     VIZIJA_ENEMY_ONLY = not VIZIJA_ENEMY_ONLY
     OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
+    OnlyEnemiesBtn.BackgroundColor3 = VIZIJA_ENEMY_ONLY and Config.Colors.Accent or Config.Colors.ToggleOff
 end)
 
 VizijaToggle.MouseButton1Click:Connect(function()
@@ -248,8 +253,8 @@ end)
 
 -- Section: Boja kutije (Color Wheel)
 local ColorSection = Instance.new("Frame", ESPSection)
-ColorSection.Size = UDim2.new(1, -32, 0, 110)
-ColorSection.Position = UDim2.new(0, 16, 0, 120)
+ColorSection.Size = UDim2.new(1, -32, 0, 100)
+ColorSection.Position = UDim2.new(0, 16, 0, 110)
 ColorSection.BackgroundColor3 = Config.Colors.Section
 ColorSection.BorderSizePixel = 0
 local ColorCorner = Instance.new("UICorner", ColorSection)
@@ -320,7 +325,7 @@ end)
 -- Nova sekcija: Imena + Krozzid
 local ImenaSection = Instance.new("Frame", ESPSection)
 ImenaSection.Size = UDim2.new(1, -32, 0, 70)
-ImenaSection.Position = UDim2.new(0, 16, 0, 250)
+ImenaSection.Position = UDim2.new(0, 16, 0, 230)
 ImenaSection.BackgroundColor3 = Config.Colors.Section
 ImenaSection.BorderSizePixel = 0
 local ImenaSectionCorner = Instance.new("UICorner", ImenaSection)
@@ -390,8 +395,8 @@ ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
 local KrozzidToggle = Instance.new("TextButton", ImenaSection)
 KrozzidToggle.Size = UDim2.new(0, 120, 0, 28)
 KrozzidToggle.Position = UDim2.new(0, 10, 0, 40)
-KrozzidToggle.BackgroundColor3 = Config.Colors.ToggleOff
-KrozzidToggle.Text = "Krozzid: Isključeno"
+KrozzidToggle.BackgroundColor3 = KROZZID_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
+KrozzidToggle.Text = KROZZID_ENABLED and "Krozzid: Uključeno" or "Krozzid: Isključeno"
 KrozzidToggle.TextColor3 = Config.Colors.Text
 KrozzidToggle.TextScaled = true
 KrozzidToggle.Font = Enum.Font.GothamBold
@@ -406,7 +411,7 @@ end)
 
 -- Section: Meta (Hitbox) - PREMESTI U COMBAT SECTION
 local MetaSection = Instance.new("Frame", CombatSection)
-MetaSection.Size = UDim2.new(1, -32, 0, 220)
+MetaSection.Size = UDim2.new(1, -32, 0, 150)
 MetaSection.Position = UDim2.new(0, 16, 0, 16)
 MetaSection.BackgroundColor3 = Config.Colors.Section
 MetaSection.BorderSizePixel = 0
@@ -449,7 +454,7 @@ end)
 UserInputService.InputChanged:Connect(function(input)
     if draggingFOV and input.UserInputType == Enum.UserInputType.MouseMovement then
         local rel = math.clamp((input.Position.X - FOVSlider.AbsolutePosition.X) / FOVSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * (FOV_MAX-FOV_MIN) + FOV_MIN)
+        local value = math.floor(rel * (HITBOX_FOV_MAX-HITBOX_FOV_MIN) + HITBOX_FOV_MIN) -- 1 do 200
         META_FOV = value
         FOVSlider.Text = tostring(value)
     end
@@ -457,7 +462,7 @@ end)
 
 local HeadBtn = Instance.new("TextButton", MetaSection)
 HeadBtn.Size = UDim2.new(0, 70, 0, 28)
-HeadBtn.Position = UDim2.new(0, 10, 0, 80)
+HeadBtn.Position = UDim2.new(0, 10, 0, 60)
 HeadBtn.BackgroundColor3 = META_HEAD and Config.Colors.Accent or Config.Colors.ToggleOff
 HeadBtn.Text = "Glava"
 HeadBtn.TextColor3 = Config.Colors.Text
@@ -468,7 +473,7 @@ HeadCorner.CornerRadius = UDim.new(0, 8)
 
 local TorsoBtn = Instance.new("TextButton", MetaSection)
 TorsoBtn.Size = UDim2.new(0, 70, 0, 28)
-TorsoBtn.Position = UDim2.new(0, 90, 0, 80)
+TorsoBtn.Position = UDim2.new(0, 90, 0, 60)
 TorsoBtn.BackgroundColor3 = META_TORSO and Config.Colors.Accent or Config.Colors.ToggleOff
 TorsoBtn.Text = "Tijelo"
 TorsoBtn.TextColor3 = Config.Colors.Text
@@ -489,7 +494,7 @@ end)
 -- GUI: Dugmad za biranje boje glave
 local HeadColorLabel = Instance.new("TextLabel", MetaSection)
 HeadColorLabel.Size = UDim2.new(0, 80, 0, 28)
-HeadColorLabel.Position = UDim2.new(0, 170, 0, 80)
+HeadColorLabel.Position = UDim2.new(0, 170, 0, 60)
 HeadColorLabel.BackgroundTransparency = 1
 HeadColorLabel.Text = "Boja glave"
 HeadColorLabel.TextColor3 = Config.Colors.Text
@@ -498,7 +503,7 @@ HeadColorLabel.Font = Enum.Font.Gotham
 
 local RedBtn = Instance.new("TextButton", MetaSection)
 RedBtn.Size = UDim2.new(0, 28, 0, 28)
-RedBtn.Position = UDim2.new(0, 260, 0, 80)
+RedBtn.Position = UDim2.new(0, 260, 0, 60)
 RedBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 RedBtn.Text = ""
 local RedBtnCorner = Instance.new("UICorner", RedBtn)
@@ -506,7 +511,7 @@ RedBtnCorner.CornerRadius = UDim.new(1, 0)
 
 local BlueBtn = Instance.new("TextButton", MetaSection)
 BlueBtn.Size = UDim2.new(0, 28, 0, 28)
-BlueBtn.Position = UDim2.new(0, 295, 0, 80)
+BlueBtn.Position = UDim2.new(0, 295, 0, 60)
 BlueBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
 BlueBtn.Text = ""
 local BlueBtnCorner = Instance.new("UICorner", BlueBtn)
@@ -514,7 +519,7 @@ BlueBtnCorner.CornerRadius = UDim.new(1, 0)
 
 local GreenBtn = Instance.new("TextButton", MetaSection)
 GreenBtn.Size = UDim2.new(0, 28, 0, 28)
-GreenBtn.Position = UDim2.new(0, 330, 0, 80)
+GreenBtn.Position = UDim2.new(0, 330, 0, 60)
 GreenBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 GreenBtn.Text = ""
 local GreenBtnCorner = Instance.new("UICorner", GreenBtn)
@@ -534,7 +539,7 @@ end)
 local FOV_ENABLED = false
 local FOVToggle = Instance.new("TextButton", CombatSection)
 FOVToggle.Size = UDim2.new(0, 90, 0, 28)
-FOVToggle.Position = UDim2.new(0, 16, 0, 250)
+FOVToggle.Position = UDim2.new(0, 16, 0, 180)
 FOVToggle.BackgroundColor3 = FOV_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
 FOVToggle.Text = FOV_ENABLED and "FOV ON" or "FOV OFF"
 FOVToggle.TextColor3 = Config.Colors.Text
@@ -546,16 +551,16 @@ FOVToggle.MouseButton1Click:Connect(function()
     FOV_ENABLED = not FOV_ENABLED
     FOVToggle.Text = FOV_ENABLED and "FOV ON" or "FOV OFF"
     FOVToggle.BackgroundColor3 = FOV_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-    if not FOV_ENABLED then
-        Camera.FieldOfView = FOV_DEFAULT
-    else
+    if FOV_ENABLED then
         Camera.FieldOfView = currentFOV
+    else
+        Camera.FieldOfView = FOV_DEFAULT
     end
 end)
 
 local FOVGuiLabel = Instance.new("TextLabel", CombatSection)
 FOVGuiLabel.Size = UDim2.new(0, 100, 0, 28)
-FOVGuiLabel.Position = UDim2.new(0, 120, 0, 250)
+FOVGuiLabel.Position = UDim2.new(0, 120, 0, 180)
 FOVGuiLabel.BackgroundTransparency = 1
 FOVGuiLabel.Text = "FOV (zoom)"
 FOVGuiLabel.TextColor3 = Config.Colors.Text
@@ -564,7 +569,7 @@ FOVGuiLabel.Font = Enum.Font.GothamBold
 
 local FOVGuiSlider = Instance.new("TextButton", CombatSection)
 FOVGuiSlider.Size = UDim2.new(0, 180, 0, 28)
-FOVGuiSlider.Position = UDim2.new(0, 230, 0, 250)
+FOVGuiSlider.Position = UDim2.new(0, 230, 0, 180)
 FOVGuiSlider.BackgroundColor3 = Config.Colors.Accent
 FOVGuiSlider.Text = tostring(currentFOV)
 FOVGuiSlider.TextColor3 = Config.Colors.Text
@@ -580,7 +585,7 @@ end)
 UserInputService.InputChanged:Connect(function(input)
     if draggingFOVGui and input.UserInputType == Enum.UserInputType.MouseMovement then
         local rel = math.clamp((input.Position.X - FOVGuiSlider.AbsolutePosition.X) / FOVGuiSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * (FOV_MAX-FOV_MIN) + FOV_MIN)
+        local value = math.floor(rel * (FOV_MAX-FOV_MIN) + FOV_MIN) -- 20 do 120 za zoom
         currentFOV = value
         FOVGuiSlider.Text = tostring(value)
         if FOV_ENABLED then
@@ -589,104 +594,53 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
+-- Dodaj Infinite Jump sekciju
+local InfiniteJumpSection = Instance.new("Frame", CombatSection)
+InfiniteJumpSection.Size = UDim2.new(1, -32, 0, 70)
+InfiniteJumpSection.Position = UDim2.new(0, 16, 0, 230)
+InfiniteJumpSection.BackgroundColor3 = Config.Colors.Section
+InfiniteJumpSection.BorderSizePixel = 0
+local InfiniteJumpCorner = Instance.new("UICorner", InfiniteJumpSection)
+InfiniteJumpCorner.CornerRadius = UDim.new(0, 12)
+
+local InfiniteJumpLabel = Instance.new("TextLabel", InfiniteJumpSection)
+InfiniteJumpLabel.Size = UDim2.new(0, 120, 0, 28)
+InfiniteJumpLabel.Position = UDim2.new(0, 10, 0, 8)
+InfiniteJumpLabel.BackgroundTransparency = 1
+InfiniteJumpLabel.Text = "Infinite Jump"
+InfiniteJumpLabel.TextColor3 = Config.Colors.Text
+InfiniteJumpLabel.TextScaled = true
+InfiniteJumpLabel.Font = Enum.Font.GothamBold
+
+local INFINITE_JUMP_ENABLED = false
+local InfiniteJumpToggle = Instance.new("TextButton", InfiniteJumpSection)
+InfiniteJumpToggle.Size = UDim2.new(0, 90, 0, 28)
+InfiniteJumpToggle.Position = UDim2.new(0, 140, 0, 8)
+InfiniteJumpToggle.BackgroundColor3 = INFINITE_JUMP_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
+InfiniteJumpToggle.Text = INFINITE_JUMP_ENABLED and "Uključeno" or "Isključeno"
+InfiniteJumpToggle.TextColor3 = Config.Colors.Text
+InfiniteJumpToggle.TextScaled = true
+InfiniteJumpToggle.Font = Enum.Font.GothamBold
+local InfiniteJumpToggleCorner = Instance.new("UICorner", InfiniteJumpToggle)
+InfiniteJumpToggleCorner.CornerRadius = UDim.new(0, 8)
+InfiniteJumpToggle.MouseButton1Click:Connect(function()
+    INFINITE_JUMP_ENABLED = not INFINITE_JUMP_ENABLED
+    InfiniteJumpToggle.Text = INFINITE_JUMP_ENABLED and "Uključeno" or "Isključeno"
+    InfiniteJumpToggle.BackgroundColor3 = INFINITE_JUMP_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
+end)
+
 -- Bindovi
-local ESP_BIND = Enum.KeyCode.E
-local HITBOX_BIND = Enum.KeyCode.H
-local NAMETAG_BIND = Enum.KeyCode.N
-local KROZZID_BIND = Enum.KeyCode.K
-local waitingForBind = nil -- "ESP", "HITBOX", "NAMETAG", "KROZZID"
-
--- Nova sekcija: Imena + Krozzid
-local ImenaSection = Instance.new("Frame", ESPSection)
-ImenaSection.Size = UDim2.new(1, -32, 0, 70)
-ImenaSection.Position = UDim2.new(0, 16, 0, 250)
-ImenaSection.BackgroundColor3 = Config.Colors.Section
-ImenaSection.BorderSizePixel = 0
-local ImenaSectionCorner = Instance.new("UICorner", ImenaSection)
-ImenaSectionCorner.CornerRadius = UDim.new(0, 12)
-
-local ImenaLabel = Instance.new("TextLabel", ImenaSection)
-ImenaLabel.Size = UDim2.new(0, 80, 0, 28)
-ImenaLabel.Position = UDim2.new(0, 10, 0, 8)
-ImenaLabel.BackgroundTransparency = 1
-ImenaLabel.Text = "Imena"
-ImenaLabel.TextColor3 = Config.Colors.Text
-ImenaLabel.TextScaled = true
-ImenaLabel.Font = Enum.Font.GothamBold
-
-local ImenaToggle = Instance.new("TextButton", ImenaSection)
-ImenaToggle.Size = UDim2.new(0, 90, 0, 28)
-ImenaToggle.Position = UDim2.new(0, 100, 0, 8)
-ImenaToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-ImenaToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
-ImenaToggle.TextColor3 = Config.Colors.Text
-ImenaToggle.TextScaled = true
-ImenaToggle.Font = Enum.Font.GothamBold
-local ImenaToggleCorner = Instance.new("UICorner", ImenaToggle)
-ImenaToggleCorner.CornerRadius = UDim.new(0, 8)
-ImenaToggle.MouseButton1Click:Connect(function()
-    NAMETAG_ENABLED = not NAMETAG_ENABLED
-    ImenaToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
-    ImenaToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-end)
-
-local ImenaScaleLabel = Instance.new("TextLabel", ImenaSection)
-ImenaScaleLabel.Size = UDim2.new(0, 60, 0, 28)
-ImenaScaleLabel.Position = UDim2.new(0, 200, 0, 8)
-ImenaScaleLabel.BackgroundTransparency = 1
-ImenaScaleLabel.Text = "Veličina"
-ImenaScaleLabel.TextColor3 = Config.Colors.Text
-ImenaScaleLabel.TextScaled = true
-ImenaScaleLabel.Font = Enum.Font.Gotham
-
-local ImenaScaleSlider = Instance.new("TextButton", ImenaSection)
-ImenaScaleSlider.Size = UDim2.new(0, 60, 0, 28)
-ImenaScaleSlider.Position = UDim2.new(0, 270, 0, 8)
-ImenaScaleSlider.BackgroundColor3 = Config.Colors.Accent
-ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
-ImenaScaleSlider.TextColor3 = Config.Colors.Text
-ImenaScaleSlider.TextScaled = true
-ImenaScaleSlider.Font = Enum.Font.GothamBold
-local draggingImenaScale = false
-ImenaScaleSlider.MouseButton1Down:Connect(function()
-    draggingImenaScale = true
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingImenaScale = false end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if draggingImenaScale and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local rel = math.clamp((input.Position.X - ImenaScaleSlider.AbsolutePosition.X) / ImenaScaleSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * 49 + 1) / 10 -- 0.1 do 5.0
-        NAMETAG_SCALE = value
-        ImenaScaleSlider.Text = tostring(value)
-    end
-end)
-NAMETAG_SCALE = 0.1
-ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
-
--- Krozzid toggle u Imena sekciji
-local KrozzidToggle = Instance.new("TextButton", ImenaSection)
-KrozzidToggle.Size = UDim2.new(0, 120, 0, 28)
-KrozzidToggle.Position = UDim2.new(0, 10, 0, 40)
-KrozzidToggle.BackgroundColor3 = Config.Colors.ToggleOff
-KrozzidToggle.Text = "Krozzid: Isključeno"
-KrozzidToggle.TextColor3 = Config.Colors.Text
-KrozzidToggle.TextScaled = true
-KrozzidToggle.Font = Enum.Font.GothamBold
-local KrozzidToggleCorner = Instance.new("UICorner", KrozzidToggle)
-KrozzidToggleCorner.CornerRadius = UDim.new(0, 8)
-local KROZZID_ENABLED = false
-KrozzidToggle.MouseButton1Click:Connect(function()
-    KROZZID_ENABLED = not KROZZID_ENABLED
-    KrozzidToggle.Text = KROZZID_ENABLED and "Krozzid: Uključeno" or "Krozzid: Isključeno"
-    KrozzidToggle.BackgroundColor3 = KROZZID_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-end)
+local ESP_BIND = nil
+local HITBOX_BIND = nil
+local NAMETAG_BIND = nil
+local KROZZID_BIND = nil
+local INFINITE_JUMP_BIND = nil
+local waitingForBind = nil -- "ESP", "HITBOX", "NAMETAG", "KROZZID", "INFINITE_JUMP"
 
 -- Nova sekcija: Bindovi - PREMESTI NA DNO MAIN FRAME
 local BindoviSection = Instance.new("Frame", MainFrame)
-BindoviSection.Size = UDim2.new(1, -32, 0, 60)
-BindoviSection.Position = UDim2.new(0, 16, 1, -80)
+BindoviSection.Size = UDim2.new(1, -32, 0, 80)
+BindoviSection.Position = UDim2.new(0, 16, 1, -100)
 BindoviSection.BackgroundColor3 = Config.Colors.Section
 BindoviSection.BorderSizePixel = 0
 local BindoviSectionCorner = Instance.new("UICorner", BindoviSection)
@@ -702,10 +656,10 @@ BindoviLabel.TextScaled = true
 BindoviLabel.Font = Enum.Font.GothamBold
 
 local ESPBindBtn = Instance.new("TextButton", BindoviSection)
-ESPBindBtn.Size = UDim2.new(0, 80, 0, 28)
+ESPBindBtn.Size = UDim2.new(0, 70, 0, 28)
 ESPBindBtn.Position = UDim2.new(0, 140, 0, 8)
 ESPBindBtn.BackgroundColor3 = Config.Colors.Accent
-ESPBindBtn.Text = "ESP: "..tostring(ESP_BIND.Name)
+ESPBindBtn.Text = "ESP: "..tostring(ESP_BIND and ESP_BIND.Name or "Nema binda")
 ESPBindBtn.TextColor3 = Config.Colors.Text
 ESPBindBtn.TextScaled = true
 ESPBindBtn.Font = Enum.Font.GothamBold
@@ -713,10 +667,10 @@ local ESPBindCorner = Instance.new("UICorner", ESPBindBtn)
 ESPBindCorner.CornerRadius = UDim.new(0, 8)
 
 local HitboxBindBtn = Instance.new("TextButton", BindoviSection)
-HitboxBindBtn.Size = UDim2.new(0, 90, 0, 28)
-HitboxBindBtn.Position = UDim2.new(0, 230, 0, 8)
+HitboxBindBtn.Size = UDim2.new(0, 80, 0, 28)
+HitboxBindBtn.Position = UDim2.new(0, 220, 0, 8)
 HitboxBindBtn.BackgroundColor3 = Config.Colors.Accent
-HitboxBindBtn.Text = "Glavudja: "..tostring(HITBOX_BIND.Name)
+HitboxBindBtn.Text = "Glavudja: "..tostring(HITBOX_BIND and HITBOX_BIND.Name or "Nema binda")
 HitboxBindBtn.TextColor3 = Config.Colors.Text
 HitboxBindBtn.TextScaled = true
 HitboxBindBtn.Font = Enum.Font.GothamBold
@@ -724,10 +678,10 @@ local HitboxBindCorner = Instance.new("UICorner", HitboxBindBtn)
 HitboxBindCorner.CornerRadius = UDim.new(0, 8)
 
 local ImenaBindBtn = Instance.new("TextButton", BindoviSection)
-ImenaBindBtn.Size = UDim2.new(0, 90, 0, 28)
-ImenaBindBtn.Position = UDim2.new(0, 330, 0, 8)
+ImenaBindBtn.Size = UDim2.new(0, 70, 0, 28)
+ImenaBindBtn.Position = UDim2.new(0, 310, 0, 8)
 ImenaBindBtn.BackgroundColor3 = Config.Colors.Accent
-ImenaBindBtn.Text = "Imena: "..tostring(NAMETAG_BIND.Name)
+ImenaBindBtn.Text = "Imena: "..tostring(NAMETAG_BIND and NAMETAG_BIND.Name or "Nema binda")
 ImenaBindBtn.TextColor3 = Config.Colors.Text
 ImenaBindBtn.TextScaled = true
 ImenaBindBtn.Font = Enum.Font.GothamBold
@@ -735,15 +689,26 @@ local ImenaBindCorner = Instance.new("UICorner", ImenaBindBtn)
 ImenaBindCorner.CornerRadius = UDim.new(0, 8)
 
 local KrozzidBindBtn = Instance.new("TextButton", BindoviSection)
-KrozzidBindBtn.Size = UDim2.new(0, 90, 0, 28)
-KrozzidBindBtn.Position = UDim2.new(0, 430, 0, 8)
+KrozzidBindBtn.Size = UDim2.new(0, 80, 0, 28)
+KrozzidBindBtn.Position = UDim2.new(0, 390, 0, 8)
 KrozzidBindBtn.BackgroundColor3 = Config.Colors.Accent
-KrozzidBindBtn.Text = "Krozzid: "..tostring(KROZZID_BIND.Name)
+KrozzidBindBtn.Text = "Krozzid: "..tostring(KROZZID_BIND and KROZZID_BIND.Name or "Nema binda")
 KrozzidBindBtn.TextColor3 = Config.Colors.Text
 KrozzidBindBtn.TextScaled = true
 KrozzidBindBtn.Font = Enum.Font.GothamBold
 local KrozzidBindCorner = Instance.new("UICorner", KrozzidBindBtn)
 KrozzidBindCorner.CornerRadius = UDim.new(0, 8)
+
+local InfiniteJumpBindBtn = Instance.new("TextButton", BindoviSection)
+InfiniteJumpBindBtn.Size = UDim2.new(0, 90, 0, 28)
+InfiniteJumpBindBtn.Position = UDim2.new(0, 140, 0, 40)
+InfiniteJumpBindBtn.BackgroundColor3 = Config.Colors.Accent
+InfiniteJumpBindBtn.Text = "Infinite Jump: "..tostring(INFINITE_JUMP_BIND and INFINITE_JUMP_BIND.Name or "Nema binda")
+InfiniteJumpBindBtn.TextColor3 = Config.Colors.Text
+InfiniteJumpBindBtn.TextScaled = true
+InfiniteJumpBindBtn.Font = Enum.Font.GothamBold
+local InfiniteJumpBindCorner = Instance.new("UICorner", InfiniteJumpBindBtn)
+InfiniteJumpBindCorner.CornerRadius = UDim.new(0, 8)
 
 ESPBindBtn.MouseButton1Click:Connect(function()
     ESPBindBtn.Text = "Pritisni tipku..."
@@ -760,6 +725,10 @@ end)
 KrozzidBindBtn.MouseButton1Click:Connect(function()
     KrozzidBindBtn.Text = "Pritisni tipku..."
     waitingForBind = "KROZZID"
+end)
+InfiniteJumpBindBtn.MouseButton1Click:Connect(function()
+    InfiniteJumpBindBtn.Text = "Pritisni tipku..."
+    waitingForBind = "INFINITE_JUMP"
 end)
 
 UserInputService.InputBegan:Connect(function(input, gpe)
@@ -784,9 +753,14 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         KrozzidBindBtn.Text = "Krozzid: "..tostring(KROZZID_BIND.Name)
         waitingForBind = nil
         return
+    elseif waitingForBind == "INFINITE_JUMP" then
+        INFINITE_JUMP_BIND = input.KeyCode
+        InfiniteJumpBindBtn.Text = "Infinite Jump: "..tostring(INFINITE_JUMP_BIND.Name)
+        waitingForBind = nil
+        return
     end
-    -- Bind funkcionalnost
-    if input.KeyCode == ESP_BIND then
+    -- Bind funkcionalnost - samo ako bind postoji
+    if ESP_BIND and input.KeyCode == ESP_BIND then
         VIZIJA_ENABLED = not VIZIJA_ENABLED
         VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
         VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
@@ -794,7 +768,7 @@ UserInputService.InputBegan:Connect(function(input, gpe)
             for _,v in pairs(vizijaBoxes) do v:Remove() end
             vizijaBoxes = {}
         end
-    elseif input.KeyCode == HITBOX_BIND then
+    elseif HITBOX_BIND and input.KeyCode == HITBOX_BIND then
         if META_HEAD or META_TORSO then
             META_HEAD = false
             META_TORSO = false
@@ -804,11 +778,11 @@ UserInputService.InputBegan:Connect(function(input, gpe)
             META_HEAD = true
             HeadBtn.BackgroundColor3 = Config.Colors.Accent
         end
-    elseif input.KeyCode == NAMETAG_BIND then
+    elseif NAMETAG_BIND and input.KeyCode == NAMETAG_BIND then
         NAMETAG_ENABLED = not NAMETAG_ENABLED
         ImenaToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
         ImenaToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-    elseif input.KeyCode == KROZZID_BIND then
+    elseif KROZZID_BIND and input.KeyCode == KROZZID_BIND then
         -- Krozzid: pronađi i highlightaj prvog protivnika kroz zid
         local origin = Camera.CFrame.Position
         local direction = Camera.CFrame.LookVector * 1000
@@ -826,6 +800,23 @@ UserInputService.InputBegan:Connect(function(input, gpe)
                 sb.Parent = head
                 game.Debris:AddItem(sb, 1.5)
             end
+        end
+    elseif INFINITE_JUMP_BIND and input.KeyCode == INFINITE_JUMP_BIND then
+        INFINITE_JUMP_ENABLED = not INFINITE_JUMP_ENABLED
+        InfiniteJumpToggle.Text = INFINITE_JUMP_ENABLED and "Uključeno" or "Isključeno"
+        InfiniteJumpToggle.BackgroundColor3 = INFINITE_JUMP_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
+    end
+end)
+
+-- Infinite Jump Input Handler
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if INFINITE_JUMP_ENABLED and INFINITE_JUMP_BIND and input.KeyCode == INFINITE_JUMP_BIND then
+        local player = Players.LocalPlayer
+        local character = player.Character
+        if character and character:FindFirstChild("Humanoid") then
+            local humanoid = character.Humanoid
+            humanoid.Jump = true
         end
     end
 end)
@@ -1033,11 +1024,7 @@ end
 local MAX_HITBOX_FOV = 200
 
 -- FOV efekt loop
-RunService.RenderStepped:Connect(function()
-    if FOV_ENABLED then
-        Camera.FieldOfView = currentFOV
-    end
-end)
+-- (ukloni RunService.RenderStepped loop za FOV)
 
 -- ESP, Hitbox, Nametag gameplay loop
 RunService.RenderStepped:Connect(function()
@@ -1065,8 +1052,85 @@ RunService.RenderStepped:Connect(function()
     else
         for _,v in pairs(vizijaBoxes) do v.Visible = false end
     end
+    
     -- Nametag
-    -- (implementacija po potrebi, placeholder)
-    -- Hitbox
-    -- (implementacija po potrebi, placeholder)
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer and getChar(plr) then
+            local char = getChar(plr)
+            local head = char:FindFirstChild("Head")
+            if head then
+                if NAMETAG_ENABLED then
+                    if not head:FindFirstChild("AlestoNametag") then
+                        local tag = Instance.new("BillboardGui")
+                        tag.Name = "AlestoNametag"
+                        tag.Adornee = head
+                        tag.Size = UDim2.new(0,100,0,40)
+                        tag.StudsOffset = Vector3.new(0,1.5,0)
+                        tag.AlwaysOnTop = true
+                        local label = Instance.new("TextLabel", tag)
+                        label.Size = UDim2.new(1,0,1,0)
+                        label.BackgroundTransparency = 1
+                        label.Text = plr.Name
+                        label.TextColor3 = Config.Colors.Accent
+                        label.TextScaled = true
+                        label.Font = Enum.Font.GothamBold
+                        tag.Parent = head
+                    else
+                        local tag = head:FindFirstChild("AlestoNametag")
+                        tag.Size = UDim2.new(0,100*NAMETAG_SCALE,0,40*NAMETAG_SCALE)
+                        tag.Enabled = true
+                    end
+                else
+                    if head:FindFirstChild("AlestoNametag") then
+                        head.AlestoNametag.Enabled = false
+                    end
+                end
+            end
+        end
+    end
+    
+    -- Hitbox - samo kad su uključeni
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer and getChar(plr) then
+            local char = getChar(plr)
+            
+            -- Hitbox za glavu
+            if char:FindFirstChild("Head") then
+                if META_HEAD then
+                    char.Head.Size = Vector3.new(META_FOV/10, META_FOV/10, META_FOV/10)
+                    char.Head.Color = HITBOX_HEAD_COLOR
+                    char.Head.Material = Enum.Material.Neon
+                else
+                    char.Head.Size = Vector3.new(2,1,1)
+                    char.Head.Color = Color3.fromRGB(255,255,255)
+                    char.Head.Material = Enum.Material.Plastic
+                end
+            end
+            
+            -- Hitbox za tijelo
+            local torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
+            if torso then
+                if META_TORSO then
+                    torso.Size = Vector3.new(META_FOV/10, META_FOV/10, META_FOV/10)
+                    torso.Color = HITBOX_HEAD_COLOR
+                    torso.Material = Enum.Material.Neon
+                else
+                    torso.Size = Vector3.new(2,2,1)
+                    torso.Color = Color3.fromRGB(255,255,255)
+                    torso.Material = Enum.Material.Plastic
+                end
+            end
+        end
+    end
+    
+    -- Infinite Jump
+    if INFINITE_JUMP_ENABLED then
+        local player = Players.LocalPlayer
+        local character = player.Character
+        if character and character:FindFirstChild("Humanoid") then
+            local humanoid = character.Humanoid
+            -- Omogući infinite jump
+            humanoid.JumpPower = 50
+        end
+    end
 end) 
