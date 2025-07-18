@@ -1341,6 +1341,33 @@ local function createSlider(slider, sliderBar, valueLabel, minValue, maxValue, c
     else
         valueLabel.Text = tostring(math.floor(currentValue))
     end
+    
+    -- Add click functionality to slider
+    slider.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local mousePos = UserInputService:GetMouseLocation()
+            local sliderPos = slider.AbsolutePosition
+            local sliderSize = slider.AbsoluteSize
+            
+            local relativeX = math.clamp((mousePos.X - sliderPos.X) / sliderSize.X, 0, 1)
+            local newValue = minValue + (maxValue - minValue) * relativeX
+            
+            -- Update slider bar
+            sliderBar.Size = UDim2.new(relativeX, 0, 1, 0)
+            
+            -- Update value label
+            if maxValue <= 10 then
+                valueLabel.Text = string.format("%.1f", newValue)
+            else
+                valueLabel.Text = tostring(math.floor(newValue))
+            end
+            
+            -- Call callback
+            if callback then
+                callback(newValue)
+            end
+        end
+    end)
 end
 
 -- Color picker functionality
@@ -1396,6 +1423,41 @@ local function createColorPicker(colorPicker, cursor, rInput, gInput, bInput, ca
         end
     end)
     
+    -- Add click functionality to color picker
+    colorPicker.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local mousePos = UserInputService:GetMouseLocation()
+            local pickerPos = colorPicker.AbsolutePosition
+            local pickerSize = colorPicker.AbsoluteSize
+            
+            local relativeX = math.clamp((mousePos.X - pickerPos.X) / pickerSize.X, 0, 1)
+            local relativeY = math.clamp((mousePos.Y - pickerPos.Y) / pickerSize.Y, 0, 1)
+            
+            -- Update cursor position
+            cursor.Position = UDim2.new(relativeX, -4, relativeY, -4)
+            
+            -- Calculate color based on position (full spectrum)
+            local hue = relativeX * 360
+            local saturation = 1
+            local value = 1 - relativeY
+            
+            local color = Color3.fromHSV(hue, saturation, value)
+            
+            -- Update RGB inputs
+            rInput.Text = tostring(math.floor(color.R * 255))
+            gInput.Text = tostring(math.floor(color.G * 255))
+            bInput.Text = tostring(math.floor(color.B * 255))
+            
+            -- Update color picker background
+            colorPicker.BackgroundColor3 = color
+            
+            -- Call callback
+            if callback then
+                callback(color)
+            end
+        end
+    end)
+    
     -- Initialize cursor position based on current color
     local currentR = tonumber(rInput.Text) or 255
     local currentG = tonumber(gInput.Text) or 0
@@ -1410,34 +1472,36 @@ local function createColorPicker(colorPicker, cursor, rInput, gInput, bInput, ca
     cursor.Position = UDim2.new(relativeX, -4, relativeY, -4)
 end
 
--- Global toggle functionality
+-- Toggle functionality
 local toggleStates = {}
-local function toggleAllToggles()
-    for toggle, data in pairs(toggleStates) do
-        local isOn = not data.isOn
-        toggleStates[toggle].isOn = isOn
-        
-        local targetColor = isOn and Config.Colors.Accent or Config.Colors.ToggleOff
-        local targetPosition = isOn and UDim2.new(1, -23, 0, 2) or UDim2.new(0, 2, 0, 2)
-        
-        -- Animate toggle background
-        TweenService:Create(toggle, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            BackgroundColor3 = targetColor
-        }):Play()
-        
-        -- Animate knob position
-        TweenService:Create(data.knob, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            Position = targetPosition
-        }):Play()
-        
-        -- Call callback
-        if data.callback then
-            data.callback(isOn)
-        end
+
+local function toggleSwitch(toggle, knob, callback)
+    local data = toggleStates[toggle]
+    if not data then return end
+    
+    local isOn = not data.isOn
+    toggleStates[toggle].isOn = isOn
+    
+    local targetColor = isOn and Config.Colors.Accent or Config.Colors.ToggleOff
+    local targetPosition = isOn and UDim2.new(1, -23, 0, 2) or UDim2.new(0, 2, 0, 2)
+    
+    -- Animate toggle background
+    TweenService:Create(toggle, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        BackgroundColor3 = targetColor
+    }):Play()
+    
+    -- Animate knob position
+    TweenService:Create(knob, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Position = targetPosition
+    }):Play()
+    
+    -- Call callback
+    if callback then
+        callback(isOn)
     end
 end
 
--- Register all toggles
+-- Register all toggles with individual click functionality
 toggleStates[HeadHitboxToggle] = {knob = HeadHitboxToggleKnob, isOn = false, callback = function(enabled) META_HEAD = enabled end}
 toggleStates[BodyHitboxToggle] = {knob = BodyHitboxToggleKnob, isOn = false, callback = function(enabled) META_TORSO = enabled end}
 toggleStates[InfJumpToggle] = {knob = InfJumpToggleKnob, isOn = false, callback = function(enabled) end}
@@ -1448,10 +1512,40 @@ toggleStates[KrozzidToggle] = {knob = KrozzidToggleKnob, isOn = false, callback 
 end}
 toggleStates[VizijaEnabledToggle] = {knob = VizijaEnabledToggleKnob, isOn = false, callback = function(enabled) VIZIJA_ENABLED = enabled end}
 
+-- Individual toggle clicks
+HeadHitboxToggle.MouseButton1Click:Connect(function()
+    toggleSwitch(HeadHitboxToggle, HeadHitboxToggleKnob, function(enabled) META_HEAD = enabled end)
+end)
+
+BodyHitboxToggle.MouseButton1Click:Connect(function()
+    toggleSwitch(BodyHitboxToggle, BodyHitboxToggleKnob, function(enabled) META_TORSO = enabled end)
+end)
+
+InfJumpToggle.MouseButton1Click:Connect(function()
+    toggleSwitch(InfJumpToggle, InfJumpToggleKnob, function(enabled) end)
+end)
+
+ImenaToggle.MouseButton1Click:Connect(function()
+    toggleSwitch(ImenaToggle, ImenaToggleKnob, function(enabled) NAMETAG_ENABLED = enabled end)
+end)
+
+KrozzidToggle.MouseButton1Click:Connect(function()
+    toggleSwitch(KrozzidToggle, KrozzidToggleKnob, function(enabled) 
+        CROSSHAIR_ENABLED = enabled 
+        updateCrosshairVisibility()
+    end)
+end)
+
+VizijaEnabledToggle.MouseButton1Click:Connect(function()
+    toggleSwitch(VizijaEnabledToggle, VizijaEnabledToggleKnob, function(enabled) VIZIJA_ENABLED = enabled end)
+end)
+
 -- Right Shift to toggle all
 UserInputService.InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.RightShift then
-        toggleAllToggles()
+        for toggle, data in pairs(toggleStates) do
+            toggleSwitch(toggle, data.knob, data.callback)
+        end
     end
 end)
 
