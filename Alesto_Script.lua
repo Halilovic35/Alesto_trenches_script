@@ -360,13 +360,32 @@ HeadBInput.Font = Enum.Font.Gotham
 local HeadBInputCorner = Instance.new("UICorner", HeadBInput)
 HeadBInputCorner.CornerRadius = UDim.new(0, 6)
 
--- Head Color Picker
+-- Head Color Picker (Modern)
 local HeadColorPicker = Instance.new("Frame", HeadHitboxSection)
 HeadColorPicker.Size = UDim2.new(0, 80, 0, 80)
 HeadColorPicker.Position = UDim2.new(1, -100, 0, 100)
 HeadColorPicker.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 local HeadColorPickerCorner = Instance.new("UICorner", HeadColorPicker)
 HeadColorPickerCorner.CornerRadius = UDim.new(0, 8)
+
+-- Head Color Picker Gradient
+local HeadColorGradient = Instance.new("UIGradient", HeadColorPicker)
+HeadColorGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(255, 0, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+})
+
+-- Head Color Picker Cursor
+local HeadColorCursor = Instance.new("Frame", HeadColorPicker)
+HeadColorCursor.Size = UDim2.new(0, 8, 0, 8)
+HeadColorCursor.Position = UDim2.new(0.8, -4, 0.2, -4)
+HeadColorCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+local HeadColorCursorCorner = Instance.new("UICorner", HeadColorCursor)
+HeadColorCursorCorner.CornerRadius = UDim.new(0, 4)
 
 -- Povećaj Tijelo Section
 local BodyHitboxSection = Instance.new("Frame", CombatSection)
@@ -403,7 +422,7 @@ BodyHitboxToggleKnob.BackgroundColor3 = Config.Colors.Text
 local BodyHitboxToggleKnobCorner = Instance.new("UICorner", BodyHitboxToggleKnob)
 BodyHitboxToggleKnobCorner.CornerRadius = UDim.new(0, 10)
 
--- Body FOV Value
+-- Body FOV Slider
 local BodyFOVLabel = Instance.new("TextLabel", BodyHitboxSection)
 BodyFOVLabel.Size = UDim2.new(1, 0, 0, 20)
 BodyFOVLabel.Position = UDim2.new(0, 16, 0, 40)
@@ -414,16 +433,31 @@ BodyFOVLabel.TextScaled = true
 BodyFOVLabel.Font = Enum.Font.Gotham
 BodyFOVLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-local BodyFOVBox = Instance.new("TextBox", BodyHitboxSection)
-BodyFOVBox.Size = UDim2.new(0, 60, 0, 25)
-BodyFOVBox.Position = UDim2.new(1, -76, 0, 40)
-BodyFOVBox.BackgroundColor3 = Config.Colors.Secondary
-BodyFOVBox.Text = tostring(META_TORSO_FOV)
-BodyFOVBox.TextColor3 = Config.Colors.Text
-BodyFOVBox.TextScaled = true
-BodyFOVBox.Font = Enum.Font.Gotham
-local BodyFOVBoxCorner = Instance.new("UICorner", BodyFOVBox)
-BodyFOVBoxCorner.CornerRadius = UDim.new(0, 8)
+-- Body FOV Slider Background
+local BodyFOVSlider = Instance.new("Frame", BodyHitboxSection)
+BodyFOVSlider.Size = UDim2.new(0, 120, 0, 6)
+BodyFOVSlider.Position = UDim2.new(1, -140, 0, 45)
+BodyFOVSlider.BackgroundColor3 = Config.Colors.Slider
+local BodyFOVSliderCorner = Instance.new("UICorner", BodyFOVSlider)
+BodyFOVSliderCorner.CornerRadius = UDim.new(0, 3)
+
+-- Body FOV Slider Fill
+local BodyFOVSliderBar = Instance.new("Frame", BodyFOVSlider)
+BodyFOVSliderBar.Size = UDim2.new((META_TORSO_FOV - HITBOX_FOV_MIN) / (HITBOX_FOV_MAX - HITBOX_FOV_MIN), 0, 1, 0)
+BodyFOVSliderBar.Position = UDim2.new(0, 0, 0, 0)
+BodyFOVSliderBar.BackgroundColor3 = Config.Colors.SliderBar
+local BodyFOVSliderBarCorner = Instance.new("UICorner", BodyFOVSliderBar)
+BodyFOVSliderBarCorner.CornerRadius = UDim.new(0, 3)
+
+-- Body FOV Value Display
+local BodyFOVValue = Instance.new("TextLabel", BodyHitboxSection)
+BodyFOVValue.Size = UDim2.new(0, 40, 0, 20)
+BodyFOVValue.Position = UDim2.new(1, -50, 0, 40)
+BodyFOVValue.BackgroundTransparency = 1
+BodyFOVValue.Text = tostring(META_TORSO_FOV)
+BodyFOVValue.TextColor3 = Config.Colors.Text
+BodyFOVValue.TextScaled = true
+BodyFOVValue.Font = Enum.Font.GothamBold
 
 -- Body Color Section
 local BodyColorLabel = Instance.new("TextLabel", BodyHitboxSection)
@@ -470,7 +504,7 @@ BodyBInput.Font = Enum.Font.Gotham
 local BodyBInputCorner = Instance.new("UICorner", BodyBInput)
 BodyBInputCorner.CornerRadius = UDim.new(0, 6)
 
--- Body Color Picker
+-- Body Color Picker (Modern)
 local BodyColorPicker = Instance.new("Frame", BodyHitboxSection)
 BodyColorPicker.Size = UDim2.new(0, 80, 0, 80)
 BodyColorPicker.Position = UDim2.new(1, -100, 0, 100)
@@ -478,10 +512,29 @@ BodyColorPicker.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 local BodyColorPickerCorner = Instance.new("UICorner", BodyColorPicker)
 BodyColorPickerCorner.CornerRadius = UDim.new(0, 8)
 
+-- Body Color Picker Gradient
+local BodyColorGradient = Instance.new("UIGradient", BodyColorPicker)
+BodyColorGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(255, 0, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+})
+
+-- Body Color Picker Cursor
+local BodyColorCursor = Instance.new("Frame", BodyColorPicker)
+BodyColorCursor.Size = UDim2.new(0, 8, 0, 8)
+BodyColorCursor.Position = UDim2.new(0.2, -4, 0.8, -4)
+BodyColorCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+local BodyColorCursorCorner = Instance.new("UICorner", BodyColorCursor)
+BodyColorCursorCorner.CornerRadius = UDim.new(0, 4)
+
 -- Local Section
 local LocalSection = Instance.new("Frame", CombatSection)
 LocalSection.Size = UDim2.new(1, -32, 0, 140)
-LocalSection.Position = UDim2.new(0, 16, 0, 330)
+LocalSection.Position = UDim2.new(0, 16, 0, 380)
 LocalSection.BackgroundColor3 = Config.Colors.Primary
 LocalSection.BorderSizePixel = 0
 local LocalSectionCorner = Instance.new("UICorner", LocalSection)
@@ -670,13 +723,32 @@ ESPBInput.Font = Enum.Font.Gotham
 local ESPBInputCorner = Instance.new("UICorner", ESPBInput)
 ESPBInputCorner.CornerRadius = UDim.new(0, 6)
 
--- ESP Color Picker
+-- ESP Color Picker (Modern)
 local ESPColorPicker = Instance.new("Frame", VizijaSection)
 ESPColorPicker.Size = UDim2.new(0, 80, 0, 80)
 ESPColorPicker.Position = UDim2.new(1, -100, 0, 100)
 ESPColorPicker.BackgroundColor3 = Color3.fromRGB(255, 20, 147)
 local ESPColorPickerCorner = Instance.new("UICorner", ESPColorPicker)
 ESPColorPickerCorner.CornerRadius = UDim.new(0, 8)
+
+-- ESP Color Picker Gradient
+local ESPColorGradient = Instance.new("UIGradient", ESPColorPicker)
+ESPColorGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(255, 0, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+})
+
+-- ESP Color Picker Cursor
+local ESPColorCursor = Instance.new("Frame", ESPColorPicker)
+ESPColorCursor.Size = UDim2.new(0, 8, 0, 8)
+ESPColorCursor.Position = UDim2.new(0.9, -4, 0.1, -4)
+ESPColorCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+local ESPColorCursorCorner = Instance.new("UICorner", ESPColorCursor)
+ESPColorCursorCorner.CornerRadius = UDim.new(0, 4)
 
 -- Toggle functionality with animations and hover effects
 local function createToggle(toggle, knob, callback)
@@ -700,38 +772,43 @@ local function createToggle(toggle, knob, callback)
         end
     end)
     
-    toggle.MouseButton1Click:Connect(function()
-        isOn = not isOn
-        
-        local targetColor = isOn and Config.Colors.Accent or Config.Colors.ToggleOff
-        local targetPosition = isOn and UDim2.new(1, -23, 0, 2) or UDim2.new(0, 2, 0, 2)
-        
-        -- Animate toggle background with bounce effect
-        local colorTween = TweenService:Create(toggle, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            BackgroundColor3 = targetColor
-        })
-        colorTween:Play()
-        
-        -- Animate knob position with bounce effect
-        local positionTween = TweenService:Create(knob, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            Position = targetPosition
-        })
-        positionTween:Play()
-        
-        -- Scale animation for feedback
-        local scaleTween = TweenService:Create(toggle, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 52, 0, 27)
-        })
-        scaleTween:Play()
-        
-        scaleTween.Completed:Connect(function()
-            TweenService:Create(toggle, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                Size = UDim2.new(0, 50, 0, 25)
-            }):Play()
-        end)
-        
-        if callback then
-            callback(isOn)
+
+    
+    -- Right Shift functionality
+    UserInputService.InputBegan:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.RightShift then
+            isOn = not isOn
+            
+            local targetColor = isOn and Config.Colors.Accent or Config.Colors.ToggleOff
+            local targetPosition = isOn and UDim2.new(1, -23, 0, 2) or UDim2.new(0, 2, 0, 2)
+            
+            -- Animate toggle background with bounce effect
+            local colorTween = TweenService:Create(toggle, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                BackgroundColor3 = targetColor
+            })
+            colorTween:Play()
+            
+            -- Animate knob position with bounce effect
+            local positionTween = TweenService:Create(knob, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                Position = targetPosition
+            })
+            positionTween:Play()
+            
+            -- Scale animation for feedback
+            local scaleTween = TweenService:Create(toggle, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Size = UDim2.new(0, 52, 0, 27)
+            })
+            scaleTween:Play()
+            
+            scaleTween.Completed:Connect(function()
+                TweenService:Create(toggle, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                    Size = UDim2.new(0, 50, 0, 25)
+                }):Play()
+            end)
+            
+            if callback then
+                callback(isOn)
+            end
         end
     end)
     
@@ -1215,6 +1292,114 @@ RunService.Heartbeat:Connect(function()
         FOVCircle.Position = Camera.CFrame.Position
         FOVCircle.Size = Vector3.new(0.1, currentFOV * 2, currentFOV * 2)
     end
+end)
+
+-- Slider functionality
+local function createSlider(slider, sliderBar, valueLabel, minValue, maxValue, currentValue, callback)
+    local isDragging = false
+    
+    slider.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isDragging = true
+        end
+    end)
+    
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isDragging = false
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local mousePos = UserInputService:GetMouseLocation()
+            local sliderPos = slider.AbsolutePosition
+            local sliderSize = slider.AbsoluteSize
+            
+            local relativeX = math.clamp((mousePos.X - sliderPos.X) / sliderSize.X, 0, 1)
+            local newValue = minValue + (maxValue - minValue) * relativeX
+            
+            -- Update slider bar
+            sliderBar.Size = UDim2.new(relativeX, 0, 1, 0)
+            
+            -- Update value label
+            valueLabel.Text = tostring(math.floor(newValue))
+            
+            -- Call callback
+            if callback then
+                callback(newValue)
+            end
+        end
+    end)
+end
+
+-- Color picker functionality
+local function createColorPicker(colorPicker, cursor, rInput, gInput, bInput, callback)
+    local isDragging = false
+    
+    colorPicker.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isDragging = true
+        end
+    end)
+    
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isDragging = false
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local mousePos = UserInputService:GetMouseLocation()
+            local pickerPos = colorPicker.AbsolutePosition
+            local pickerSize = colorPicker.AbsoluteSize
+            
+            local relativeX = math.clamp((mousePos.X - pickerPos.X) / pickerSize.X, 0, 1)
+            local relativeY = math.clamp((mousePos.Y - pickerPos.Y) / pickerSize.Y, 0, 1)
+            
+            -- Update cursor position
+            cursor.Position = UDim2.new(relativeX, -4, relativeY, -4)
+            
+            -- Calculate color based on position
+            local hue = relativeX * 360
+            local saturation = 1 - relativeY
+            local value = 1
+            
+            local color = Color3.fromHSV(hue, saturation, value)
+            
+            -- Update RGB inputs
+            rInput.Text = tostring(math.floor(color.R * 255))
+            gInput.Text = tostring(math.floor(color.G * 255))
+            bInput.Text = tostring(math.floor(color.B * 255))
+            
+            -- Call callback
+            if callback then
+                callback(color)
+            end
+        end
+    end)
+end
+
+-- Initialize sliders and color pickers
+createSlider(HeadFOVSlider, HeadFOVSliderBar, HeadFOVValue, HITBOX_FOV_MIN, HITBOX_FOV_MAX, META_HEAD_FOV, function(value)
+    META_HEAD_FOV = value
+end)
+
+createSlider(BodyFOVSlider, BodyFOVSliderBar, BodyFOVValue, HITBOX_FOV_MIN, HITBOX_FOV_MAX, META_TORSO_FOV, function(value)
+    META_TORSO_FOV = value
+end)
+
+createColorPicker(HeadColorPicker, HeadColorCursor, HeadRInput, HeadGInput, HeadBInput, function(color)
+    HITBOX_HEAD_COLOR = color
+end)
+
+createColorPicker(BodyColorPicker, BodyColorCursor, BodyRInput, BodyGInput, BodyBInput, function(color)
+    HITBOX_TORSO_COLOR = color
+end)
+
+createColorPicker(ESPColorPicker, ESPColorCursor, ESPRInput, ESPGInput, ESPBInput, function(color)
+    VIZIJA_COLOR = color
 end)
 
 -- Cleanup on script end
