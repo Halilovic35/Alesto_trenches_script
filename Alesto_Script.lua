@@ -44,13 +44,13 @@ local Config = {}
 Config.Colors = {
     Primary = Color3.fromRGB(24, 24, 32),
     Secondary = Color3.fromRGB(32, 32, 44),
-    Accent = Color3.fromRGB(255, 20, 147), -- pink umesto plava
+    Accent = Color3.fromRGB(0, 120, 255), -- Blue accent color
     Text = Color3.fromRGB(255, 255, 255),
     Minimized = Color3.fromRGB(40, 40, 50),
     Section = Color3.fromRGB(36, 36, 48),
     ToggleOff = Color3.fromRGB(60, 60, 60),
     Slider = Color3.fromRGB(60, 60, 80),
-    SliderBar = Color3.fromRGB(80, 80, 100)
+    SliderBar = Color3.fromRGB(0, 120, 255)
 }
 
 -- Add missing config variables
@@ -104,6 +104,7 @@ MainFrame.Parent = ScreenGui
 local Corner = Instance.new("UICorner", MainFrame)
 Corner.CornerRadius = UDim.new(0, 16)
 
+-- Title Bar
 local TitleBar = Instance.new("Frame", MainFrame)
 TitleBar.Name = "Bar_"..randStr(3)
 TitleBar.Size = UDim2.new(1, 0, 0, 48)
@@ -115,23 +116,58 @@ TitleCorner.CornerRadius = UDim.new(0, 16)
 local Title = Instance.new("TextLabel", TitleBar)
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
-Title.Text = "Alesto Hub | Combat & ESP"
+Title.Text = "Tbao Hub | Murderers vs sheriffs duels"
 Title.TextColor3 = Config.Colors.Text
 Title.TextScaled = true
 Title.Font = Enum.Font.GothamBold
 
+-- Window Controls
+local SearchBtn = Instance.new("TextButton", TitleBar)
+SearchBtn.Size = UDim2.new(0, 24, 0, 24)
+SearchBtn.Position = UDim2.new(1, -120, 0.5, -12)
+SearchBtn.BackgroundTransparency = 1
+SearchBtn.Text = "🔍"
+SearchBtn.TextColor3 = Config.Colors.Text
+SearchBtn.TextScaled = true
+SearchBtn.Font = Enum.Font.Gotham
+
+local PinBtn = Instance.new("TextButton", TitleBar)
+PinBtn.Size = UDim2.new(0, 24, 0, 24)
+PinBtn.Position = UDim2.new(1, -90, 0.5, -12)
+PinBtn.BackgroundTransparency = 1
+PinBtn.Text = "📌"
+PinBtn.TextColor3 = Config.Colors.Text
+PinBtn.TextScaled = true
+PinBtn.Font = Enum.Font.Gotham
+
+local FolderBtn = Instance.new("TextButton", TitleBar)
+FolderBtn.Size = UDim2.new(0, 24, 0, 24)
+FolderBtn.Position = UDim2.new(1, -60, 0.5, -12)
+FolderBtn.BackgroundTransparency = 1
+FolderBtn.Text = "📁"
+FolderBtn.TextColor3 = Config.Colors.Text
+FolderBtn.TextScaled = true
+FolderBtn.Font = Enum.Font.Gotham
+
 local MinimizeBtn = Instance.new("TextButton", TitleBar)
-MinimizeBtn.Size = UDim2.new(0, 38, 0, 38)
-MinimizeBtn.Position = UDim2.new(1, -44, 0, 5)
-MinimizeBtn.BackgroundColor3 = Config.Colors.Accent
-MinimizeBtn.Text = "-"
+MinimizeBtn.Size = UDim2.new(0, 24, 0, 24)
+MinimizeBtn.Position = UDim2.new(1, -30, 0.5, -12)
+MinimizeBtn.BackgroundTransparency = 1
+MinimizeBtn.Text = "🗗"
 MinimizeBtn.TextColor3 = Config.Colors.Text
 MinimizeBtn.TextScaled = true
-MinimizeBtn.Font = Enum.Font.GothamBold
-local MinBtnCorner = Instance.new("UICorner", MinimizeBtn)
-MinBtnCorner.CornerRadius = UDim.new(0, 12)
+MinimizeBtn.Font = Enum.Font.Gotham
 
--- MODERNI TABOVI
+local CloseBtn = Instance.new("TextButton", TitleBar)
+CloseBtn.Size = UDim2.new(0, 24, 0, 24)
+CloseBtn.Position = UDim2.new(1, -30, 0.5, -12)
+CloseBtn.BackgroundTransparency = 1
+CloseBtn.Text = "✕"
+CloseBtn.TextColor3 = Config.Colors.Text
+CloseBtn.TextScaled = true
+CloseBtn.Font = Enum.Font.GothamBold
+
+-- Tabs
 local TabsFrame = Instance.new("Frame", MainFrame)
 TabsFrame.Size = UDim2.new(1, 0, 0, 48)
 TabsFrame.Position = UDim2.new(0, 0, 0, 48)
@@ -140,9 +176,20 @@ TabsFrame.BorderSizePixel = 0
 local TabsCorner = Instance.new("UICorner", TabsFrame)
 TabsCorner.CornerRadius = UDim.new(0, 16)
 
+local InfoTab = Instance.new("TextButton", TabsFrame)
+InfoTab.Size = UDim2.new(0.33, -2, 1, 0)
+InfoTab.Position = UDim2.new(0, 0, 0, 0)
+InfoTab.BackgroundColor3 = Config.Colors.Secondary
+InfoTab.Text = "Info"
+InfoTab.TextColor3 = Config.Colors.Text
+InfoTab.TextScaled = true
+InfoTab.Font = Enum.Font.GothamBold
+local InfoTabCorner = Instance.new("UICorner", InfoTab)
+InfoTabCorner.CornerRadius = UDim.new(0, 12)
+
 local CombatTab = Instance.new("TextButton", TabsFrame)
-CombatTab.Size = UDim2.new(0.5, -2, 1, 0)
-CombatTab.Position = UDim2.new(0, 0, 0, 0)
+CombatTab.Size = UDim2.new(0.33, -2, 1, 0)
+CombatTab.Position = UDim2.new(0.33, 2, 0, 0)
 CombatTab.BackgroundColor3 = Config.Colors.Accent
 CombatTab.Text = "Combat"
 CombatTab.TextColor3 = Config.Colors.Text
@@ -152,17 +199,27 @@ local CombatTabCorner = Instance.new("UICorner", CombatTab)
 CombatTabCorner.CornerRadius = UDim.new(0, 12)
 
 local ESPTab = Instance.new("TextButton", TabsFrame)
-ESPTab.Size = UDim2.new(0.5, -2, 1, 0)
-ESPTab.Position = UDim2.new(0.5, 2, 0, 0)
+ESPTab.Size = UDim2.new(0.33, -2, 1, 0)
+ESPTab.Position = UDim2.new(0.66, 4, 0, 0)
 ESPTab.BackgroundColor3 = Config.Colors.Secondary
-ESPTab.Text = "ESP"
+ESPTab.Text = "Esp"
 ESPTab.TextColor3 = Config.Colors.Text
 ESPTab.TextScaled = true
 ESPTab.Font = Enum.Font.GothamBold
 local ESPTabCorner = Instance.new("UICorner", ESPTab)
 ESPTabCorner.CornerRadius = UDim.new(0, 12)
 
--- SVE SEKCIJE (Combat/ESP) SU U POSEBNIM FRAME-ovima, SAKRIVAJU SE OVISNO O TABU
+-- Content Sections
+local InfoSection = Instance.new("Frame", MainFrame)
+InfoSection.Name = "InfoSection"
+InfoSection.Size = UDim2.new(1, -32, 1, -120)
+InfoSection.Position = UDim2.new(0, 16, 0, 100)
+InfoSection.BackgroundColor3 = Config.Colors.Section
+InfoSection.BorderSizePixel = 0
+local InfoSectionCorner = Instance.new("UICorner", InfoSection)
+InfoSectionCorner.CornerRadius = UDim.new(0, 16)
+InfoSection.Visible = false
+
 local CombatSection = Instance.new("Frame", MainFrame)
 CombatSection.Name = "CombatSection"
 CombatSection.Size = UDim2.new(1, -32, 1, -120)
@@ -182,955 +239,693 @@ local ESPSectionCorner = Instance.new("UICorner", ESPSection)
 ESPSectionCorner.CornerRadius = UDim.new(0, 16)
 ESPSection.Visible = false
 
+-- Tab switching
+InfoTab.MouseButton1Click:Connect(function()
+    InfoTab.BackgroundColor3 = Config.Colors.Accent
+    CombatTab.BackgroundColor3 = Config.Colors.Secondary
+    ESPTab.BackgroundColor3 = Config.Colors.Secondary
+    InfoSection.Visible = true
+    CombatSection.Visible = false
+    ESPSection.Visible = false
+end)
+
 CombatTab.MouseButton1Click:Connect(function()
+    InfoTab.BackgroundColor3 = Config.Colors.Secondary
     CombatTab.BackgroundColor3 = Config.Colors.Accent
     ESPTab.BackgroundColor3 = Config.Colors.Secondary
+    InfoSection.Visible = false
     CombatSection.Visible = true
     ESPSection.Visible = false
 end)
+
 ESPTab.MouseButton1Click:Connect(function()
+    InfoTab.BackgroundColor3 = Config.Colors.Secondary
     CombatTab.BackgroundColor3 = Config.Colors.Secondary
     ESPTab.BackgroundColor3 = Config.Colors.Accent
+    InfoSection.Visible = false
     CombatSection.Visible = false
     ESPSection.Visible = true
 end)
 
--- Section: Vizija (ESP)
-local VizijaSection = Instance.new("Frame", ESPSection)
-VizijaSection.Size = UDim2.new(1, -32, 0, 80)
-VizijaSection.Position = UDim2.new(0, 16, 0, 16)
-VizijaSection.BackgroundColor3 = Config.Colors.Section
-VizijaSection.BorderSizePixel = 0
-local VizijaCorner = Instance.new("UICorner", VizijaSection)
-VizijaCorner.CornerRadius = UDim.new(0, 12)
+-- Info Section Content
+local InfoTitle = Instance.new("TextLabel", InfoSection)
+InfoTitle.Size = UDim2.new(1, 0, 0, 40)
+InfoTitle.Position = UDim2.new(0, 16, 0, 16)
+InfoTitle.BackgroundTransparency = 1
+InfoTitle.Text = "Script Information"
+InfoTitle.TextColor3 = Config.Colors.Text
+InfoTitle.TextScaled = true
+InfoTitle.Font = Enum.Font.GothamBold
 
-local VizijaLabel = Instance.new("TextLabel", VizijaSection)
-VizijaLabel.Size = UDim2.new(0, 120, 0, 32)
-VizijaLabel.Position = UDim2.new(0, 10, 0, 8)
-VizijaLabel.BackgroundTransparency = 1
-VizijaLabel.Text = "Vizija (kutije)"
-VizijaLabel.TextColor3 = Config.Colors.Text
-VizijaLabel.TextScaled = true
-VizijaLabel.Font = Enum.Font.GothamBold
+local InfoText = Instance.new("TextLabel", InfoSection)
+InfoText.Size = UDim2.new(1, -32, 1, -80)
+InfoText.Position = UDim2.new(0, 16, 0, 60)
+InfoText.BackgroundTransparency = 1
+InfoText.Text = "Tbao Hub Script\n\nFeatures:\n• Combat enhancements\n• ESP functionality\n• Modern UI\n\nPress Right Shift to toggle"
+InfoText.TextColor3 = Config.Colors.Text
+InfoText.TextScaled = true
+InfoText.Font = Enum.Font.Gotham
+InfoText.TextXAlignment = Enum.TextXAlignment.Left
+InfoText.TextYAlignment = Enum.TextYAlignment.Top
 
-local VizijaToggle = Instance.new("TextButton", VizijaSection)
-VizijaToggle.Size = UDim2.new(0, 100, 0, 32)
-VizijaToggle.Position = UDim2.new(0, 140, 0, 8)
-VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
-VizijaToggle.TextColor3 = Config.Colors.Text
-VizijaToggle.TextScaled = true
-VizijaToggle.Font = Enum.Font.GothamBold
-local VizijaToggleCorner = Instance.new("UICorner", VizijaToggle)
-VizijaToggleCorner.CornerRadius = UDim.new(0, 8)
+-- Combat Section Content
+local HitboxSection = Instance.new("Frame", CombatSection)
+HitboxSection.Size = UDim2.new(1, -32, 0, 120)
+HitboxSection.Position = UDim2.new(0, 16, 0, 16)
+HitboxSection.BackgroundColor3 = Config.Colors.Primary
+HitboxSection.BorderSizePixel = 0
+local HitboxSectionCorner = Instance.new("UICorner", HitboxSection)
+HitboxSectionCorner.CornerRadius = UDim.new(0, 12)
 
-local OnlyEnemiesBtn = Instance.new("TextButton", VizijaSection)
-OnlyEnemiesBtn.Size = UDim2.new(0, 120, 0, 28)
-OnlyEnemiesBtn.Position = UDim2.new(0, 10, 0, 48)
-OnlyEnemiesBtn.BackgroundColor3 = Config.Colors.ToggleOff
-OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
-OnlyEnemiesBtn.TextColor3 = Config.Colors.Text
-OnlyEnemiesBtn.TextScaled = true
-OnlyEnemiesBtn.Font = Enum.Font.Gotham
-local OnlyEnemiesCorner = Instance.new("UICorner", OnlyEnemiesBtn)
-OnlyEnemiesCorner.CornerRadius = UDim.new(0, 8)
+local HitboxLabel = Instance.new("TextLabel", HitboxSection)
+HitboxLabel.Size = UDim2.new(1, 0, 0, 30)
+HitboxLabel.Position = UDim2.new(0, 16, 0, 8)
+HitboxLabel.BackgroundTransparency = 1
+HitboxLabel.Text = "Hitbox"
+HitboxLabel.TextColor3 = Config.Colors.Text
+HitboxLabel.TextScaled = true
+HitboxLabel.Font = Enum.Font.GothamBold
+HitboxLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-OnlyEnemiesBtn.MouseButton1Click:Connect(function()
-    VIZIJA_ENEMY_ONLY = not VIZIJA_ENEMY_ONLY
-    OnlyEnemiesBtn.Text = VIZIJA_ENEMY_ONLY and "Samo protivnici" or "Svi igrači"
-    OnlyEnemiesBtn.BackgroundColor3 = VIZIJA_ENEMY_ONLY and Config.Colors.Accent or Config.Colors.ToggleOff
-end)
+-- Hitbox Toggle
+local HitboxToggle = Instance.new("TextButton", HitboxSection)
+HitboxToggle.Size = UDim2.new(0, 50, 0, 25)
+HitboxToggle.Position = UDim2.new(1, -66, 0, 8)
+HitboxToggle.BackgroundColor3 = Config.Colors.ToggleOff
+HitboxToggle.Text = ""
+local HitboxToggleCorner = Instance.new("UICorner", HitboxToggle)
+HitboxToggleCorner.CornerRadius = UDim.new(0, 12)
 
-VizijaToggle.MouseButton1Click:Connect(function()
-    VIZIJA_ENABLED = not VIZIJA_ENABLED
-    VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
-    VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-    if not VIZIJA_ENABLED then
-        for _,v in pairs(vizijaBoxes) do v:Remove() end
-        vizijaBoxes = {}
-    end
-end)
+local HitboxToggleKnob = Instance.new("Frame", HitboxToggle)
+HitboxToggleKnob.Size = UDim2.new(0, 21, 0, 21)
+HitboxToggleKnob.Position = UDim2.new(0, 2, 0, 2)
+HitboxToggleKnob.BackgroundColor3 = Config.Colors.Text
+local HitboxToggleKnobCorner = Instance.new("UICorner", HitboxToggleKnob)
+HitboxToggleKnobCorner.CornerRadius = UDim.new(0, 10)
 
--- Section: Boja kutije (Color Wheel)
-local ColorSection = Instance.new("Frame", ESPSection)
-ColorSection.Size = UDim2.new(1, -32, 0, 100)
-ColorSection.Position = UDim2.new(0, 16, 0, 110)
-ColorSection.BackgroundColor3 = Config.Colors.Section
-ColorSection.BorderSizePixel = 0
-local ColorCorner = Instance.new("UICorner", ColorSection)
-ColorCorner.CornerRadius = UDim.new(0, 12)
+-- Hitbox Value Slider
+local HitboxValueLabel = Instance.new("TextLabel", HitboxSection)
+HitboxValueLabel.Size = UDim2.new(1, 0, 0, 20)
+HitboxValueLabel.Position = UDim2.new(0, 16, 0, 40)
+HitboxValueLabel.BackgroundTransparency = 1
+HitboxValueLabel.Text = "Hitbox value"
+HitboxValueLabel.TextColor3 = Config.Colors.Text
+HitboxValueLabel.TextScaled = true
+HitboxValueLabel.Font = Enum.Font.Gotham
+HitboxValueLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-local ColorLabel = Instance.new("TextLabel", ColorSection)
-ColorLabel.Size = UDim2.new(0, 120, 0, 32)
-ColorLabel.Position = UDim2.new(0, 10, 0, 8)
-ColorLabel.BackgroundTransparency = 1
-ColorLabel.Text = "Boja kutije"
-ColorLabel.TextColor3 = Config.Colors.Text
-ColorLabel.TextScaled = true
-ColorLabel.Font = Enum.Font.GothamBold
+local HitboxValueBox = Instance.new("TextBox", HitboxSection)
+HitboxValueBox.Size = UDim2.new(0, 60, 0, 25)
+HitboxValueBox.Position = UDim2.new(1, -76, 0, 40)
+HitboxValueBox.BackgroundColor3 = Config.Colors.Secondary
+HitboxValueBox.Text = tostring(META_FOV)
+HitboxValueBox.TextColor3 = Config.Colors.Text
+HitboxValueBox.TextScaled = true
+HitboxValueBox.Font = Enum.Font.Gotham
+HitboxValueBox.PlaceholderText = "0"
+local HitboxValueBoxCorner = Instance.new("UICorner", HitboxValueBox)
+HitboxValueBoxCorner.CornerRadius = UDim.new(0, 8)
 
--- Color wheel (simple implementation)
-local ColorWheel = Instance.new("ImageButton", ColorSection)
-ColorWheel.Size = UDim2.new(0, 70, 0, 70)
-ColorWheel.Position = UDim2.new(0, 140, 0, 8)
-ColorWheel.BackgroundTransparency = 1
-ColorWheel.Image = "rbxassetid://6020299385" -- Roblox color wheel asset
+-- Hitbox Color Section
+local HitboxColorLabel = Instance.new("TextLabel", HitboxSection)
+HitboxColorLabel.Size = UDim2.new(1, 0, 0, 20)
+HitboxColorLabel.Position = UDim2.new(0, 16, 0, 70)
+HitboxColorLabel.BackgroundTransparency = 1
+HitboxColorLabel.Text = "Hitbox color"
+HitboxColorLabel.TextColor3 = Config.Colors.Text
+HitboxColorLabel.TextScaled = true
+HitboxColorLabel.Font = Enum.Font.Gotham
+HitboxColorLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-local ColorPreview = Instance.new("Frame", ColorSection)
-ColorPreview.Size = UDim2.new(0, 32, 0, 32)
-ColorPreview.Position = UDim2.new(0, 220, 0, 24)
-ColorPreview.BackgroundColor3 = VIZIJA_COLOR
-ColorPreview.BorderSizePixel = 0
-local ColorPreviewCorner = Instance.new("UICorner", ColorPreview)
-ColorPreviewCorner.CornerRadius = UDim.new(1, 0)
+-- RGB Inputs
+local RInput = Instance.new("TextBox", HitboxSection)
+RInput.Size = UDim2.new(0, 40, 0, 20)
+RInput.Position = UDim2.new(1, -140, 0, 70)
+RInput.BackgroundColor3 = Config.Colors.Secondary
+RInput.Text = "255"
+RInput.TextColor3 = Config.Colors.Text
+RInput.TextScaled = true
+RInput.Font = Enum.Font.Gotham
+local RInputCorner = Instance.new("UICorner", RInput)
+RInputCorner.CornerRadius = UDim.new(0, 6)
 
-ColorWheel.MouseButton1Down:Connect(function(input)
-    local abs = ColorWheel.AbsolutePosition
-    local rel = Vector2.new(input.X - abs.X, input.Y - abs.Y)
-    local r = ColorWheel.AbsoluteSize.X/2
-    local center = Vector2.new(r, r)
-    local dist = (rel - center).Magnitude
-    if dist <= r then
-        local angle = math.atan2(rel.Y - r, rel.X - r)
-        local hue = (angle/(2*math.pi))%1
-        VIZIJA_COLOR = Color3.fromHSV(hue, 1, 1)
-        ColorPreview.BackgroundColor3 = VIZIJA_COLOR
-    end
-end)
+local GInput = Instance.new("TextBox", HitboxSection)
+GInput.Size = UDim2.new(0, 40, 0, 20)
+GInput.Position = UDim2.new(1, -95, 0, 70)
+GInput.BackgroundColor3 = Config.Colors.Secondary
+GInput.Text = "0"
+GInput.TextColor3 = Config.Colors.Text
+GInput.TextScaled = true
+GInput.Font = Enum.Font.Gotham
+local GInputCorner = Instance.new("UICorner", GInput)
+GInputCorner.CornerRadius = UDim.new(0, 6)
 
--- Dodaj i mouse movement za smooth color picking
-local draggingColor = false
-ColorWheel.MouseButton1Down:Connect(function()
-    draggingColor = true
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingColor = false end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if draggingColor and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local abs = ColorWheel.AbsolutePosition
-        local rel = Vector2.new(input.Position.X - abs.X, input.Position.Y - abs.Y)
-        local r = ColorWheel.AbsoluteSize.X/2
-        local center = Vector2.new(r, r)
-        local dist = (rel - center).Magnitude
-        if dist <= r then
-            local angle = math.atan2(rel.Y - r, rel.X - r)
-            local hue = (angle/(2*math.pi))%1
-            VIZIJA_COLOR = Color3.fromHSV(hue, 1, 1)
-            ColorPreview.BackgroundColor3 = VIZIJA_COLOR
+local BInput = Instance.new("TextBox", HitboxSection)
+BInput.Size = UDim2.new(0, 40, 0, 20)
+BInput.Position = UDim2.new(1, -50, 0, 70)
+BInput.BackgroundColor3 = Config.Colors.Secondary
+BInput.Text = "0"
+BInput.TextColor3 = Config.Colors.Text
+BInput.TextScaled = true
+BInput.Font = Enum.Font.Gotham
+local BInputCorner = Instance.new("UICorner", BInput)
+BInputCorner.CornerRadius = UDim.new(0, 6)
+
+-- Hex Input
+local HexInput = Instance.new("TextBox", HitboxSection)
+HexInput.Size = UDim2.new(0, 60, 0, 20)
+HexInput.Position = UDim2.new(1, -76, 0, 95)
+HexInput.BackgroundColor3 = Config.Colors.Secondary
+HexInput.Text = "#FF0000"
+HexInput.TextColor3 = Config.Colors.Text
+HexInput.TextScaled = true
+HexInput.Font = Enum.Font.Gotham
+local HexInputCorner = Instance.new("UICorner", HexInput)
+HexInputCorner.CornerRadius = UDim.new(0, 6)
+
+-- Color Picker
+local ColorPicker = Instance.new("Frame", HitboxSection)
+ColorPicker.Size = UDim2.new(0, 60, 0, 60)
+ColorPicker.Position = UDim2.new(1, -76, 0, 120)
+ColorPicker.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+local ColorPickerCorner = Instance.new("UICorner", ColorPicker)
+ColorPickerCorner.CornerRadius = UDim.new(0, 8)
+
+-- Local Section
+local LocalSection = Instance.new("Frame", CombatSection)
+LocalSection.Size = UDim2.new(1, -32, 0, 80)
+LocalSection.Position = UDim2.new(0, 16, 0, 150)
+LocalSection.BackgroundColor3 = Config.Colors.Primary
+LocalSection.BorderSizePixel = 0
+local LocalSectionCorner = Instance.new("UICorner", LocalSection)
+LocalSectionCorner.CornerRadius = UDim.new(0, 12)
+
+local LocalLabel = Instance.new("TextLabel", LocalSection)
+LocalLabel.Size = UDim2.new(1, 0, 0, 30)
+LocalLabel.Position = UDim2.new(0, 16, 0, 8)
+LocalLabel.BackgroundTransparency = 1
+LocalLabel.Text = "Local"
+LocalLabel.TextColor3 = Config.Colors.Text
+LocalLabel.TextScaled = true
+LocalLabel.Font = Enum.Font.GothamBold
+LocalLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- No Clip Toggle
+local NoClipLabel = Instance.new("TextLabel", LocalSection)
+NoClipLabel.Size = UDim2.new(1, -100, 0, 20)
+NoClipLabel.Position = UDim2.new(0, 16, 0, 40)
+NoClipLabel.BackgroundTransparency = 1
+NoClipLabel.Text = "No clip"
+NoClipLabel.TextColor3 = Config.Colors.Text
+NoClipLabel.TextScaled = true
+NoClipLabel.Font = Enum.Font.Gotham
+NoClipLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local NoClipToggle = Instance.new("TextButton", LocalSection)
+NoClipToggle.Size = UDim2.new(0, 50, 0, 25)
+NoClipToggle.Position = UDim2.new(1, -66, 0, 40)
+NoClipToggle.BackgroundColor3 = Config.Colors.ToggleOff
+NoClipToggle.Text = ""
+local NoClipToggleCorner = Instance.new("UICorner", NoClipToggle)
+NoClipToggleCorner.CornerRadius = UDim.new(0, 12)
+
+local NoClipToggleKnob = Instance.new("Frame", NoClipToggle)
+NoClipToggleKnob.Size = UDim2.new(0, 21, 0, 21)
+NoClipToggleKnob.Position = UDim2.new(0, 2, 0, 2)
+NoClipToggleKnob.BackgroundColor3 = Config.Colors.Text
+local NoClipToggleKnobCorner = Instance.new("UICorner", NoClipToggleKnob)
+NoClipToggleKnobCorner.CornerRadius = UDim.new(0, 10)
+
+-- Inf Jump Toggle
+local InfJumpLabel = Instance.new("TextLabel", LocalSection)
+InfJumpLabel.Size = UDim2.new(1, -100, 0, 20)
+InfJumpLabel.Position = UDim2.new(0, 16, 0, 65)
+InfJumpLabel.BackgroundTransparency = 1
+InfJumpLabel.Text = "Inf jump"
+InfJumpLabel.TextColor3 = Config.Colors.Text
+InfJumpLabel.TextScaled = true
+InfJumpLabel.Font = Enum.Font.Gotham
+InfJumpLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local InfJumpToggle = Instance.new("TextButton", LocalSection)
+InfJumpToggle.Size = UDim2.new(0, 50, 0, 25)
+InfJumpToggle.Position = UDim2.new(1, -66, 0, 65)
+InfJumpToggle.BackgroundColor3 = Config.Colors.ToggleOff
+InfJumpToggle.Text = ""
+local InfJumpToggleCorner = Instance.new("UICorner", InfJumpToggle)
+InfJumpToggleCorner.CornerRadius = UDim.new(0, 12)
+
+local InfJumpToggleKnob = Instance.new("Frame", InfJumpToggle)
+InfJumpToggleKnob.Size = UDim2.new(0, 21, 0, 21)
+InfJumpToggleKnob.Position = UDim2.new(0, 2, 0, 2)
+InfJumpToggleKnob.BackgroundColor3 = Config.Colors.Text
+local InfJumpToggleKnobCorner = Instance.new("UICorner", InfJumpToggleKnob)
+InfJumpToggleKnobCorner.CornerRadius = UDim.new(0, 10)
+
+-- ESP Section Content
+local ESPEnabledLabel = Instance.new("TextLabel", ESPSection)
+ESPEnabledLabel.Size = UDim2.new(1, -100, 0, 30)
+ESPEnabledLabel.Position = UDim2.new(0, 16, 0, 16)
+ESPEnabledLabel.BackgroundTransparency = 1
+ESPEnabledLabel.Text = "Esp enabled"
+ESPEnabledLabel.TextColor3 = Config.Colors.Text
+ESPEnabledLabel.TextScaled = true
+ESPEnabledLabel.Font = Enum.Font.Gotham
+ESPEnabledLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local ESPEnabledToggle = Instance.new("TextButton", ESPSection)
+ESPEnabledToggle.Size = UDim2.new(0, 50, 0, 25)
+ESPEnabledToggle.Position = UDim2.new(1, -66, 0, 16)
+ESPEnabledToggle.BackgroundColor3 = Config.Colors.ToggleOff
+ESPEnabledToggle.Text = ""
+local ESPEnabledToggleCorner = Instance.new("UICorner", ESPEnabledToggle)
+ESPEnabledToggleCorner.CornerRadius = UDim.new(0, 12)
+
+local ESPEnabledToggleKnob = Instance.new("Frame", ESPEnabledToggle)
+ESPEnabledToggleKnob.Size = UDim2.new(0, 21, 0, 21)
+ESPEnabledToggleKnob.Position = UDim2.new(0, 2, 0, 2)
+ESPEnabledToggleKnob.BackgroundColor3 = Config.Colors.Text
+local ESPEnabledToggleKnobCorner = Instance.new("UICorner", ESPEnabledToggleKnob)
+ESPEnabledToggleKnobCorner.CornerRadius = UDim.new(0, 10)
+
+local ESPNameLabel = Instance.new("TextLabel", ESPSection)
+ESPNameLabel.Size = UDim2.new(1, -100, 0, 30)
+ESPNameLabel.Position = UDim2.new(0, 16, 0, 50)
+ESPNameLabel.BackgroundTransparency = 1
+ESPNameLabel.Text = "Esp name"
+ESPNameLabel.TextColor3 = Config.Colors.Text
+ESPNameLabel.TextScaled = true
+ESPNameLabel.Font = Enum.Font.Gotham
+ESPNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local ESPNameToggle = Instance.new("TextButton", ESPSection)
+ESPNameToggle.Size = UDim2.new(0, 50, 0, 25)
+ESPNameToggle.Position = UDim2.new(1, -66, 0, 50)
+ESPNameToggle.BackgroundColor3 = Config.Colors.ToggleOff
+ESPNameToggle.Text = ""
+local ESPNameToggleCorner = Instance.new("UICorner", ESPNameToggle)
+ESPNameToggleCorner.CornerRadius = UDim.new(0, 12)
+
+local ESPNameToggleKnob = Instance.new("Frame", ESPNameToggle)
+ESPNameToggleKnob.Size = UDim2.new(0, 21, 0, 21)
+ESPNameToggleKnob.Position = UDim2.new(0, 2, 0, 2)
+ESPNameToggleKnob.BackgroundColor3 = Config.Colors.Text
+local ESPNameToggleKnobCorner = Instance.new("UICorner", ESPNameToggleKnob)
+ESPNameToggleKnobCorner.CornerRadius = UDim.new(0, 10)
+
+local ESPBoxLabel = Instance.new("TextLabel", ESPSection)
+ESPBoxLabel.Size = UDim2.new(1, -100, 0, 30)
+ESPBoxLabel.Position = UDim2.new(0, 16, 0, 84)
+ESPBoxLabel.BackgroundTransparency = 1
+ESPBoxLabel.Text = "Esp box"
+ESPBoxLabel.TextColor3 = Config.Colors.Text
+ESPBoxLabel.TextScaled = true
+ESPBoxLabel.Font = Enum.Font.Gotham
+ESPBoxLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local ESPBoxToggle = Instance.new("TextButton", ESPSection)
+ESPBoxToggle.Size = UDim2.new(0, 50, 0, 25)
+ESPBoxToggle.Position = UDim2.new(1, -66, 0, 84)
+ESPBoxToggle.BackgroundColor3 = Config.Colors.ToggleOff
+ESPBoxToggle.Text = ""
+local ESPBoxToggleCorner = Instance.new("UICorner", ESPBoxToggle)
+ESPBoxToggleCorner.CornerRadius = UDim.new(0, 12)
+
+local ESPBoxToggleKnob = Instance.new("Frame", ESPBoxToggle)
+ESPBoxToggleKnob.Size = UDim2.new(0, 21, 0, 21)
+ESPBoxToggleKnob.Position = UDim2.new(0, 2, 0, 2)
+ESPBoxToggleKnob.BackgroundColor3 = Config.Colors.Text
+local ESPBoxToggleKnobCorner = Instance.new("UICorner", ESPBoxToggleKnob)
+ESPBoxToggleKnobCorner.CornerRadius = UDim.new(0, 10)
+
+local ESPTracerLabel = Instance.new("TextLabel", ESPSection)
+ESPTracerLabel.Size = UDim2.new(1, -100, 0, 30)
+ESPTracerLabel.Position = UDim2.new(0, 16, 0, 118)
+ESPTracerLabel.BackgroundTransparency = 1
+ESPTracerLabel.Text = "Esp tracer"
+ESPTracerLabel.TextColor3 = Config.Colors.Text
+ESPTracerLabel.TextScaled = true
+ESPTracerLabel.Font = Enum.Font.Gotham
+ESPTracerLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local ESPTracerToggle = Instance.new("TextButton", ESPSection)
+ESPTracerToggle.Size = UDim2.new(0, 50, 0, 25)
+ESPTracerToggle.Position = UDim2.new(1, -66, 0, 118)
+ESPTracerToggle.BackgroundColor3 = Config.Colors.ToggleOff
+ESPTracerToggle.Text = ""
+local ESPTracerToggleCorner = Instance.new("UICorner", ESPTracerToggle)
+ESPTracerToggleCorner.CornerRadius = UDim.new(0, 12)
+
+local ESPTracerToggleKnob = Instance.new("Frame", ESPTracerToggle)
+ESPTracerToggleKnob.Size = UDim2.new(0, 21, 0, 21)
+ESPTracerToggleKnob.Position = UDim2.new(0, 2, 0, 2)
+ESPTracerToggleKnob.BackgroundColor3 = Config.Colors.Text
+local ESPTracerToggleKnobCorner = Instance.new("UICorner", ESPTracerToggleKnob)
+ESPTracerToggleKnobCorner.CornerRadius = UDim.new(0, 10)
+
+-- Toggle functionality
+local function createToggle(toggle, knob, callback)
+    local isOn = false
+    
+    toggle.MouseButton1Click:Connect(function()
+        isOn = not isOn
+        if isOn then
+            toggle.BackgroundColor3 = Config.Colors.Accent
+            knob.Position = UDim2.new(1, -23, 0, 2)
+        else
+            toggle.BackgroundColor3 = Config.Colors.ToggleOff
+            knob.Position = UDim2.new(0, 2, 0, 2)
         end
-    end
+        if callback then
+            callback(isOn)
+        end
+    end)
+    
+    return function() return isOn end
+end
+
+-- Create toggles
+local hitboxEnabled = createToggle(HitboxToggle, HitboxToggleKnob, function(enabled)
+    META_HEAD = enabled
 end)
 
--- Nova sekcija: Imena + Krozzid
-local ImenaSection = Instance.new("Frame", ESPSection)
-ImenaSection.Size = UDim2.new(1, -32, 0, 70)
-ImenaSection.Position = UDim2.new(0, 16, 0, 230)
-ImenaSection.BackgroundColor3 = Config.Colors.Section
-ImenaSection.BorderSizePixel = 0
-local ImenaSectionCorner = Instance.new("UICorner", ImenaSection)
-ImenaSectionCorner.CornerRadius = UDim.new(0, 12)
-
-local ImenaLabel = Instance.new("TextLabel", ImenaSection)
-ImenaLabel.Size = UDim2.new(0, 80, 0, 28)
-ImenaLabel.Position = UDim2.new(0, 10, 0, 8)
-ImenaLabel.BackgroundTransparency = 1
-ImenaLabel.Text = "Imena"
-ImenaLabel.TextColor3 = Config.Colors.Text
-ImenaLabel.TextScaled = true
-ImenaLabel.Font = Enum.Font.GothamBold
-
-local ImenaToggle = Instance.new("TextButton", ImenaSection)
-ImenaToggle.Size = UDim2.new(0, 90, 0, 28)
-ImenaToggle.Position = UDim2.new(0, 100, 0, 8)
-ImenaToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-ImenaToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
-ImenaToggle.TextColor3 = Config.Colors.Text
-ImenaToggle.TextScaled = true
-ImenaToggle.Font = Enum.Font.GothamBold
-local ImenaToggleCorner = Instance.new("UICorner", ImenaToggle)
-ImenaToggleCorner.CornerRadius = UDim.new(0, 8)
-ImenaToggle.MouseButton1Click:Connect(function()
-    NAMETAG_ENABLED = not NAMETAG_ENABLED
-    ImenaToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
-    ImenaToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
+local noClipEnabled = createToggle(NoClipToggle, NoClipToggleKnob, function(enabled)
+    -- No clip functionality
 end)
 
-local ImenaScaleLabel = Instance.new("TextLabel", ImenaSection)
-ImenaScaleLabel.Size = UDim2.new(0, 60, 0, 28)
-ImenaScaleLabel.Position = UDim2.new(0, 200, 0, 8)
-ImenaScaleLabel.BackgroundTransparency = 1
-ImenaScaleLabel.Text = "Veličina"
-ImenaScaleLabel.TextColor3 = Config.Colors.Text
-ImenaScaleLabel.TextScaled = true
-ImenaScaleLabel.Font = Enum.Font.Gotham
-
-local ImenaScaleSlider = Instance.new("TextButton", ImenaSection)
-ImenaScaleSlider.Size = UDim2.new(0, 60, 0, 28)
-ImenaScaleSlider.Position = UDim2.new(0, 270, 0, 8)
-ImenaScaleSlider.BackgroundColor3 = Config.Colors.Accent
-ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
-ImenaScaleSlider.TextColor3 = Config.Colors.Text
-ImenaScaleSlider.TextScaled = true
-ImenaScaleSlider.Font = Enum.Font.GothamBold
-local draggingImenaScale = false
-ImenaScaleSlider.MouseButton1Down:Connect(function()
-    draggingImenaScale = true
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingImenaScale = false end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if draggingImenaScale and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local rel = math.clamp((input.Position.X - ImenaScaleSlider.AbsolutePosition.X) / ImenaScaleSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * 49 + 1) / 10 -- 0.1 do 5.0
-        NAMETAG_SCALE = value
-        ImenaScaleSlider.Text = tostring(value)
-    end
-end)
-NAMETAG_SCALE = 0.1
-ImenaScaleSlider.Text = tostring(NAMETAG_SCALE)
-
--- Krozzid toggle u Imena sekciji
-local KrozzidToggle = Instance.new("TextButton", ImenaSection)
-KrozzidToggle.Size = UDim2.new(0, 120, 0, 28)
-KrozzidToggle.Position = UDim2.new(0, 10, 0, 40)
-KrozzidToggle.BackgroundColor3 = KROZZID_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-KrozzidToggle.Text = KROZZID_ENABLED and "Krozzid: Uključeno" or "Krozzid: Isključeno"
-KrozzidToggle.TextColor3 = Config.Colors.Text
-KrozzidToggle.TextScaled = true
-KrozzidToggle.Font = Enum.Font.GothamBold
-local KrozzidToggleCorner = Instance.new("UICorner", KrozzidToggle)
-KrozzidToggleCorner.CornerRadius = UDim.new(0, 8)
-local KROZZID_ENABLED = false
-KrozzidToggle.MouseButton1Click:Connect(function()
-    KROZZID_ENABLED = not KROZZID_ENABLED
-    KrozzidToggle.Text = KROZZID_ENABLED and "Krozzid: Uključeno" or "Krozzid: Isključeno"
-    KrozzidToggle.BackgroundColor3 = KROZZID_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
+local infJumpEnabled = createToggle(InfJumpToggle, InfJumpToggleKnob, function(enabled)
+    -- Inf jump functionality
 end)
 
--- Section: Meta (Hitbox) - PREMESTI U COMBAT SECTION
-local MetaSection = Instance.new("Frame", CombatSection)
-MetaSection.Size = UDim2.new(1, -32, 0, 150)
-MetaSection.Position = UDim2.new(0, 16, 0, 16)
-MetaSection.BackgroundColor3 = Config.Colors.Section
-MetaSection.BorderSizePixel = 0
-local MetaCorner = Instance.new("UICorner", MetaSection)
-MetaCorner.CornerRadius = UDim.new(0, 12)
-
-local MetaLabel = Instance.new("TextLabel", MetaSection)
-MetaLabel.Size = UDim2.new(0, 120, 0, 32)
-MetaLabel.Position = UDim2.new(0, 10, 0, 8)
-MetaLabel.BackgroundTransparency = 1
-MetaLabel.Text = "Povecaj glavudju"
-MetaLabel.TextColor3 = Config.Colors.Text
-MetaLabel.TextScaled = true
-MetaLabel.Font = Enum.Font.GothamBold
-
-local FOVLabel = Instance.new("TextLabel", MetaSection)
-FOVLabel.Size = UDim2.new(0, 60, 0, 28)
-FOVLabel.Position = UDim2.new(0, 10, 0, 48)
-FOVLabel.BackgroundTransparency = 1
-FOVLabel.Text = "FOV"
-FOVLabel.TextColor3 = Config.Colors.Text
-FOVLabel.TextScaled = true
-FOVLabel.Font = Enum.Font.Gotham
-
-local FOVSlider = Instance.new("TextButton", MetaSection)
-FOVSlider.Size = UDim2.new(0, 180, 0, 28)
-FOVSlider.Position = UDim2.new(0, 70, 0, 48)
-FOVSlider.BackgroundColor3 = Config.Colors.Accent
-FOVSlider.Text = tostring(META_FOV)
-FOVSlider.TextColor3 = Config.Colors.Text
-FOVSlider.TextScaled = true
-FOVSlider.Font = Enum.Font.GothamBold
-local draggingFOV = false
-FOVSlider.MouseButton1Down:Connect(function()
-    draggingFOV = true
+local espEnabled = createToggle(ESPEnabledToggle, ESPEnabledToggleKnob, function(enabled)
+    VIZIJA_ENABLED = enabled
 end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingFOV = false end
+
+local espNameEnabled = createToggle(ESPNameToggle, ESPNameToggleKnob, function(enabled)
+    NAMETAG_ENABLED = enabled
 end)
-UserInputService.InputChanged:Connect(function(input)
-    if draggingFOV and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local rel = math.clamp((input.Position.X - FOVSlider.AbsolutePosition.X) / FOVSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * (HITBOX_FOV_MAX-HITBOX_FOV_MIN) + HITBOX_FOV_MIN) -- 1 do 200
+
+local espBoxEnabled = createToggle(ESPBoxToggle, ESPBoxToggleKnob, function(enabled)
+    -- ESP box functionality
+end)
+
+local espTracerEnabled = createToggle(ESPTracerToggle, ESPTracerToggleKnob, function(enabled)
+    -- ESP tracer functionality
+end)
+
+-- Hitbox value input handling
+HitboxValueBox.FocusLost:Connect(function()
+    local value = tonumber(HitboxValueBox.Text)
+    if value and value >= HITBOX_FOV_MIN and value <= HITBOX_FOV_MAX then
         META_FOV = value
-        FOVSlider.Text = tostring(value)
-    end
-end)
-
-local HeadBtn = Instance.new("TextButton", MetaSection)
-HeadBtn.Size = UDim2.new(0, 70, 0, 28)
-HeadBtn.Position = UDim2.new(0, 10, 0, 60)
-HeadBtn.BackgroundColor3 = META_HEAD and Config.Colors.Accent or Config.Colors.ToggleOff
-HeadBtn.Text = "Glava"
-HeadBtn.TextColor3 = Config.Colors.Text
-HeadBtn.TextScaled = true
-HeadBtn.Font = Enum.Font.GothamBold
-local HeadCorner = Instance.new("UICorner", HeadBtn)
-HeadCorner.CornerRadius = UDim.new(0, 8)
-
-local TorsoBtn = Instance.new("TextButton", MetaSection)
-TorsoBtn.Size = UDim2.new(0, 70, 0, 28)
-TorsoBtn.Position = UDim2.new(0, 90, 0, 60)
-TorsoBtn.BackgroundColor3 = META_TORSO and Config.Colors.Accent or Config.Colors.ToggleOff
-TorsoBtn.Text = "Tijelo"
-TorsoBtn.TextColor3 = Config.Colors.Text
-TorsoBtn.TextScaled = true
-TorsoBtn.Font = Enum.Font.GothamBold
-local TorsoCorner = Instance.new("UICorner", TorsoBtn)
-TorsoCorner.CornerRadius = UDim.new(0, 8)
-
-HeadBtn.MouseButton1Click:Connect(function()
-    META_HEAD = not META_HEAD
-    HeadBtn.BackgroundColor3 = META_HEAD and Config.Colors.Accent or Config.Colors.ToggleOff
-end)
-TorsoBtn.MouseButton1Click:Connect(function()
-    META_TORSO = not META_TORSO
-    TorsoBtn.BackgroundColor3 = META_TORSO and Config.Colors.Accent or Config.Colors.ToggleOff
-end)
-
--- GUI: Dugmad za biranje boje glave
-local HeadColorLabel = Instance.new("TextLabel", MetaSection)
-HeadColorLabel.Size = UDim2.new(0, 80, 0, 28)
-HeadColorLabel.Position = UDim2.new(0, 170, 0, 60)
-HeadColorLabel.BackgroundTransparency = 1
-HeadColorLabel.Text = "Boja glave"
-HeadColorLabel.TextColor3 = Config.Colors.Text
-HeadColorLabel.TextScaled = true
-HeadColorLabel.Font = Enum.Font.Gotham
-
-local RedBtn = Instance.new("TextButton", MetaSection)
-RedBtn.Size = UDim2.new(0, 28, 0, 28)
-RedBtn.Position = UDim2.new(0, 260, 0, 60)
-RedBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-RedBtn.Text = ""
-local RedBtnCorner = Instance.new("UICorner", RedBtn)
-RedBtnCorner.CornerRadius = UDim.new(1, 0)
-
-local BlueBtn = Instance.new("TextButton", MetaSection)
-BlueBtn.Size = UDim2.new(0, 28, 0, 28)
-BlueBtn.Position = UDim2.new(0, 295, 0, 60)
-BlueBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
-BlueBtn.Text = ""
-local BlueBtnCorner = Instance.new("UICorner", BlueBtn)
-BlueBtnCorner.CornerRadius = UDim.new(1, 0)
-
-local GreenBtn = Instance.new("TextButton", MetaSection)
-GreenBtn.Size = UDim2.new(0, 28, 0, 28)
-GreenBtn.Position = UDim2.new(0, 330, 0, 60)
-GreenBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-GreenBtn.Text = ""
-local GreenBtnCorner = Instance.new("UICorner", GreenBtn)
-GreenBtnCorner.CornerRadius = UDim.new(1, 0)
-
-RedBtn.MouseButton1Click:Connect(function()
-    HITBOX_HEAD_COLOR = Color3.fromRGB(255, 0, 0)
-end)
-BlueBtn.MouseButton1Click:Connect(function()
-    HITBOX_HEAD_COLOR = Color3.fromRGB(0, 0, 255)
-end)
-GreenBtn.MouseButton1Click:Connect(function()
-    HITBOX_HEAD_COLOR = Color3.fromRGB(0, 255, 0)
-end)
-
--- FOV ZOOM TOGGLE I SLIDER - DODAJ U COMBAT SECTION
-local FOV_ENABLED = false
-local FOVToggle = Instance.new("TextButton", CombatSection)
-FOVToggle.Size = UDim2.new(0, 90, 0, 28)
-FOVToggle.Position = UDim2.new(0, 16, 0, 180)
-FOVToggle.BackgroundColor3 = FOV_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-FOVToggle.Text = FOV_ENABLED and "FOV ON" or "FOV OFF"
-FOVToggle.TextColor3 = Config.Colors.Text
-FOVToggle.TextScaled = true
-FOVToggle.Font = Enum.Font.GothamBold
-local FOVToggleCorner = Instance.new("UICorner", FOVToggle)
-FOVToggleCorner.CornerRadius = UDim.new(0, 8)
-FOVToggle.MouseButton1Click:Connect(function()
-    FOV_ENABLED = not FOV_ENABLED
-    FOVToggle.Text = FOV_ENABLED and "FOV ON" or "FOV OFF"
-    FOVToggle.BackgroundColor3 = FOV_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-    if FOV_ENABLED then
-        Camera.FieldOfView = currentFOV
     else
-        Camera.FieldOfView = FOV_DEFAULT
+        HitboxValueBox.Text = tostring(META_FOV)
     end
 end)
 
-local FOVGuiLabel = Instance.new("TextLabel", CombatSection)
-FOVGuiLabel.Size = UDim2.new(0, 100, 0, 28)
-FOVGuiLabel.Position = UDim2.new(0, 120, 0, 180)
-FOVGuiLabel.BackgroundTransparency = 1
-FOVGuiLabel.Text = "FOV (zoom)"
-FOVGuiLabel.TextColor3 = Config.Colors.Text
-FOVGuiLabel.TextScaled = true
-FOVGuiLabel.Font = Enum.Font.GothamBold
+-- Color picker functionality
+local function updateColor()
+    local r = tonumber(RInput.Text) or 255
+    local g = tonumber(GInput.Text) or 0
+    local b = tonumber(BInput.Text) or 0
+    
+    r = math.clamp(r, 0, 255)
+    g = math.clamp(g, 0, 255)
+    b = math.clamp(b, 0, 255)
+    
+    local color = Color3.fromRGB(r, g, b)
+    HITBOX_HEAD_COLOR = color
+    ColorPicker.BackgroundColor3 = color
+    HexInput.Text = string.format("#%02X%02X%02X", r, g, b)
+end
 
-local FOVGuiSlider = Instance.new("TextButton", CombatSection)
-FOVGuiSlider.Size = UDim2.new(0, 180, 0, 28)
-FOVGuiSlider.Position = UDim2.new(0, 230, 0, 180)
-FOVGuiSlider.BackgroundColor3 = Config.Colors.Accent
-FOVGuiSlider.Text = tostring(currentFOV)
-FOVGuiSlider.TextColor3 = Config.Colors.Text
-FOVGuiSlider.TextScaled = true
-FOVGuiSlider.Font = Enum.Font.GothamBold
-local draggingFOVGui = false
-FOVGuiSlider.MouseButton1Down:Connect(function()
-    draggingFOVGui = true
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingFOVGui = false end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if draggingFOVGui and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local rel = math.clamp((input.Position.X - FOVGuiSlider.AbsolutePosition.X) / FOVGuiSlider.AbsoluteSize.X, 0, 1)
-        local value = math.floor(rel * (FOV_MAX-FOV_MIN) + FOV_MIN) -- 20 do 120 za zoom
-        currentFOV = value
-        FOVGuiSlider.Text = tostring(value)
-        if FOV_ENABLED then
-            Camera.FieldOfView = value
-        end
+RInput.FocusLost:Connect(updateColor)
+GInput.FocusLost:Connect(updateColor)
+BInput.FocusLost:Connect(updateColor)
+
+-- Minimize functionality
+MinimizeBtn.MouseButton1Click:Connect(function()
+    if isMinimized then
+        MainFrame.Size = UDim2.new(0, 370, 0, 600)
+        MainFrame.Position = Config.MenuPosition
+        isMinimized = false
+    else
+        MainFrame.Size = Config.MinimizedSize
+        MainFrame.Position = Config.MinimizedPosition
+        isMinimized = true
     end
 end)
 
--- Dodaj Infinite Jump sekciju
-local InfiniteJumpSection = Instance.new("Frame", CombatSection)
-InfiniteJumpSection.Size = UDim2.new(1, -32, 0, 70)
-InfiniteJumpSection.Position = UDim2.new(0, 16, 0, 230)
-InfiniteJumpSection.BackgroundColor3 = Config.Colors.Section
-InfiniteJumpSection.BorderSizePixel = 0
-local InfiniteJumpCorner = Instance.new("UICorner", InfiniteJumpSection)
-InfiniteJumpCorner.CornerRadius = UDim.new(0, 12)
-
-local InfiniteJumpLabel = Instance.new("TextLabel", InfiniteJumpSection)
-InfiniteJumpLabel.Size = UDim2.new(0, 120, 0, 28)
-InfiniteJumpLabel.Position = UDim2.new(0, 10, 0, 8)
-InfiniteJumpLabel.BackgroundTransparency = 1
-InfiniteJumpLabel.Text = "Infinite Jump"
-InfiniteJumpLabel.TextColor3 = Config.Colors.Text
-InfiniteJumpLabel.TextScaled = true
-InfiniteJumpLabel.Font = Enum.Font.GothamBold
-
-local INFINITE_JUMP_ENABLED = false
-local InfiniteJumpToggle = Instance.new("TextButton", InfiniteJumpSection)
-InfiniteJumpToggle.Size = UDim2.new(0, 90, 0, 28)
-InfiniteJumpToggle.Position = UDim2.new(0, 140, 0, 8)
-InfiniteJumpToggle.BackgroundColor3 = INFINITE_JUMP_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-InfiniteJumpToggle.Text = INFINITE_JUMP_ENABLED and "Uključeno" or "Isključeno"
-InfiniteJumpToggle.TextColor3 = Config.Colors.Text
-InfiniteJumpToggle.TextScaled = true
-InfiniteJumpToggle.Font = Enum.Font.GothamBold
-local InfiniteJumpToggleCorner = Instance.new("UICorner", InfiniteJumpToggle)
-InfiniteJumpToggleCorner.CornerRadius = UDim.new(0, 8)
-InfiniteJumpToggle.MouseButton1Click:Connect(function()
-    INFINITE_JUMP_ENABLED = not INFINITE_JUMP_ENABLED
-    InfiniteJumpToggle.Text = INFINITE_JUMP_ENABLED and "Uključeno" or "Isključeno"
-    InfiniteJumpToggle.BackgroundColor3 = INFINITE_JUMP_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
+-- Close functionality
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
 end)
 
--- Bindovi
-local ESP_BIND = nil
-local HITBOX_BIND = nil
-local NAMETAG_BIND = nil
-local KROZZID_BIND = nil
-local INFINITE_JUMP_BIND = nil
-local waitingForBind = nil -- "ESP", "HITBOX", "NAMETAG", "KROZZID", "INFINITE_JUMP"
-
--- Nova sekcija: Bindovi - PREMESTI NA DNO MAIN FRAME
-local BindoviSection = Instance.new("Frame", MainFrame)
-BindoviSection.Size = UDim2.new(1, -32, 0, 80)
-BindoviSection.Position = UDim2.new(0, 16, 1, -100)
-BindoviSection.BackgroundColor3 = Config.Colors.Section
-BindoviSection.BorderSizePixel = 0
-local BindoviSectionCorner = Instance.new("UICorner", BindoviSection)
-BindoviSectionCorner.CornerRadius = UDim.new(0, 12)
-
-local BindoviLabel = Instance.new("TextLabel", BindoviSection)
-BindoviLabel.Size = UDim2.new(0, 120, 0, 28)
-BindoviLabel.Position = UDim2.new(0, 10, 0, 8)
-BindoviLabel.BackgroundTransparency = 1
-BindoviLabel.Text = "Bindovi (tipke)"
-BindoviLabel.TextColor3 = Config.Colors.Text
-BindoviLabel.TextScaled = true
-BindoviLabel.Font = Enum.Font.GothamBold
-
-local ESPBindBtn = Instance.new("TextButton", BindoviSection)
-ESPBindBtn.Size = UDim2.new(0, 70, 0, 28)
-ESPBindBtn.Position = UDim2.new(0, 140, 0, 8)
-ESPBindBtn.BackgroundColor3 = Config.Colors.Accent
-ESPBindBtn.Text = "ESP: "..tostring(ESP_BIND and ESP_BIND.Name or "Nema binda")
-ESPBindBtn.TextColor3 = Config.Colors.Text
-ESPBindBtn.TextScaled = true
-ESPBindBtn.Font = Enum.Font.GothamBold
-local ESPBindCorner = Instance.new("UICorner", ESPBindBtn)
-ESPBindCorner.CornerRadius = UDim.new(0, 8)
-
-local HitboxBindBtn = Instance.new("TextButton", BindoviSection)
-HitboxBindBtn.Size = UDim2.new(0, 80, 0, 28)
-HitboxBindBtn.Position = UDim2.new(0, 220, 0, 8)
-HitboxBindBtn.BackgroundColor3 = Config.Colors.Accent
-HitboxBindBtn.Text = "Glavudja: "..tostring(HITBOX_BIND and HITBOX_BIND.Name or "Nema binda")
-HitboxBindBtn.TextColor3 = Config.Colors.Text
-HitboxBindBtn.TextScaled = true
-HitboxBindBtn.Font = Enum.Font.GothamBold
-local HitboxBindCorner = Instance.new("UICorner", HitboxBindBtn)
-HitboxBindCorner.CornerRadius = UDim.new(0, 8)
-
-local ImenaBindBtn = Instance.new("TextButton", BindoviSection)
-ImenaBindBtn.Size = UDim2.new(0, 70, 0, 28)
-ImenaBindBtn.Position = UDim2.new(0, 310, 0, 8)
-ImenaBindBtn.BackgroundColor3 = Config.Colors.Accent
-ImenaBindBtn.Text = "Imena: "..tostring(NAMETAG_BIND and NAMETAG_BIND.Name or "Nema binda")
-ImenaBindBtn.TextColor3 = Config.Colors.Text
-ImenaBindBtn.TextScaled = true
-ImenaBindBtn.Font = Enum.Font.GothamBold
-local ImenaBindCorner = Instance.new("UICorner", ImenaBindBtn)
-ImenaBindCorner.CornerRadius = UDim.new(0, 8)
-
-local KrozzidBindBtn = Instance.new("TextButton", BindoviSection)
-KrozzidBindBtn.Size = UDim2.new(0, 80, 0, 28)
-KrozzidBindBtn.Position = UDim2.new(0, 390, 0, 8)
-KrozzidBindBtn.BackgroundColor3 = Config.Colors.Accent
-KrozzidBindBtn.Text = "Krozzid: "..tostring(KROZZID_BIND and KROZZID_BIND.Name or "Nema binda")
-KrozzidBindBtn.TextColor3 = Config.Colors.Text
-KrozzidBindBtn.TextScaled = true
-KrozzidBindBtn.Font = Enum.Font.GothamBold
-local KrozzidBindCorner = Instance.new("UICorner", KrozzidBindBtn)
-KrozzidBindCorner.CornerRadius = UDim.new(0, 8)
-
-local InfiniteJumpBindBtn = Instance.new("TextButton", BindoviSection)
-InfiniteJumpBindBtn.Size = UDim2.new(0, 90, 0, 28)
-InfiniteJumpBindBtn.Position = UDim2.new(0, 140, 0, 40)
-InfiniteJumpBindBtn.BackgroundColor3 = Config.Colors.Accent
-InfiniteJumpBindBtn.Text = "Infinite Jump: "..tostring(INFINITE_JUMP_BIND and INFINITE_JUMP_BIND.Name or "Nema binda")
-InfiniteJumpBindBtn.TextColor3 = Config.Colors.Text
-InfiniteJumpBindBtn.TextScaled = true
-InfiniteJumpBindBtn.Font = Enum.Font.GothamBold
-local InfiniteJumpBindCorner = Instance.new("UICorner", InfiniteJumpBindBtn)
-InfiniteJumpBindCorner.CornerRadius = UDim.new(0, 8)
-
-ESPBindBtn.MouseButton1Click:Connect(function()
-    ESPBindBtn.Text = "Pritisni tipku..."
-    waitingForBind = "ESP"
-end)
-HitboxBindBtn.MouseButton1Click:Connect(function()
-    HitboxBindBtn.Text = "Pritisni tipku..."
-    waitingForBind = "HITBOX"
-end)
-ImenaBindBtn.MouseButton1Click:Connect(function()
-    ImenaBindBtn.Text = "Pritisni tipku..."
-    waitingForBind = "NAMETAG"
-end)
-KrozzidBindBtn.MouseButton1Click:Connect(function()
-    KrozzidBindBtn.Text = "Pritisni tipku..."
-    waitingForBind = "KROZZID"
-end)
-InfiniteJumpBindBtn.MouseButton1Click:Connect(function()
-    InfiniteJumpBindBtn.Text = "Pritisni tipku..."
-    waitingForBind = "INFINITE_JUMP"
-end)
-
-UserInputService.InputBegan:Connect(function(input, gpe)
-    if gpe then return end
-    if waitingForBind == "ESP" then
-        ESP_BIND = input.KeyCode
-        ESPBindBtn.Text = "ESP: "..tostring(ESP_BIND.Name)
-        waitingForBind = nil
-        return
-    elseif waitingForBind == "HITBOX" then
-        HITBOX_BIND = input.KeyCode
-        HitboxBindBtn.Text = "Glavudja: "..tostring(HITBOX_BIND.Name)
-        waitingForBind = nil
-        return
-    elseif waitingForBind == "NAMETAG" then
-        NAMETAG_BIND = input.KeyCode
-        ImenaBindBtn.Text = "Imena: "..tostring(NAMETAG_BIND.Name)
-        waitingForBind = nil
-        return
-    elseif waitingForBind == "KROZZID" then
-        KROZZID_BIND = input.KeyCode
-        KrozzidBindBtn.Text = "Krozzid: "..tostring(KROZZID_BIND.Name)
-        waitingForBind = nil
-        return
-    elseif waitingForBind == "INFINITE_JUMP" then
-        INFINITE_JUMP_BIND = input.KeyCode
-        InfiniteJumpBindBtn.Text = "Infinite Jump: "..tostring(INFINITE_JUMP_BIND.Name)
-        waitingForBind = nil
-        return
+-- Menu toggle
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Config.MenuKey then
+        isMenuOpen = not isMenuOpen
+        MainFrame.Visible = isMenuOpen
     end
-    -- Bind funkcionalnost - samo ako bind postoji
-    if ESP_BIND and input.KeyCode == ESP_BIND then
-        VIZIJA_ENABLED = not VIZIJA_ENABLED
-        VizijaToggle.Text = VIZIJA_ENABLED and "Uključeno" or "Isključeno"
-        VizijaToggle.BackgroundColor3 = VIZIJA_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-        if not VIZIJA_ENABLED then
-            for _,v in pairs(vizijaBoxes) do v:Remove() end
-            vizijaBoxes = {}
-        end
-    elseif HITBOX_BIND and input.KeyCode == HITBOX_BIND then
-        if META_HEAD or META_TORSO then
-            META_HEAD = false
-            META_TORSO = false
-            HeadBtn.BackgroundColor3 = Config.Colors.ToggleOff
-            TorsoBtn.BackgroundColor3 = Config.Colors.ToggleOff
-        else
-            META_HEAD = true
-            HeadBtn.BackgroundColor3 = Config.Colors.Accent
-        end
-    elseif NAMETAG_BIND and input.KeyCode == NAMETAG_BIND then
-        NAMETAG_ENABLED = not NAMETAG_ENABLED
-        ImenaToggle.Text = NAMETAG_ENABLED and "Uključeno" or "Isključeno"
-        ImenaToggle.BackgroundColor3 = NAMETAG_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
-    elseif KROZZID_BIND and input.KeyCode == KROZZID_BIND then
-        -- Krozzid: pronađi i highlightaj prvog protivnika kroz zid
-        local origin = Camera.CFrame.Position
-        local direction = Camera.CFrame.LookVector * 1000
-        local ignoreList = {Players.LocalPlayer.Character}
-        local target = krozZid(origin, direction, ignoreList)
-        if target and target:FindFirstChild("Head") then
-            -- Highlight protivnika (npr. crveni SelectionBox na glavi)
-            local head = target.Head
-            if not head:FindFirstChild("KrozzidHighlight") then
-                local sb = Instance.new("SelectionBox")
-                sb.Name = "KrozzidHighlight"
-                sb.Adornee = head
-                sb.Color3 = Color3.fromRGB(255,0,0)
-                sb.LineThickness = 0.1
-                sb.Parent = head
-                game.Debris:AddItem(sb, 1.5)
+end)
+
+-- Helper functions
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local shortestDistance = math.huge
+    
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= Players.LocalPlayer and player.Character and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 and player.Character:FindFirstChild("HumanoidRootPart") then
+            local distance = (player.Character.HumanoidRootPart.Position - Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+            if distance < shortestDistance then
+                closestPlayer = player
+                shortestDistance = distance
             end
         end
-    elseif INFINITE_JUMP_BIND and input.KeyCode == INFINITE_JUMP_BIND then
-        INFINITE_JUMP_ENABLED = not INFINITE_JUMP_ENABLED
-        InfiniteJumpToggle.Text = INFINITE_JUMP_ENABLED and "Uključeno" or "Isključeno"
-        InfiniteJumpToggle.BackgroundColor3 = INFINITE_JUMP_ENABLED and Config.Colors.Accent or Config.Colors.ToggleOff
     end
-end)
-
--- Infinite Jump Input Handler
-UserInputService.InputBegan:Connect(function(input, gpe)
-    if gpe then return end
-    if INFINITE_JUMP_ENABLED and INFINITE_JUMP_BIND and input.KeyCode == INFINITE_JUMP_BIND then
-        local player = Players.LocalPlayer
-        local character = player.Character
-        if character and character:FindFirstChild("Humanoid") then
-            local humanoid = character.Humanoid
-            humanoid.Jump = true
-        end
-    end
-end)
-
--- Minimized (kockica) GUI
-local MiniFrame = Instance.new("Frame")
-MiniFrame.Name = miniName
-MiniFrame.Size = Config.MinimizedSize
-MiniFrame.Position = Config.MinimizedPosition
-MiniFrame.BackgroundColor3 = Config.Colors.Minimized
-MiniFrame.Visible = false
-MiniFrame.Active = true
-MiniFrame.Parent = ScreenGui
-local MiniCorner = Instance.new("UICorner", MiniFrame)
-MiniCorner.CornerRadius = UDim.new(1, 0)
-
-local MiniBtn = Instance.new("TextButton", MiniFrame)
-MiniBtn.Size = UDim2.new(1, 0, 1, 0)
-MiniBtn.BackgroundTransparency = 1
-MiniBtn.Text = ">"
-MiniBtn.TextColor3 = Config.Colors.Text
-MiniBtn.TextScaled = true
-MiniBtn.Font = Enum.Font.GothamBold
-
--- Dragging logic
-local function enableDrag(frame)
-    local dragging = false
-    local dragInput, mousePos, framePos
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            mousePos = input.Position
-            framePos = frame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then dragging = false end
-            end)
-        end
-    end)
-    frame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            local delta = input.Position - mousePos
-            frame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
-        end
-    end)
-end
-
-enableDrag(MainFrame)
-enableDrag(MiniFrame)
-
--- Minimize/maximize logic
-local function minimizeGUI()
-    MainFrame.Visible = false
-    MiniFrame.Visible = true
-    isMinimized = true
-end
-
-local function maximizeGUI()
-    MainFrame.Visible = true
-    MiniFrame.Visible = false
-    isMinimized = false
-end
-
-MinimizeBtn.MouseButton1Click:Connect(minimizeGUI)
-MiniBtn.MouseButton1Click:Connect(maximizeGUI)
-
--- Keyboard toggle (RightShift za cijeli panel)
-UserInputService.InputBegan:Connect(function(input, gpe)
-    if gpe then return end
-    if input.KeyCode == Config.MenuKey then
-        if isMenuOpen then
-            MainFrame.Visible = false
-            MiniFrame.Visible = false
-            isMenuOpen = false
-        else
-            if isMinimized then
-                MiniFrame.Visible = true
-            else
-                MainFrame.Visible = true
-            end
-            isMenuOpen = true
-        end
-    end
-end)
-
--- Helperi
-local function getTeam(player)
-    local team = nil
-    pcall(function()
-        if player.Team then team = player.Team.Name end
-    end)
-    return team
+    
+    return closestPlayer
 end
 
 local function isEnemy(player)
-    local lp = Players.LocalPlayer
-    local playerTeam = getTeam(player)
-    local localTeam = getTeam(lp)
+    if not VIZIJA_ENEMY_ONLY then return true end
     
-    -- Ako oba igrača imaju tim, provjeri jesu li različiti
-    if playerTeam and localTeam then
-        return playerTeam ~= localTeam
+    local localPlayer = Players.LocalPlayer
+    if not localPlayer or not localPlayer.Character then return false end
+    
+    -- Check if player is on different team (basic team check)
+    local localTeam = localPlayer.Team
+    local playerTeam = player.Team
+    
+    if localTeam and playerTeam then
+        return localTeam ~= playerTeam
     end
     
-    -- Ako jedan ima tim a drugi nema, smatraju se neprijateljima
-    if (playerTeam and not localTeam) or (not playerTeam and localTeam) then
-        return true
+    return true -- Default to enemy if no team info
+end
+
+-- ESP Box creation and management
+local function createESPBox(player)
+    if vizijaBoxes[player] then return end
+    
+    local espBox = Instance.new("BillboardGui")
+    espBox.Name = "ESPBox_" .. player.Name
+    espBox.Size = UDim2.new(0, 100, 0, 150)
+    espBox.StudsOffset = Vector3.new(0, 2, 0)
+    espBox.AlwaysOnTop = true
+    espBox.Adornee = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundColor3 = VIZIJA_COLOR
+    frame.BackgroundTransparency = 0.7
+    frame.BorderSizePixel = 2
+    frame.BorderColor3 = VIZIJA_COLOR
+    frame.Parent = espBox
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = frame
+    
+    -- Name tag
+    local nameTag = Instance.new("TextLabel")
+    nameTag.Size = UDim2.new(1, 0, 0, 20)
+    nameTag.Position = UDim2.new(0, 0, 0, -25)
+    nameTag.BackgroundTransparency = 1
+    nameTag.Text = player.Name
+    nameTag.TextColor3 = VIZIJA_COLOR
+    nameTag.TextScaled = true
+    nameTag.Font = Enum.Font.GothamBold
+    nameTag.Parent = espBox
+    
+    espBox.Parent = Camera
+    vizijaBoxes[player] = espBox
+end
+
+local function removeESPBox(player)
+    if vizijaBoxes[player] then
+        vizijaBoxes[player]:Destroy()
+        vizijaBoxes[player] = nil
     end
-    
-    -- Ako oba nemaju tim, smatraju se neprijateljima (FFA)
-    return true
 end
 
-local function getChar(plr)
-    return plr.Character
-end
-
--- Dodaj krozZid funkciju
-local function krozZid(origin, direction, ignoreList)
-    local raycastParams = RaycastParams.new()
-    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-    raycastParams.FilterDescendantsInstances = ignoreList
-    
-    local result = workspace:Raycast(origin, direction, raycastParams)
-    if result then
-        local hitPart = result.Instance
-        local hitPlayer = Players:GetPlayerFromCharacter(hitPart.Parent)
-        if hitPlayer and hitPlayer ~= Players.LocalPlayer then
-            return hitPlayer.Character
+-- Player management
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        if VIZIJA_ENABLED and isEnemy(player) then
+            createESPBox(player)
         end
-    end
-    return nil
-end
+    end)
+end)
 
-local function get2DBox(char)
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    local head = char:FindFirstChild("Head")
-    local torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
-    local minY, maxY = hrp.Position.Y, hrp.Position.Y
-    if head then
-        minY = math.min(minY, head.Position.Y)
-        maxY = math.max(maxY, head.Position.Y)
-    end
-    if torso then
-        minY = math.min(minY, torso.Position.Y)
-        maxY = math.max(maxY, torso.Position.Y)
-    end
-    local pos, onscreen = Camera:WorldToViewportPoint(hrp.Position)
-    if not onscreen then return end
-    local w = 3.5 * 2
-    local h = (maxY - minY + 2.5) * 10
-    return pos.X - w/2, pos.Y - h/2, w, h
-end
+Players.PlayerRemoving:Connect(function(player)
+    removeESPBox(player)
+end)
 
-local function createBox()
-    local boxName = "Box_"..randStr(4)
-    local box = Drawing and Drawing.new and Drawing.new("Square")
-    if box then
-        box.Thickness = 2
-        box.Filled = false
-        box.Visible = false
-        box.Transparency = 1
-        box.ZIndex = 2
-        box.Name = boxName
+-- ESP Loop
+RunService.Heartbeat:Connect(function()
+    if not VIZIJA_ENABLED then
+        -- Remove all ESP boxes when disabled
+        for player, espBox in pairs(vizijaBoxes) do
+            espBox:Destroy()
+        end
+        vizijaBoxes = {}
+        return
     end
-    return box
-end
-
--- Force render loop (uvijek renderuj igrače)
-RunService.RenderStepped:Connect(function()
-    if FORCE_RENDER then
-        for _,plr in pairs(Players:GetPlayers()) do
-            if plr ~= Players.LocalPlayer and getChar(plr) then
-                local char = getChar(plr)
-                -- Forsiraj renderovanje karaktera
-                pcall(function()
-                    char.Parent = workspace
-                    for _,part in pairs(char:GetDescendants()) do
-                        if part:IsA("BasePart") then
-                            part.Material = Enum.Material.Plastic
-                            part.CanCollide = false
+    
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= Players.LocalPlayer and player.Character and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 and player.Character:FindFirstChild("HumanoidRootPart") then
+            if isEnemy(player) then
+                if not vizijaBoxes[player] then
+                    createESPBox(player)
+                end
+                
+                -- Update ESP box position and visibility
+                local espBox = vizijaBoxes[player]
+                if espBox and espBox.Adornee then
+                    local rootPart = player.Character.HumanoidRootPart
+                    local distance = (rootPart.Position - Camera.CFrame.Position).Magnitude
+                    
+                    if distance < 1000 then -- Only show ESP within 1000 studs
+                        espBox.Enabled = true
+                        espBox.Adornee = rootPart
+                        
+                        -- Update color
+                        local frame = espBox:FindFirstChild("Frame")
+                        local nameTag = espBox:FindFirstChild("TextLabel")
+                        if frame then
+                            frame.BackgroundColor3 = VIZIJA_COLOR
+                            frame.BorderColor3 = VIZIJA_COLOR
                         end
+                        if nameTag then
+                            nameTag.TextColor3 = VIZIJA_COLOR
+                        end
+                    else
+                        espBox.Enabled = false
                     end
-                end)
+                end
+            else
+                removeESPBox(player)
             end
+        else
+            removeESPBox(player)
         end
     end
 end)
 
--- U virtualnom hitboxu koristi maksimalnu vrijednost
-local function isInVirtualHitbox(targetPart, fov)
-    local screenPos, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
-    if not onScreen then return false end
-    local mousePos = UserInputService:GetMouseLocation()
-    local dist = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
-    return dist <= fov
-end
-
--- Ograniči maksimalni FOV za fizički hitbox
-local MAX_HITBOX_FOV = 200
-
--- FOV efekt loop
--- (ukloni RunService.RenderStepped loop za FOV)
-
--- ESP, Hitbox, Nametag gameplay loop
-RunService.RenderStepped:Connect(function()
-    -- ESP kutije
-    if VIZIJA_ENABLED then
-        for _,v in pairs(vizijaBoxes) do v.Visible = false end
-        for _,plr in pairs(Players:GetPlayers()) do
-            if plr ~= Players.LocalPlayer and getChar(plr) then
-                if not VIZIJA_ENEMY_ONLY or isEnemy(plr) then
-                    local char = getChar(plr)
-                    local box = vizijaBoxes[plr] or createBox()
-                    vizijaBoxes[plr] = box
-                    local x, y, w, h = get2DBox(char)
-                    if x and y and w and h then
-                        box.Position = Vector2.new(x, y)
-                        box.Size = Vector2.new(w, h)
-                        box.Color = VIZIJA_COLOR
-                        box.Visible = true
-                    else
-                        box.Visible = false
-                    end
-                end
-            end
-        end
-    else
-        for _,v in pairs(vizijaBoxes) do v.Visible = false end
+-- Hitbox functionality
+RunService.Heartbeat:Connect(function()
+    if not META_HEAD then return end
+    
+    local closestPlayer = getClosestPlayer()
+    if not closestPlayer or not closestPlayer.Character then return end
+    
+    local head = closestPlayer.Character:FindFirstChild("Head")
+    if not head then return end
+    
+    -- Expand head hitbox
+    local originalSize = head.Size
+    head.Size = Vector3.new(META_FOV, META_FOV, META_FOV)
+    
+    -- Visual indicator (optional)
+    if head:FindFirstChild("HitboxIndicator") then
+        head.HitboxIndicator:Destroy()
     end
     
-    -- Nametag
-    for _,plr in pairs(Players:GetPlayers()) do
-        if plr ~= Players.LocalPlayer and getChar(plr) then
-            local char = getChar(plr)
-            local head = char:FindFirstChild("Head")
-            if head then
-                if NAMETAG_ENABLED then
-                    if not head:FindFirstChild("AlestoNametag") then
-                        local tag = Instance.new("BillboardGui")
-                        tag.Name = "AlestoNametag"
-                        tag.Adornee = head
-                        tag.Size = UDim2.new(0,100,0,40)
-                        tag.StudsOffset = Vector3.new(0,1.5,0)
-                        tag.AlwaysOnTop = true
-                        local label = Instance.new("TextLabel", tag)
-                        label.Size = UDim2.new(1,0,1,0)
-                        label.BackgroundTransparency = 1
-                        label.Text = plr.Name
-                        label.TextColor3 = Config.Colors.Accent
-                        label.TextScaled = true
-                        label.Font = Enum.Font.GothamBold
-                        tag.Parent = head
-                    else
-                        local tag = head:FindFirstChild("AlestoNametag")
-                        tag.Size = UDim2.new(0,100*NAMETAG_SCALE,0,40*NAMETAG_SCALE)
-                        tag.Enabled = true
-                    end
-                else
-                    if head:FindFirstChild("AlestoNametag") then
-                        head.AlestoNametag.Enabled = false
-                    end
-                end
-            end
-        end
-    end
+    local indicator = Instance.new("Part")
+    indicator.Name = "HitboxIndicator"
+    indicator.Size = Vector3.new(META_FOV, META_FOV, META_FOV)
+    indicator.Position = head.Position
+    indicator.Anchored = true
+    indicator.CanCollide = false
+    indicator.Transparency = 0.8
+    indicator.Color = HITBOX_HEAD_COLOR
+    indicator.Material = Enum.Material.Neon
+    indicator.Parent = head
     
-    -- Hitbox - samo kad su uključeni
-    for _,plr in pairs(Players:GetPlayers()) do
-        if plr ~= Players.LocalPlayer and getChar(plr) then
-            local char = getChar(plr)
-            
-            -- Hitbox za glavu
-            if char:FindFirstChild("Head") then
-                if META_HEAD then
-                    char.Head.Size = Vector3.new(META_FOV/10, META_FOV/10, META_FOV/10)
-                    char.Head.Color = HITBOX_HEAD_COLOR
-                    char.Head.Material = Enum.Material.Neon
-                else
-                    char.Head.Size = Vector3.new(2,1,1)
-                    char.Head.Color = Color3.fromRGB(255,255,255)
-                    char.Head.Material = Enum.Material.Plastic
-                end
-            end
-            
-            -- Hitbox za tijelo
-            local torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
-            if torso then
-                if META_TORSO then
-                    torso.Size = Vector3.new(META_FOV/10, META_FOV/10, META_FOV/10)
-                    torso.Color = HITBOX_HEAD_COLOR
-                    torso.Material = Enum.Material.Neon
-                else
-                    torso.Size = Vector3.new(2,2,1)
-                    torso.Color = Color3.fromRGB(255,255,255)
-                    torso.Material = Enum.Material.Plastic
-                end
-            end
-        end
-    end
+    -- Clean up after a short time
+    game:GetService("Debris"):AddItem(indicator, 0.1)
+end)
+
+-- No clip functionality
+RunService.Heartbeat:Connect(function()
+    local player = Players.LocalPlayer
+    if not player or not player.Character then return end
     
-    -- Infinite Jump
-    if INFINITE_JUMP_ENABLED then
-        local player = Players.LocalPlayer
-        local character = player.Character
-        if character and character:FindFirstChild("Humanoid") then
-            local humanoid = character.Humanoid
-            -- Omogući infinite jump
-            humanoid.JumpPower = 50
+    local humanoid = player.Character:FindFirstChild("Humanoid")
+    local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
+    
+    if not humanoid or not rootPart then return end
+    
+    -- No clip implementation
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("BasePart") and part ~= rootPart then
+            part.CanCollide = false
         end
     end
-end) 
+end)
+
+-- Infinite jump functionality
+UserInputService.JumpRequest:Connect(function()
+    local player = Players.LocalPlayer
+    if not player or not player.Character then return end
+    
+    local humanoid = player.Character:FindFirstChild("Humanoid")
+    if not humanoid then return end
+    
+    -- Infinite jump implementation
+    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+end)
+
+-- FOV circle (optional)
+local FOVCircle = Instance.new("Part")
+FOVCircle.Name = "FOVCircle"
+FOVCircle.Shape = Enum.PartType.Cylinder
+FOVCircle.Size = Vector3.new(0.1, currentFOV * 2, currentFOV * 2)
+FOVCircle.Position = Camera.CFrame.Position
+FOVCircle.Anchored = true
+FOVCircle.CanCollide = false
+FOVCircle.Transparency = 0.8
+FOVCircle.Color = Color3.fromRGB(255, 255, 255)
+FOVCircle.Material = Enum.Material.Neon
+FOVCircle.Parent = workspace
+
+-- Update FOV circle
+RunService.Heartbeat:Connect(function()
+    if FOVCircle then
+        FOVCircle.Position = Camera.CFrame.Position
+        FOVCircle.Size = Vector3.new(0.1, currentFOV * 2, currentFOV * 2)
+    end
+end)
+
+-- Cleanup on script end
+game:BindToClose(function()
+    for _, espBox in pairs(vizijaBoxes) do
+        espBox:Destroy()
+    end
+    if FOVCircle then
+        FOVCircle:Destroy()
+    end
+end)
+
+print("Alesto Script loaded successfully!") 
