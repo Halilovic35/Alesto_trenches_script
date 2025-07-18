@@ -148,6 +148,32 @@ CloseBtn.TextColor3 = Config.Colors.Text
 CloseBtn.TextScaled = true
 CloseBtn.Font = Enum.Font.GothamBold
 
+-- Minimize/Maximize functionality
+MinimizeBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    
+    if isMinimized then
+        -- Minimize
+        TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = Config.MinimizedSize,
+            Position = Config.MinimizedPosition
+        }):Play()
+        MinimizeBtn.Text = "+"
+    else
+        -- Maximize
+        TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 600, 0, 750),
+            Position = Config.MenuPosition
+        }):Play()
+        MinimizeBtn.Text = "-"
+    end
+end)
+
+-- Close functionality
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
 -- Tabs
 local TabsFrame = Instance.new("Frame", MainFrame)
 TabsFrame.Size = UDim2.new(1, 0, 0, 48)
@@ -1540,12 +1566,11 @@ VizijaEnabledToggle.MouseButton1Click:Connect(function()
     toggleSwitch(VizijaEnabledToggle, VizijaEnabledToggleKnob, function(enabled) VIZIJA_ENABLED = enabled end)
 end)
 
--- Right Shift to toggle all
+-- Right Shift to toggle GUI visibility
 UserInputService.InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.RightShift then
-        for toggle, data in pairs(toggleStates) do
-            toggleSwitch(toggle, data.knob, data.callback)
-        end
+        isMenuOpen = not isMenuOpen
+        MainFrame.Visible = isMenuOpen
     end
 end)
 
