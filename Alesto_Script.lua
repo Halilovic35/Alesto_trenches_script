@@ -54,7 +54,7 @@ Config.Colors = {
 }
 
 -- Add missing config variables
-Config.MenuPosition = UDim2.new(0.5, -185, 0.5, -300)
+Config.MenuPosition = UDim2.new(0.5, -225, 0.5, -350)
 Config.MenuKey = Enum.KeyCode.RightShift
 Config.MinimizedSize = UDim2.new(0, 50, 0, 50)
 Config.MinimizedPosition = UDim2.new(0, 10, 0, 10)
@@ -99,7 +99,7 @@ print("GUI parentan")
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = frameName
-MainFrame.Size = UDim2.new(0, 370, 0, 600)
+MainFrame.Size = UDim2.new(0, 450, 0, 700)
 MainFrame.Position = Config.MenuPosition
 MainFrame.BackgroundColor3 = Config.Colors.Primary
 MainFrame.BorderSizePixel = 0
@@ -218,12 +218,34 @@ local VizijaSectionCorner = Instance.new("UICorner", VizijaSection)
 VizijaSectionCorner.CornerRadius = UDim.new(0, 16)
 VizijaSection.Visible = false
 
--- Tab switching with animations
+-- Tab switching with animations and hover effects
+local function addTabHoverEffects(tab)
+    tab.MouseEnter:Connect(function()
+        if tab.BackgroundColor3 ~= Config.Colors.Accent then
+            TweenService:Create(tab, TweenInfo.new(0.2), {
+                BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+            }):Play()
+        end
+    end)
+    
+    tab.MouseLeave:Connect(function()
+        if tab.BackgroundColor3 ~= Config.Colors.Accent then
+            TweenService:Create(tab, TweenInfo.new(0.2), {
+                BackgroundColor3 = Config.Colors.Secondary
+            }):Play()
+        end
+    end)
+end
+
+addTabHoverEffects(InfoTab)
+addTabHoverEffects(CombatTab)
+addTabHoverEffects(VizijaTab)
+
 InfoTab.MouseButton1Click:Connect(function()
-    -- Animate tab colors
-    TweenService:Create(InfoTab, TweenInfo.new(0.2), {BackgroundColor3 = Config.Colors.Accent}):Play()
-    TweenService:Create(CombatTab, TweenInfo.new(0.2), {BackgroundColor3 = Config.Colors.Secondary}):Play()
-    TweenService:Create(VizijaTab, TweenInfo.new(0.2), {BackgroundColor3 = Config.Colors.Secondary}):Play()
+    -- Animate tab colors with bounce effect
+    TweenService:Create(InfoTab, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Config.Colors.Accent}):Play()
+    TweenService:Create(CombatTab, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Config.Colors.Secondary}):Play()
+    TweenService:Create(VizijaTab, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Config.Colors.Secondary}):Play()
     
     InfoSection.Visible = true
     CombatSection.Visible = false
@@ -276,7 +298,7 @@ InfoText.TextYAlignment = Enum.TextYAlignment.Top
 -- Combat Section Content
 -- Povećaj Glavudju Section
 local HeadHitboxSection = Instance.new("Frame", CombatSection)
-HeadHitboxSection.Size = UDim2.new(1, -32, 0, 120)
+HeadHitboxSection.Size = UDim2.new(1, -32, 0, 140)
 HeadHitboxSection.Position = UDim2.new(0, 16, 0, 16)
 HeadHitboxSection.BackgroundColor3 = Config.Colors.Primary
 HeadHitboxSection.BorderSizePixel = 0
@@ -312,7 +334,7 @@ HeadHitboxToggleKnobCorner.CornerRadius = UDim.new(0, 10)
 -- Head FOV Value
 local HeadFOVLabel = Instance.new("TextLabel", HeadHitboxSection)
 HeadFOVLabel.Size = UDim2.new(1, 0, 0, 20)
-HeadFOVLabel.Position = UDim2.new(0, 16, 0, 40)
+HeadFOVLabel.Position = UDim2.new(0, 16, 0, 45)
 HeadFOVLabel.BackgroundTransparency = 1
 HeadFOVLabel.Text = "FOV Glavudje"
 HeadFOVLabel.TextColor3 = Config.Colors.Text
@@ -322,7 +344,7 @@ HeadFOVLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 local HeadFOVBox = Instance.new("TextBox", HeadHitboxSection)
 HeadFOVBox.Size = UDim2.new(0, 60, 0, 25)
-HeadFOVBox.Position = UDim2.new(1, -76, 0, 40)
+HeadFOVBox.Position = UDim2.new(1, -76, 0, 45)
 HeadFOVBox.BackgroundColor3 = Config.Colors.Secondary
 HeadFOVBox.Text = tostring(META_HEAD_FOV)
 HeadFOVBox.TextColor3 = Config.Colors.Text
@@ -334,7 +356,7 @@ HeadFOVBoxCorner.CornerRadius = UDim.new(0, 8)
 -- Head Color Section
 local HeadColorLabel = Instance.new("TextLabel", HeadHitboxSection)
 HeadColorLabel.Size = UDim2.new(1, 0, 0, 20)
-HeadColorLabel.Position = UDim2.new(0, 16, 0, 70)
+HeadColorLabel.Position = UDim2.new(0, 16, 0, 80)
 HeadColorLabel.BackgroundTransparency = 1
 HeadColorLabel.Text = "Boja Glavudje"
 HeadColorLabel.TextColor3 = Config.Colors.Text
@@ -345,7 +367,7 @@ HeadColorLabel.TextXAlignment = Enum.TextXAlignment.Left
 -- Head RGB Inputs
 local HeadRInput = Instance.new("TextBox", HeadHitboxSection)
 HeadRInput.Size = UDim2.new(0, 40, 0, 20)
-HeadRInput.Position = UDim2.new(1, -140, 0, 70)
+HeadRInput.Position = UDim2.new(1, -140, 0, 80)
 HeadRInput.BackgroundColor3 = Config.Colors.Secondary
 HeadRInput.Text = "255"
 HeadRInput.TextColor3 = Config.Colors.Text
@@ -356,7 +378,7 @@ HeadRInputCorner.CornerRadius = UDim.new(0, 6)
 
 local HeadGInput = Instance.new("TextBox", HeadHitboxSection)
 HeadGInput.Size = UDim2.new(0, 40, 0, 20)
-HeadGInput.Position = UDim2.new(1, -95, 0, 70)
+HeadGInput.Position = UDim2.new(1, -95, 0, 80)
 HeadGInput.BackgroundColor3 = Config.Colors.Secondary
 HeadGInput.Text = "0"
 HeadGInput.TextColor3 = Config.Colors.Text
@@ -367,7 +389,7 @@ HeadGInputCorner.CornerRadius = UDim.new(0, 6)
 
 local HeadBInput = Instance.new("TextBox", HeadHitboxSection)
 HeadBInput.Size = UDim2.new(0, 40, 0, 20)
-HeadBInput.Position = UDim2.new(1, -50, 0, 70)
+HeadBInput.Position = UDim2.new(1, -50, 0, 80)
 HeadBInput.BackgroundColor3 = Config.Colors.Secondary
 HeadBInput.Text = "0"
 HeadBInput.TextColor3 = Config.Colors.Text
@@ -379,15 +401,15 @@ HeadBInputCorner.CornerRadius = UDim.new(0, 6)
 -- Head Color Picker
 local HeadColorPicker = Instance.new("Frame", HeadHitboxSection)
 HeadColorPicker.Size = UDim2.new(0, 60, 0, 60)
-HeadColorPicker.Position = UDim2.new(1, -76, 0, 95)
+HeadColorPicker.Position = UDim2.new(1, -76, 0, 105)
 HeadColorPicker.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 local HeadColorPickerCorner = Instance.new("UICorner", HeadColorPicker)
 HeadColorPickerCorner.CornerRadius = UDim.new(0, 8)
 
 -- Povećaj Tijelo Section
 local BodyHitboxSection = Instance.new("Frame", CombatSection)
-BodyHitboxSection.Size = UDim2.new(1, -32, 0, 120)
-BodyHitboxSection.Position = UDim2.new(0, 16, 0, 150)
+BodyHitboxSection.Size = UDim2.new(1, -32, 0, 140)
+BodyHitboxSection.Position = UDim2.new(0, 16, 0, 170)
 BodyHitboxSection.BackgroundColor3 = Config.Colors.Primary
 BodyHitboxSection.BorderSizePixel = 0
 local BodyHitboxSectionCorner = Instance.new("UICorner", BodyHitboxSection)
@@ -496,8 +518,8 @@ BodyColorPickerCorner.CornerRadius = UDim.new(0, 8)
 
 -- Local Section
 local LocalSection = Instance.new("Frame", CombatSection)
-LocalSection.Size = UDim2.new(1, -32, 0, 120)
-LocalSection.Position = UDim2.new(0, 16, 0, 284)
+LocalSection.Size = UDim2.new(1, -32, 0, 140)
+LocalSection.Position = UDim2.new(0, 16, 0, 330)
 LocalSection.BackgroundColor3 = Config.Colors.Primary
 LocalSection.BorderSizePixel = 0
 local LocalSectionCorner = Instance.new("UICorner", LocalSection)
@@ -696,9 +718,27 @@ ESPColorPicker.BackgroundColor3 = Color3.fromRGB(255, 20, 147)
 local ESPColorPickerCorner = Instance.new("UICorner", ESPColorPicker)
 ESPColorPickerCorner.CornerRadius = UDim.new(0, 8)
 
--- Toggle functionality with animations
+-- Toggle functionality with animations and hover effects
 local function createToggle(toggle, knob, callback)
     local isOn = false
+    local originalColor = toggle.BackgroundColor3
+    
+    -- Hover animations
+    toggle.MouseEnter:Connect(function()
+        if not isOn then
+            TweenService:Create(toggle, TweenInfo.new(0.2), {
+                BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+            }):Play()
+        end
+    end)
+    
+    toggle.MouseLeave:Connect(function()
+        if not isOn then
+            TweenService:Create(toggle, TweenInfo.new(0.2), {
+                BackgroundColor3 = originalColor
+            }):Play()
+        end
+    end)
     
     toggle.MouseButton1Click:Connect(function()
         isOn = not isOn
@@ -706,17 +746,29 @@ local function createToggle(toggle, knob, callback)
         local targetColor = isOn and Config.Colors.Accent or Config.Colors.ToggleOff
         local targetPosition = isOn and UDim2.new(1, -23, 0, 2) or UDim2.new(0, 2, 0, 2)
         
-        -- Animate toggle background
-        local colorTween = TweenService:Create(toggle, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        -- Animate toggle background with bounce effect
+        local colorTween = TweenService:Create(toggle, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
             BackgroundColor3 = targetColor
         })
         colorTween:Play()
         
-        -- Animate knob position
-        local positionTween = TweenService:Create(knob, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        -- Animate knob position with bounce effect
+        local positionTween = TweenService:Create(knob, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
             Position = targetPosition
         })
         positionTween:Play()
+        
+        -- Scale animation for feedback
+        local scaleTween = TweenService:Create(toggle, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 52, 0, 27)
+        })
+        scaleTween:Play()
+        
+        scaleTween.Completed:Connect(function()
+            TweenService:Create(toggle, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Size = UDim2.new(0, 50, 0, 25)
+            }):Play()
+        end)
         
         if callback then
             callback(isOn)
@@ -755,6 +807,35 @@ local vizijaEnabled = createToggle(VizijaEnabledToggle, VizijaEnabledToggleKnob,
     VIZIJA_ENABLED = enabled
 end)
 
+-- Add hover effects to input boxes
+local function addInputHoverEffects(input)
+    local originalColor = input.BackgroundColor3
+    
+    input.MouseEnter:Connect(function()
+        TweenService:Create(input, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+        }):Play()
+    end)
+    
+    input.MouseLeave:Connect(function()
+        TweenService:Create(input, TweenInfo.new(0.2), {
+            BackgroundColor3 = originalColor
+        }):Play()
+    end)
+    
+    input.Focused:Connect(function()
+        TweenService:Create(input, TweenInfo.new(0.2), {
+            BackgroundColor3 = Config.Colors.Accent
+        }):Play()
+    end)
+    
+    input.FocusLost:Connect(function()
+        TweenService:Create(input, TweenInfo.new(0.2), {
+            BackgroundColor3 = originalColor
+        }):Play()
+    end)
+end
+
 -- Head FOV input handling
 HeadFOVBox.FocusLost:Connect(function()
     local value = tonumber(HeadFOVBox.Text)
@@ -764,6 +845,19 @@ HeadFOVBox.FocusLost:Connect(function()
         HeadFOVBox.Text = tostring(META_HEAD_FOV)
     end
 end)
+
+-- Add hover effects to all input boxes
+addInputHoverEffects(HeadFOVBox)
+addInputHoverEffects(BodyFOVBox)
+addInputHoverEffects(HeadRInput)
+addInputHoverEffects(HeadGInput)
+addInputHoverEffects(HeadBInput)
+addInputHoverEffects(BodyRInput)
+addInputHoverEffects(BodyGInput)
+addInputHoverEffects(BodyBInput)
+addInputHoverEffects(ESPRInput)
+addInputHoverEffects(ESPGInput)
+addInputHoverEffects(ESPBInput)
 
 -- Body FOV input handling
 BodyFOVBox.FocusLost:Connect(function()
@@ -832,15 +926,29 @@ ESPRInput.FocusLost:Connect(updateESPColor)
 ESPGInput.FocusLost:Connect(updateESPColor)
 ESPBInput.FocusLost:Connect(updateESPColor)
 
--- Minimize functionality
+-- Minimize functionality with animations
 MinimizeBtn.MouseButton1Click:Connect(function()
     if isMinimized then
-        MainFrame.Size = UDim2.new(0, 370, 0, 600)
-        MainFrame.Position = Config.MenuPosition
+        -- Animate back to full size
+        local sizeTween = TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 450, 0, 700)
+        })
+        local positionTween = TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Position = Config.MenuPosition
+        })
+        sizeTween:Play()
+        positionTween:Play()
         isMinimized = false
     else
-        MainFrame.Size = Config.MinimizedSize
-        MainFrame.Position = Config.MinimizedPosition
+        -- Animate to minimized
+        local sizeTween = TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = Config.MinimizedSize
+        })
+        local positionTween = TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Position = Config.MinimizedPosition
+        })
+        sizeTween:Play()
+        positionTween:Play()
         isMinimized = true
     end
 end)
