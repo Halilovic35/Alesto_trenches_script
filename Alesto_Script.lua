@@ -54,7 +54,7 @@ Config.Colors = {
 }
 
 -- Add missing config variables
-Config.MenuPosition = UDim2.new(0.5, -225, 0.5, -350)
+Config.MenuPosition = UDim2.new(0.5, -275, 0.5, -400)
 Config.MenuKey = Enum.KeyCode.RightShift
 Config.MinimizedSize = UDim2.new(0, 50, 0, 50)
 Config.MinimizedPosition = UDim2.new(0, 10, 0, 10)
@@ -99,7 +99,9 @@ print("GUI parentan")
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = frameName
-MainFrame.Size = UDim2.new(0, 450, 0, 700)
+-- MainFrame size - duplo veći
+MainFrame.Size = UDim2.new(0, 900, 0, 1400)
+Config.MenuPosition = UDim2.new(0.5, -450, 0.5, -700)
 MainFrame.Position = Config.MenuPosition
 MainFrame.BackgroundColor3 = Config.Colors.Primary
 MainFrame.BorderSizePixel = 0
@@ -155,20 +157,9 @@ TabsFrame.BorderSizePixel = 0
 local TabsCorner = Instance.new("UICorner", TabsFrame)
 TabsCorner.CornerRadius = UDim.new(0, 16)
 
-local InfoTab = Instance.new("TextButton", TabsFrame)
-InfoTab.Size = UDim2.new(0.33, -2, 1, 0)
-InfoTab.Position = UDim2.new(0, 0, 0, 0)
-InfoTab.BackgroundColor3 = Config.Colors.Secondary
-InfoTab.Text = "Info"
-InfoTab.TextColor3 = Config.Colors.Text
-InfoTab.TextScaled = true
-InfoTab.Font = Enum.Font.GothamBold
-local InfoTabCorner = Instance.new("UICorner", InfoTab)
-InfoTabCorner.CornerRadius = UDim.new(0, 12)
-
 local CombatTab = Instance.new("TextButton", TabsFrame)
-CombatTab.Size = UDim2.new(0.33, -2, 1, 0)
-CombatTab.Position = UDim2.new(0.33, 2, 0, 0)
+CombatTab.Size = UDim2.new(0.5, -2, 1, 0)
+CombatTab.Position = UDim2.new(0, 0, 0, 0)
 CombatTab.BackgroundColor3 = Config.Colors.Accent
 CombatTab.Text = "Combat"
 CombatTab.TextColor3 = Config.Colors.Text
@@ -178,8 +169,8 @@ local CombatTabCorner = Instance.new("UICorner", CombatTab)
 CombatTabCorner.CornerRadius = UDim.new(0, 12)
 
 local VizijaTab = Instance.new("TextButton", TabsFrame)
-VizijaTab.Size = UDim2.new(0.33, -2, 1, 0)
-VizijaTab.Position = UDim2.new(0.66, 4, 0, 0)
+VizijaTab.Size = UDim2.new(0.5, -2, 1, 0)
+VizijaTab.Position = UDim2.new(0.5, 2, 0, 0)
 VizijaTab.BackgroundColor3 = Config.Colors.Secondary
 VizijaTab.Text = "Vizija"
 VizijaTab.TextColor3 = Config.Colors.Text
@@ -189,20 +180,12 @@ local VizijaTabCorner = Instance.new("UICorner", VizijaTab)
 VizijaTabCorner.CornerRadius = UDim.new(0, 12)
 
 -- Content Sections
-local InfoSection = Instance.new("Frame", MainFrame)
-InfoSection.Name = "InfoSection"
-InfoSection.Size = UDim2.new(1, -32, 1, -120)
-InfoSection.Position = UDim2.new(0, 16, 0, 100)
-InfoSection.BackgroundColor3 = Config.Colors.Section
-InfoSection.BorderSizePixel = 0
-local InfoSectionCorner = Instance.new("UICorner", InfoSection)
-InfoSectionCorner.CornerRadius = UDim.new(0, 16)
-InfoSection.Visible = false
 
 local CombatSection = Instance.new("Frame", MainFrame)
 CombatSection.Name = "CombatSection"
-CombatSection.Size = UDim2.new(1, -32, 1, -120)
-CombatSection.Position = UDim2.new(0, 16, 0, 100)
+-- CombatSection i VizijaSection size - proporcionalno veći
+CombatSection.Size = UDim2.new(1, -64, 1, -240)
+CombatSection.Position = UDim2.new(0, 32, 0, 160)
 CombatSection.BackgroundColor3 = Config.Colors.Section
 CombatSection.BorderSizePixel = 0
 local CombatSectionCorner = Instance.new("UICorner", CombatSection)
@@ -210,8 +193,9 @@ CombatSectionCorner.CornerRadius = UDim.new(0, 16)
 
 local VizijaSection = Instance.new("Frame", MainFrame)
 VizijaSection.Name = "VizijaSection"
-VizijaSection.Size = UDim2.new(1, -32, 1, -120)
-VizijaSection.Position = UDim2.new(0, 16, 0, 100)
+-- CombatSection i VizijaSection size - proporcionalno veći
+VizijaSection.Size = UDim2.new(1, -64, 1, -240)
+VizijaSection.Position = UDim2.new(0, 32, 0, 160)
 VizijaSection.BackgroundColor3 = Config.Colors.Section
 VizijaSection.BorderSizePixel = 0
 local VizijaSectionCorner = Instance.new("UICorner", VizijaSection)
@@ -237,69 +221,34 @@ local function addTabHoverEffects(tab)
     end)
 end
 
-addTabHoverEffects(InfoTab)
 addTabHoverEffects(CombatTab)
 addTabHoverEffects(VizijaTab)
 
-InfoTab.MouseButton1Click:Connect(function()
+CombatTab.MouseButton1Click:Connect(function()
     -- Animate tab colors with bounce effect
-    TweenService:Create(InfoTab, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Config.Colors.Accent}):Play()
-    TweenService:Create(CombatTab, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Config.Colors.Secondary}):Play()
+    TweenService:Create(CombatTab, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Config.Colors.Accent}):Play()
     TweenService:Create(VizijaTab, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Config.Colors.Secondary}):Play()
     
-    InfoSection.Visible = true
-    CombatSection.Visible = false
-    VizijaSection.Visible = false
-end)
-
-CombatTab.MouseButton1Click:Connect(function()
-    -- Animate tab colors
-    TweenService:Create(InfoTab, TweenInfo.new(0.2), {BackgroundColor3 = Config.Colors.Secondary}):Play()
-    TweenService:Create(CombatTab, TweenInfo.new(0.2), {BackgroundColor3 = Config.Colors.Accent}):Play()
-    TweenService:Create(VizijaTab, TweenInfo.new(0.2), {BackgroundColor3 = Config.Colors.Secondary}):Play()
-    
-    InfoSection.Visible = false
     CombatSection.Visible = true
     VizijaSection.Visible = false
 end)
 
 VizijaTab.MouseButton1Click:Connect(function()
-    -- Animate tab colors
-    TweenService:Create(InfoTab, TweenInfo.new(0.2), {BackgroundColor3 = Config.Colors.Secondary}):Play()
-    TweenService:Create(CombatTab, TweenInfo.new(0.2), {BackgroundColor3 = Config.Colors.Secondary}):Play()
-    TweenService:Create(VizijaTab, TweenInfo.new(0.2), {BackgroundColor3 = Config.Colors.Accent}):Play()
+    -- Animate tab colors with bounce effect
+    TweenService:Create(CombatTab, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Config.Colors.Secondary}):Play()
+    TweenService:Create(VizijaTab, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Config.Colors.Accent}):Play()
     
-    InfoSection.Visible = false
     CombatSection.Visible = false
     VizijaSection.Visible = true
 end)
 
--- Info Section Content
-local InfoTitle = Instance.new("TextLabel", InfoSection)
-InfoTitle.Size = UDim2.new(1, 0, 0, 40)
-InfoTitle.Position = UDim2.new(0, 16, 0, 16)
-InfoTitle.BackgroundTransparency = 1
-InfoTitle.Text = "Script Information"
-InfoTitle.TextColor3 = Config.Colors.Text
-InfoTitle.TextScaled = true
-InfoTitle.Font = Enum.Font.GothamBold
 
-local InfoText = Instance.new("TextLabel", InfoSection)
-InfoText.Size = UDim2.new(1, -32, 1, -80)
-InfoText.Position = UDim2.new(0, 16, 0, 60)
-InfoText.BackgroundTransparency = 1
-InfoText.Text = "Alesto Panel Script\n\nFeatures:\n• Povećaj Glavudju/Tijelo\n• Vizija (ESP)\n• Imena & Krozzid\n• No Clip & Inf Jump\n• Modern UI\n\nPress Right Shift to toggle"
-InfoText.TextColor3 = Config.Colors.Text
-InfoText.TextScaled = true
-InfoText.Font = Enum.Font.Gotham
-InfoText.TextXAlignment = Enum.TextXAlignment.Left
-InfoText.TextYAlignment = Enum.TextYAlignment.Top
 
 -- Combat Section Content
 -- Povećaj Glavudju Section
 local HeadHitboxSection = Instance.new("Frame", CombatSection)
-HeadHitboxSection.Size = UDim2.new(1, -32, 0, 140)
-HeadHitboxSection.Position = UDim2.new(0, 16, 0, 16)
+HeadHitboxSection.Size = UDim2.new(1, -64, 0, 280)
+HeadHitboxSection.Position = UDim2.new(0, 32, 0, 32)
 HeadHitboxSection.BackgroundColor3 = Config.Colors.Primary
 HeadHitboxSection.BorderSizePixel = 0
 local HeadHitboxSectionCorner = Instance.new("UICorner", HeadHitboxSection)
@@ -400,16 +349,16 @@ HeadBInputCorner.CornerRadius = UDim.new(0, 6)
 
 -- Head Color Picker
 local HeadColorPicker = Instance.new("Frame", HeadHitboxSection)
-HeadColorPicker.Size = UDim2.new(0, 60, 0, 60)
-HeadColorPicker.Position = UDim2.new(1, -76, 0, 105)
+HeadColorPicker.Size = UDim2.new(0, 180, 0, 180)
+HeadColorPicker.Position = UDim2.new(1, -220, 0, 180)
 HeadColorPicker.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 local HeadColorPickerCorner = Instance.new("UICorner", HeadColorPicker)
 HeadColorPickerCorner.CornerRadius = UDim.new(0, 8)
 
 -- Povećaj Tijelo Section
 local BodyHitboxSection = Instance.new("Frame", CombatSection)
-BodyHitboxSection.Size = UDim2.new(1, -32, 0, 140)
-BodyHitboxSection.Position = UDim2.new(0, 16, 0, 170)
+BodyHitboxSection.Size = UDim2.new(1, -64, 0, 280)
+BodyHitboxSection.Position = UDim2.new(0, 32, 0, 328)
 BodyHitboxSection.BackgroundColor3 = Config.Colors.Primary
 BodyHitboxSection.BorderSizePixel = 0
 local BodyHitboxSectionCorner = Instance.new("UICorner", BodyHitboxSection)
@@ -510,8 +459,8 @@ BodyBInputCorner.CornerRadius = UDim.new(0, 6)
 
 -- Body Color Picker
 local BodyColorPicker = Instance.new("Frame", BodyHitboxSection)
-BodyColorPicker.Size = UDim2.new(0, 60, 0, 60)
-BodyColorPicker.Position = UDim2.new(1, -76, 0, 95)
+BodyColorPicker.Size = UDim2.new(0, 180, 0, 180)
+BodyColorPicker.Position = UDim2.new(1, -220, 0, 180)
 BodyColorPicker.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 local BodyColorPickerCorner = Instance.new("UICorner", BodyColorPicker)
 BodyColorPickerCorner.CornerRadius = UDim.new(0, 8)
@@ -535,36 +484,12 @@ LocalLabel.TextScaled = true
 LocalLabel.Font = Enum.Font.GothamBold
 LocalLabel.TextXAlignment = Enum.TextXAlignment.Left
 
--- No Clip Toggle
-local NoClipLabel = Instance.new("TextLabel", LocalSection)
-NoClipLabel.Size = UDim2.new(1, -100, 0, 20)
-NoClipLabel.Position = UDim2.new(0, 16, 0, 40)
-NoClipLabel.BackgroundTransparency = 1
-NoClipLabel.Text = "No clip"
-NoClipLabel.TextColor3 = Config.Colors.Text
-NoClipLabel.TextScaled = true
-NoClipLabel.Font = Enum.Font.Gotham
-NoClipLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-local NoClipToggle = Instance.new("TextButton", LocalSection)
-NoClipToggle.Size = UDim2.new(0, 50, 0, 25)
-NoClipToggle.Position = UDim2.new(1, -66, 0, 40)
-NoClipToggle.BackgroundColor3 = Config.Colors.ToggleOff
-NoClipToggle.Text = ""
-local NoClipToggleCorner = Instance.new("UICorner", NoClipToggle)
-NoClipToggleCorner.CornerRadius = UDim.new(0, 12)
-
-local NoClipToggleKnob = Instance.new("Frame", NoClipToggle)
-NoClipToggleKnob.Size = UDim2.new(0, 21, 0, 21)
-NoClipToggleKnob.Position = UDim2.new(0, 2, 0, 2)
-NoClipToggleKnob.BackgroundColor3 = Config.Colors.Text
-local NoClipToggleKnobCorner = Instance.new("UICorner", NoClipToggleKnob)
-NoClipToggleKnobCorner.CornerRadius = UDim.new(0, 10)
 
 -- Inf Jump Toggle
 local InfJumpLabel = Instance.new("TextLabel", LocalSection)
 InfJumpLabel.Size = UDim2.new(1, -100, 0, 20)
-InfJumpLabel.Position = UDim2.new(0, 16, 0, 70)
+InfJumpLabel.Position = UDim2.new(0, 16, 0, 40)
 InfJumpLabel.BackgroundTransparency = 1
 InfJumpLabel.Text = "Inf jump"
 InfJumpLabel.TextColor3 = Config.Colors.Text
@@ -574,7 +499,7 @@ InfJumpLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 local InfJumpToggle = Instance.new("TextButton", LocalSection)
 InfJumpToggle.Size = UDim2.new(0, 50, 0, 25)
-InfJumpToggle.Position = UDim2.new(1, -66, 0, 70)
+InfJumpToggle.Position = UDim2.new(1, -66, 0, 40)
 InfJumpToggle.BackgroundColor3 = Config.Colors.ToggleOff
 InfJumpToggle.Text = ""
 local InfJumpToggleCorner = Instance.new("UICorner", InfJumpToggle)
@@ -587,10 +512,36 @@ InfJumpToggleKnob.BackgroundColor3 = Config.Colors.Text
 local InfJumpToggleKnobCorner = Instance.new("UICorner", InfJumpToggleKnob)
 InfJumpToggleKnobCorner.CornerRadius = UDim.new(0, 10)
 
--- Imena Toggle
-local ImenaLabel = Instance.new("TextLabel", LocalSection)
-ImenaLabel.Size = UDim2.new(1, -100, 0, 20)
-ImenaLabel.Position = UDim2.new(0, 16, 0, 100)
+-- Krozzid Toggle
+local KrozzidLabel = Instance.new("TextLabel", LocalSection)
+KrozzidLabel.Size = UDim2.new(1, -100, 0, 20)
+KrozzidLabel.Position = UDim2.new(0, 16, 0, 70)
+KrozzidLabel.BackgroundTransparency = 1
+KrozzidLabel.Text = "Krozzid"
+KrozzidLabel.TextColor3 = Config.Colors.Text
+KrozzidLabel.TextScaled = true
+KrozzidLabel.Font = Enum.Font.Gotham
+KrozzidLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local KrozzidToggle = Instance.new("TextButton", LocalSection)
+KrozzidToggle.Size = UDim2.new(0, 50, 0, 25)
+KrozzidToggle.Position = UDim2.new(1, -66, 0, 70)
+KrozzidToggle.BackgroundColor3 = Config.Colors.ToggleOff
+KrozzidToggle.Text = ""
+local KrozzidToggleCorner = Instance.new("UICorner", KrozzidToggle)
+KrozzidToggleCorner.CornerRadius = UDim.new(0, 12)
+
+local KrozzidToggleKnob = Instance.new("Frame", KrozzidToggle)
+KrozzidToggleKnob.Size = UDim2.new(0, 21, 0, 21)
+KrozzidToggleKnob.Position = UDim2.new(0, 2, 0, 2)
+KrozzidToggleKnob.BackgroundColor3 = Config.Colors.Text
+local KrozzidToggleKnobCorner = Instance.new("UICorner", KrozzidToggleKnob)
+KrozzidToggleKnobCorner.CornerRadius = UDim.new(0, 10)
+
+-- Imena Toggle (moved to VizijaSection)
+local ImenaLabel = Instance.new("TextLabel", VizijaSection)
+ImenaLabel.Size = UDim2.new(1, -100, 0, 120)
+ImenaLabel.Position = UDim2.new(0, 16, 0, 150)
 ImenaLabel.BackgroundTransparency = 1
 ImenaLabel.Text = "Imena"
 ImenaLabel.TextColor3 = Config.Colors.Text
@@ -598,9 +549,9 @@ ImenaLabel.TextScaled = true
 ImenaLabel.Font = Enum.Font.Gotham
 ImenaLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-local ImenaToggle = Instance.new("TextButton", LocalSection)
+local ImenaToggle = Instance.new("TextButton", VizijaSection)
 ImenaToggle.Size = UDim2.new(0, 50, 0, 25)
-ImenaToggle.Position = UDim2.new(1, -66, 0, 100)
+ImenaToggle.Position = UDim2.new(1, -66, 0, 150)
 ImenaToggle.BackgroundColor3 = Config.Colors.ToggleOff
 ImenaToggle.Text = ""
 local ImenaToggleCorner = Instance.new("UICorner", ImenaToggle)
@@ -613,31 +564,27 @@ ImenaToggleKnob.BackgroundColor3 = Config.Colors.Text
 local ImenaToggleKnobCorner = Instance.new("UICorner", ImenaToggleKnob)
 ImenaToggleKnobCorner.CornerRadius = UDim.new(0, 10)
 
--- Krozzid Toggle
-local KrozzidLabel = Instance.new("TextLabel", LocalSection)
-KrozzidLabel.Size = UDim2.new(1, -100, 0, 20)
-KrozzidLabel.Position = UDim2.new(0, 16, 0, 130)
-KrozzidLabel.BackgroundTransparency = 1
-KrozzidLabel.Text = "Krozzid"
-KrozzidLabel.TextColor3 = Config.Colors.Text
-KrozzidLabel.TextScaled = true
-KrozzidLabel.Font = Enum.Font.Gotham
-KrozzidLabel.TextXAlignment = Enum.TextXAlignment.Left
+-- Imena FOV
+local ImenaFOVLabel = Instance.new("TextLabel", VizijaSection)
+ImenaFOVLabel.Size = UDim2.new(1, 0, 0, 20)
+ImenaFOVLabel.Position = UDim2.new(0, 16, 0, 185)
+ImenaFOVLabel.BackgroundTransparency = 1
+ImenaFOVLabel.Text = "FOV Imena"
+ImenaFOVLabel.TextColor3 = Config.Colors.Text
+ImenaFOVLabel.TextScaled = true
+ImenaFOVLabel.Font = Enum.Font.Gotham
+ImenaFOVLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-local KrozzidToggle = Instance.new("TextButton", LocalSection)
-KrozzidToggle.Size = UDim2.new(0, 50, 0, 25)
-KrozzidToggle.Position = UDim2.new(1, -66, 0, 130)
-KrozzidToggle.BackgroundColor3 = Config.Colors.ToggleOff
-KrozzidToggle.Text = ""
-local KrozzidToggleCorner = Instance.new("UICorner", KrozzidToggle)
-KrozzidToggleCorner.CornerRadius = UDim.new(0, 12)
-
-local KrozzidToggleKnob = Instance.new("Frame", KrozzidToggle)
-KrozzidToggleKnob.Size = UDim2.new(0, 21, 0, 21)
-KrozzidToggleKnob.Position = UDim2.new(0, 2, 0, 2)
-KrozzidToggleKnob.BackgroundColor3 = Config.Colors.Text
-local KrozzidToggleKnobCorner = Instance.new("UICorner", KrozzidToggleKnob)
-KrozzidToggleKnobCorner.CornerRadius = UDim.new(0, 10)
+local ImenaFOVBox = Instance.new("TextBox", VizijaSection)
+ImenaFOVBox.Size = UDim2.new(0, 60, 0, 25)
+ImenaFOVBox.Position = UDim2.new(1, -76, 0, 185)
+ImenaFOVBox.BackgroundColor3 = Config.Colors.Secondary
+ImenaFOVBox.Text = "1.0"
+ImenaFOVBox.TextColor3 = Config.Colors.Text
+ImenaFOVBox.TextScaled = true
+ImenaFOVBox.Font = Enum.Font.Gotham
+local ImenaFOVBoxCorner = Instance.new("UICorner", ImenaFOVBox)
+ImenaFOVBoxCorner.CornerRadius = UDim.new(0, 8)
 
 -- Vizija Section Content
 local VizijaEnabledLabel = Instance.new("TextLabel", VizijaSection)
@@ -712,8 +659,8 @@ ESPBInputCorner.CornerRadius = UDim.new(0, 6)
 
 -- ESP Color Picker
 local ESPColorPicker = Instance.new("Frame", VizijaSection)
-ESPColorPicker.Size = UDim2.new(0, 60, 0, 60)
-ESPColorPicker.Position = UDim2.new(1, -76, 0, 75)
+ESPColorPicker.Size = UDim2.new(0, 180, 0, 180)
+ESPColorPicker.Position = UDim2.new(1, -220, 0, 180)
 ESPColorPicker.BackgroundColor3 = Color3.fromRGB(255, 20, 147)
 local ESPColorPickerCorner = Instance.new("UICorner", ESPColorPicker)
 ESPColorPickerCorner.CornerRadius = UDim.new(0, 8)
