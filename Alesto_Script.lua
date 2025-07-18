@@ -141,7 +141,7 @@ MinimizeBtn.Font = Enum.Font.GothamBold
 
 local CloseBtn = Instance.new("TextButton", TitleBar)
 CloseBtn.Size = UDim2.new(0, 24, 0, 24)
-CloseBtn.Position = UDim2.new(1, -30, 0.5, -12)
+CloseBtn.Position = UDim2.new(1, -60, 0.5, -12)
 CloseBtn.BackgroundTransparency = 1
 CloseBtn.Text = "X"
 CloseBtn.TextColor3 = Config.Colors.Text
@@ -150,10 +150,12 @@ CloseBtn.Font = Enum.Font.GothamBold
 
 -- Minimize/Maximize functionality
 MinimizeBtn.MouseButton1Click:Connect(function()
+    print("Minimize button clicked!")
     isMinimized = not isMinimized
     
     if isMinimized then
         -- Minimize
+        print("Minimizing GUI...")
         TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
             Size = Config.MinimizedSize,
             Position = Config.MinimizedPosition
@@ -161,6 +163,7 @@ MinimizeBtn.MouseButton1Click:Connect(function()
         MinimizeBtn.Text = "+"
     else
         -- Maximize
+        print("Maximizing GUI...")
         TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, 600, 0, 750),
             Position = Config.MenuPosition
@@ -171,6 +174,7 @@ end)
 
 -- Close functionality
 CloseBtn.MouseButton1Click:Connect(function()
+    print("Close button clicked!")
     ScreenGui:Destroy()
 end)
 
@@ -1540,63 +1544,92 @@ toggleStates[VizijaEnabledToggle] = {knob = VizijaEnabledToggleKnob, isOn = fals
 
 -- Individual toggle clicks
 HeadHitboxToggle.MouseButton1Click:Connect(function()
-    toggleSwitch(HeadHitboxToggle, HeadHitboxToggleKnob, function(enabled) META_HEAD = enabled end)
+    print("Head Hitbox Toggle clicked!")
+    toggleSwitch(HeadHitboxToggle, HeadHitboxToggleKnob, function(enabled) 
+        META_HEAD = enabled 
+        print("Head Hitbox:", enabled)
+    end)
 end)
 
 BodyHitboxToggle.MouseButton1Click:Connect(function()
-    toggleSwitch(BodyHitboxToggle, BodyHitboxToggleKnob, function(enabled) META_TORSO = enabled end)
+    print("Body Hitbox Toggle clicked!")
+    toggleSwitch(BodyHitboxToggle, BodyHitboxToggleKnob, function(enabled) 
+        META_TORSO = enabled 
+        print("Body Hitbox:", enabled)
+    end)
 end)
 
 InfJumpToggle.MouseButton1Click:Connect(function()
-    toggleSwitch(InfJumpToggle, InfJumpToggleKnob, function(enabled) end)
+    print("Infinite Jump Toggle clicked!")
+    toggleSwitch(InfJumpToggle, InfJumpToggleKnob, function(enabled) 
+        print("Infinite Jump:", enabled)
+    end)
 end)
 
 ImenaToggle.MouseButton1Click:Connect(function()
-    toggleSwitch(ImenaToggle, ImenaToggleKnob, function(enabled) NAMETAG_ENABLED = enabled end)
+    print("Imena Toggle clicked!")
+    toggleSwitch(ImenaToggle, ImenaToggleKnob, function(enabled) 
+        NAMETAG_ENABLED = enabled 
+        print("Imena:", enabled)
+    end)
 end)
 
 KrozzidToggle.MouseButton1Click:Connect(function()
+    print("Crosshair Toggle clicked!")
     toggleSwitch(KrozzidToggle, KrozzidToggleKnob, function(enabled) 
         CROSSHAIR_ENABLED = enabled 
         updateCrosshairVisibility()
+        print("Crosshair:", enabled)
     end)
 end)
 
 VizijaEnabledToggle.MouseButton1Click:Connect(function()
-    toggleSwitch(VizijaEnabledToggle, VizijaEnabledToggleKnob, function(enabled) VIZIJA_ENABLED = enabled end)
+    print("Vizija Toggle clicked!")
+    toggleSwitch(VizijaEnabledToggle, VizijaEnabledToggleKnob, function(enabled) 
+        VIZIJA_ENABLED = enabled 
+        print("Vizija:", enabled)
+    end)
 end)
 
 -- Right Shift to toggle GUI visibility
 UserInputService.InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.RightShift then
+        print("Right Shift pressed! Toggling GUI visibility...")
         isMenuOpen = not isMenuOpen
         MainFrame.Visible = isMenuOpen
+        print("GUI visible:", isMenuOpen)
     end
 end)
 
 -- Initialize sliders and color pickers
 createSlider(HeadFOVSlider, HeadFOVSliderBar, HeadFOVValue, HITBOX_FOV_MIN, HITBOX_FOV_MAX, META_HEAD_FOV, function(value)
     META_HEAD_FOV = value
+    print("Head FOV changed to:", value)
 end)
 
 createSlider(BodyFOVSlider, BodyFOVSliderBar, BodyFOVValue, HITBOX_FOV_MIN, HITBOX_FOV_MAX, META_TORSO_FOV, function(value)
     META_TORSO_FOV = value
+    print("Body FOV changed to:", value)
 end)
 
 createSlider(ImenaFOVSlider, ImenaFOVSliderBar, ImenaFOVValue, 0.1, 5, 1.0, function(value)
     NAMETAG_SCALE = value
+    print("Imena FOV changed to:", value)
 end)
 
 createColorPicker(HeadColorPicker, HeadColorCursor, HeadRInput, HeadGInput, HeadBInput, function(color)
     HITBOX_HEAD_COLOR = color
+    print("Head color changed to:", color)
 end)
 
 createColorPicker(BodyColorPicker, BodyColorCursor, BodyRInput, BodyGInput, BodyBInput, function(color)
     HITBOX_TORSO_COLOR = color
+    print("Body color changed to:", color)
 end)
 
 createColorPicker(ESPColorPicker, ESPColorCursor, ESPRInput, ESPGInput, ESPBInput, function(color)
     VIZIJA_COLOR = color
+    print("ESP color changed to:", color)
 end)
 
 -- Cleanup on script end
@@ -1612,4 +1645,9 @@ game:BindToClose(function()
     end
 end)
 
-print("Alesto Panel loaded successfully!") 
+print("Alesto Panel loaded successfully!")
+print("Debug mode enabled - check console for all interactions")
+print("Right Shift: Toggle GUI visibility")
+print("Click toggles: Individual toggle control")
+print("Click/drag sliders: Adjust FOV values")
+print("Click/drag color pickers: Change colors") 
