@@ -77,51 +77,112 @@ local guiName = "UI_"..randStr(4)
 local frameName = "Panel_"..randStr(4)
 local miniName = "Mini_"..randStr(4)
 
--- GUI Elements
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = guiName
-ScreenGui.DisplayOrder = 1000
-ScreenGui.Parent = parentGui
+-- Modern GUI redesign by Alesto & GPT
+-- 1. Clean up old GUI
+if ScreenGui then ScreenGui:Destroy() end
+local ModernGui = Instance.new("ScreenGui")
+ModernGui.Name = guiName
+ModernGui.DisplayOrder = 1000
+ModernGui.Parent = parentGui
 
+-- Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = frameName
-MainFrame.Size = UDim2.new(0, 370, 0, 600)
+MainFrame.Size = Config.MenuSize
 MainFrame.Position = Config.MenuPosition
-MainFrame.BackgroundColor3 = Config.Colors.Primary
+MainFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = false
-MainFrame.Parent = ScreenGui
+MainFrame.Parent = ModernGui
+local MainCorner = Instance.new("UICorner", MainFrame)
+MainCorner.CornerRadius = UDim.new(0, 18)
 
-local Corner = Instance.new("UICorner", MainFrame)
-Corner.CornerRadius = UDim.new(0, 16)
-
-local TitleBar = Instance.new("Frame", MainFrame)
-TitleBar.Name = "Bar_"..randStr(3)
-TitleBar.Size = UDim2.new(1, 0, 0, 48)
-TitleBar.BackgroundColor3 = Config.Colors.Secondary
-TitleBar.BorderSizePixel = 0
-local TitleCorner = Instance.new("UICorner", TitleBar)
-TitleCorner.CornerRadius = UDim.new(0, 16)
-
-local Title = Instance.new("TextLabel", TitleBar)
-Title.Size = UDim2.new(1, 0, 1, 0)
-Title.BackgroundTransparency = 1
-Title.Text = "Alesto Panel"
-Title.TextColor3 = Config.Colors.Text
-Title.TextScaled = true
-Title.Font = Enum.Font.GothamBold
-
-local MinimizeBtn = Instance.new("TextButton", TitleBar)
-MinimizeBtn.Size = UDim2.new(0, 38, 0, 38)
-MinimizeBtn.Position = UDim2.new(1, -44, 0, 5)
-MinimizeBtn.BackgroundColor3 = Config.Colors.Accent
+-- Minimize button (gore desno)
+local MinimizeBtn = Instance.new("TextButton", MainFrame)
+MinimizeBtn.Size = UDim2.new(0, 32, 0, 32)
+MinimizeBtn.Position = UDim2.new(1, -40, 0, 8)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
 MinimizeBtn.Text = "-"
 MinimizeBtn.TextColor3 = Config.Colors.Text
 MinimizeBtn.TextScaled = true
 MinimizeBtn.Font = Enum.Font.GothamBold
-local MinBtnCorner = Instance.new("UICorner", MinimizeBtn)
-MinBtnCorner.CornerRadius = UDim.new(0, 12)
+local MinimizeBtnCorner = Instance.new("UICorner", MinimizeBtn)
+MinimizeBtnCorner.CornerRadius = UDim.new(1, 0)
+
+-- Tab Bar
+local TabBar = Instance.new("Frame", MainFrame)
+TabBar.Size = UDim2.new(1, 0, 0, 48)
+TabBar.BackgroundColor3 = Color3.fromRGB(32, 32, 44)
+TabBar.BorderSizePixel = 0
+local TabBarCorner = Instance.new("UICorner", TabBar)
+TabBarCorner.CornerRadius = UDim.new(0, 18)
+
+local function createTab(name, pos)
+    local btn = Instance.new("TextButton", TabBar)
+    btn.Size = UDim2.new(0, 120, 0, 38)
+    btn.Position = UDim2.new(0, 16 + (pos-1)*130, 0, 5)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 56)
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(255, 128, 192)
+    btn.TextScaled = true
+    btn.Font = Enum.Font.GothamBold
+    local c = Instance.new("UICorner", btn)
+    c.CornerRadius = UDim.new(0, 12)
+    return btn
+end
+local CombatTabBtn = createTab("Combat", 1)
+local ESPTabBtn = createTab("ESP", 2)
+
+-- Tab containers
+local CombatTab = Instance.new("Frame", MainFrame)
+CombatTab.Size = UDim2.new(1, -32, 1, -64)
+CombatTab.Position = UDim2.new(0, 16, 0, 56)
+CombatTab.BackgroundTransparency = 1
+CombatTab.Visible = true
+local ESPTab = Instance.new("Frame", MainFrame)
+ESPTab.Size = UDim2.new(1, -32, 1, -64)
+ESPTab.Position = UDim2.new(0, 16, 0, 56)
+ESPTab.BackgroundTransparency = 1
+ESPTab.Visible = false
+
+-- Tab switching logic
+CombatTabBtn.MouseButton1Click:Connect(function()
+    CombatTab.Visible = true
+    ESPTab.Visible = false
+    CombatTabBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 40)
+    ESPTabBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 56)
+end)
+ESPTabBtn.MouseButton1Click:Connect(function()
+    CombatTab.Visible = false
+    ESPTab.Visible = true
+    ESPTabBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 40)
+    CombatTabBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 56)
+end)
+CombatTabBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 40)
+
+-- Modern pink toggle
+local function createToggle(parent, label, default)
+    local frame = Instance.new("Frame", parent)
+    frame.Size = UDim2.new(1, 0, 0, 44)
+    frame.BackgroundTransparency = 1
+    local txt = Instance.new("TextLabel", frame)
+    txt.Size = UDim2.new(0.6, 0, 1, 0)
+    txt.Position = UDim2.new(0, 0, 0, 0)
+    txt.BackgroundTransparency = 1
+    txt.Text = label
+    txt.TextColor3 = Color3.fromRGB(255,255,255)
+    txt.TextScaled = true
+    txt.Font = Enum.Font.Gotham
+    local btn = Instance.new("TextButton", frame)
+    btn.Size = UDim2.new(0, 44, 0, 28)
+    btn.Position = UDim2.new(1, -54, 0.5, -14)
+    btn.BackgroundColor3 = default and Color3.fromRGB(255, 64, 160) or Color3.fromRGB(40,40,56)
+    btn.Text = ""
+    local corner = Instance.new("UICorner", btn)
+    corner.CornerRadius = UDim.new(1,0)
+    return btn, frame
+end
 
 -- Section: Vizija (ESP)
 local VizijaSection = Instance.new("Frame", MainFrame)
@@ -624,7 +685,7 @@ MiniFrame.Position = Config.MinimizedPosition
 MiniFrame.BackgroundColor3 = Config.Colors.Minimized
 MiniFrame.Visible = false
 MiniFrame.Active = true
-MiniFrame.Parent = ScreenGui
+MiniFrame.Parent = ModernGui
 local MiniCorner = Instance.new("UICorner", MiniFrame)
 MiniCorner.CornerRadius = UDim.new(1, 0)
 
